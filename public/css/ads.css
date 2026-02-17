@@ -1,0 +1,185 @@
+/* Horizontal Scroll Container */
+.ads-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* Hide scrollbar but keep functionality */
+.ads-scroll-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.ads-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.ads-scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.ads-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Ad Card */
+.ad-card {
+    min-width: 280px;
+    max-width: 280px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    flex-shrink: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ad-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+/* Ad Badge */
+.ad-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 193, 7, 0.95);
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
+
+/* Ad Thumbnail */
+.ad-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #f5f5f5;
+}
+
+.ad-thumbnail img,
+.ad-thumbnail video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.ad-thumbnail:hover img,
+.ad-thumbnail:hover video {
+    transform: scale(1.05);
+}
+
+/* Video Play Icon */
+.video-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+
+/* Ad Content */
+.ad-content {
+    padding: 15px;
+}
+
+.ad-title {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #333;
+    line-height: 1.3;
+}
+
+.ad-description {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+/* CTA Button */
+.ad-cta-btn {
+    display: block;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.ad-cta-btn:hover {
+    background: #0056b3;
+    text-decoration: none;
+    color: white;
+}
+
+/* Ad Stats */
+.ad-stats {
+    margin-top: 10px;
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+}
+
+.ad-stats i {
+    font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ad-card {
+        min-width: 250px;
+        max-width: 250px;
+    }
+    
+    .ad-thumbnail {
+        height: 160px;
+    }
+
+    .myads{
+        display: none;
+    }
+    
+}
+
+@media (max-width: 480px) {
+    .ad-card {
+        min-width: 220px;
+        max-width: 220px;
+    }
+    
+    .ad-thumbnail {
+        height: 140px;
+    }
+    
+    .ad-content {
+        padding: 12px;
+    }
+
+    .myads{
+        display: none;
+    }
+}

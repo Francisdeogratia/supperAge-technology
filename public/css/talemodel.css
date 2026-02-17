@@ -1,0 +1,465 @@
+/* Tales Modal Styles - Dark & Grey Theme */
+.tales-modal {
+    border-radius: 14px !important;
+    border: none !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+    background: #1e1e1e !important;
+}
+
+/* Header */
+.tales-modal-header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 18px 20px;
+    border-bottom: 1px solid #2a2a3a;
+}
+
+.header-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.header-info {
+    flex: 1;
+}
+
+.tales-title {
+    color: #f0f0f0;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    letter-spacing: 0.3px;
+}
+
+.tales-title i {
+    margin-right: 8px;
+    font-size: 16px;
+    color: #5e9cff;
+}
+
+.tales-description {
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.description-badge {
+    color: #d0d0d0;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.description-badge i {
+    margin-right: 5px;
+    color: #5e9cff;
+}
+
+.description-text {
+    color: #999;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.description-text strong {
+    background: rgba(94,156,255,0.15);
+    color: #5e9cff;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.tales-user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #3a3a4a;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.tales-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tales-user-avatar i {
+    font-size: 44px;
+    color: #666;
+}
+
+/* Body */
+.tales-modal-body {
+    padding: 20px;
+    background: #1e1e1e;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 16px;
+}
+
+.section-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ccc;
+    margin-bottom: 8px;
+}
+
+.section-label i {
+    margin-right: 6px;
+    color: #5e9cff;
+}
+
+/* Select Dropdown */
+.tales-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #3a3a4a;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #2a2a2a;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.tales-select:focus {
+    outline: none;
+    border-color: #5e9cff;
+    background: #2a2a2a;
+}
+
+.tales-select option {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+/* Progress Section */
+.progress-section {
+    margin-bottom: 16px;
+}
+
+.upload-progress {
+    background: #2a2a2a;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.upload-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5e9cff, #7b68ee);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.3s;
+}
+
+.progress-percentage {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Textarea */
+.tales-textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #3a3a4a;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #2a2a2a;
+    color: #e0e0e0;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tales-textarea::placeholder {
+    color: #666;
+}
+
+.tales-textarea:focus {
+    outline: none;
+    border-color: #5e9cff;
+    background: #2a2a2a;
+    box-shadow: 0 0 0 3px rgba(94,156,255,0.12);
+}
+
+/* Color Customization */
+.color-customization {
+    background: #252525;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #3a3a4a;
+}
+
+.color-preview-box {
+    margin-bottom: 12px;
+}
+
+.tales-modal .preview-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5e9cff;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.tales-modal .preview-label i {
+    margin-right: 6px;
+    color: #5e9cff;
+}
+
+.preview-display {
+    background: #1e1e1e;
+    border: 1px solid #3a3a4a;
+    border-radius: 8px;
+    padding: 14px;
+    min-height: 50px;
+    font-size: 14px;
+    color: #999;
+}
+
+.color-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.color-control-item {
+    text-align: center;
+}
+
+.color-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 6px;
+}
+
+.color-label i {
+    margin-right: 4px;
+}
+
+.color-input {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #3a3a4a;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    background: transparent;
+}
+
+.color-input:hover {
+    transform: scale(1.1);
+    border-color: #5e9cff;
+}
+
+/* Action Section */
+.action-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.tales-upload-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background: #2a2a2a;
+    border: 1.5px solid #5e9cff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #5e9cff;
+}
+
+.tales-upload-btn:hover {
+    background: #5e9cff;
+    color: #fff;
+}
+
+.tales-upload-btn i {
+    font-size: 22px;
+    margin-bottom: 4px;
+}
+
+.upload-hint {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.tales-submit-btn {
+    flex: 1.5;
+    padding: 14px;
+    background: linear-gradient(135deg, #5e9cff, #7b68ee);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(94,156,255,0.3);
+}
+
+.tales-submit-btn:hover {
+    background: linear-gradient(135deg, #4a8ae6, #6a57dd);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(94,156,255,0.4);
+}
+
+.tales-submit-btn i {
+    margin-right: 8px;
+}
+
+/* Expiry Banner */
+.expiry-banner {
+    background: #252525;
+    color: #999;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #3a3a4a;
+}
+
+.expiry-banner i {
+    margin-right: 6px;
+    color: #5e9cff;
+}
+
+/* Footer */
+.tales-modal-footer {
+    padding: 14px 20px;
+    background: #1a1a1a;
+    border-top: 1px solid #2a2a3a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tales-status-msg {
+    color: #4caf50;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.tales-loader {
+    display: none;
+    font-size: 22px;
+    color: #5e9cff;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.tales-close-btn {
+    background: #333;
+    color: #ccc;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tales-close-btn:hover {
+    background: #444;
+    color: #fff;
+}
+
+.tales-close-btn i {
+    margin-right: 6px;
+}
+
+/* Scrollbar */
+.tales-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tales-modal-body::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 10px;
+}
+
+.tales-modal-body::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 10px;
+}
+
+.tales-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Light Mode overrides (when NOT in dark mode) - keep the dark tales modal */
+/* The modal stays dark regardless of page theme */
+
+/* Dark Mode adjustments (mostly same since modal is already dark) */
+body.dark-mode .tales-modal { background: #1a1a1a !important; }
+body.dark-mode .tales-modal-header { background: linear-gradient(135deg, #141428, #111827); border-bottom-color: #252535; }
+body.dark-mode .tales-modal-body { background: #1a1a1a; }
+body.dark-mode .tales-textarea { background: #252525; border-color: #333; color: #e0e0e0; }
+body.dark-mode .tales-textarea:focus { border-color: #5e9cff; background: #252525; }
+body.dark-mode .tales-select { background: #252525; border-color: #333; color: #e0e0e0; }
+body.dark-mode .tales-select:focus { border-color: #5e9cff; }
+body.dark-mode .color-customization { background: #222; border-color: #333; }
+body.dark-mode .preview-display { background: #1a1a1a; border-color: #333; }
+body.dark-mode .tales-upload-btn { background: #252525; border-color: #5e9cff; color: #5e9cff; }
+body.dark-mode .tales-upload-btn:hover { background: #5e9cff; color: #fff; }
+body.dark-mode .expiry-banner { background: #222; border-color: #333; }
+body.dark-mode .tales-modal-footer { background: #151515; border-top-color: #252535; }
+body.dark-mode .tales-close-btn { background: #2a2a2a; color: #ccc; }
+body.dark-mode .tales-close-btn:hover { background: #3a3a3a; }
+body.dark-mode .section-label { color: #ccc; }
+body.dark-mode .color-label { color: #999; }
+body.dark-mode .color-input { border-color: #333; }
+body.dark-mode .tales-user-avatar { border-color: #333; }
+body.dark-mode .description-badge { color: #ccc; }
+body.dark-mode .description-text { color: #888; }
+body.dark-mode .tales-title { color: #f0f0f0; }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .tales-modal-header { padding: 14px 16px; }
+    .tales-title { font-size: 16px; }
+    .description-text { font-size: 10px; }
+    .tales-user-avatar { width: 40px; height: 40px; }
+    .tales-modal-body { padding: 16px; }
+    .color-controls { gap: 10px; }
+    .color-input { width: 42px; height: 42px; }
+    .action-section { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+    .header-layout { flex-direction: column; }
+    .tales-user-avatar { width: 36px; height: 36px; }
+    .tales-modal-body { padding: 14px; }
+    .tales-title { font-size: 15px; }
+    .tales-textarea { min-height: 100px; }
+    .color-controls { grid-template-columns: 1fr; }
+}

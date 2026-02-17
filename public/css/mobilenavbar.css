@@ -1,0 +1,698 @@
+/* - CSS Styles -- */
+
+/* Hide desktop icons on mobile */
+@media (max-width: 768px) {
+  .desktop-icons {
+    display: none !important;
+  }
+  
+  /* Add padding at bottom to prevent content from being hidden behind nav */
+  body {
+    padding-bottom: 70px;
+  }
+}
+
+/* Show desktop icons on larger screens */
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+  .mobile-dropdown-overlay {
+    display: none !important;
+  }
+
+  
+}
+
+/* Mobile Bottom Navigation Styles */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border-top: 1px solid #e0e0e0;
+}
+
+
+.mobile-bottom-nav .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #65676b;
+  font-size: 10px;
+  padding: 5px 10px;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.mobile-bottom-nav .nav-item i {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.mobile-bottom-nav .nav-item span {
+  font-weight: 500;
+}
+
+.mobile-bottom-nav .nav-item.active {
+  color: #1877f2;
+}
+
+.mobile-bottom-nav .nav-item.active i {
+  color: #1877f2;
+}
+
+.mobile-bottom-nav .nav-item:hover {
+  color: #1877f2;
+  background: rgba(24, 119, 242, 0.1);
+  border-radius: 8px;
+}
+
+/* Profile image in nav */
+.mobile-bottom-nav .nav-profile-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-bottom: 2px;
+  border: 2px solid transparent;
+}
+
+.mobile-bottom-nav .nav-item.active .nav-profile-img {
+  border-color: #1877f2;
+}
+
+/* Badge for notifications/messages */
+.mobile-bottom-nav .nav-badge {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  background: #e41e3f;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Profile Menu Wrapper */
+.profile-menu-wrapper {
+  position: relative;
+}
+
+.profile-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Mobile Profile Dropdown */
+.mobile-profile-dropdown {
+  position: fixed;
+  bottom: 70px;
+  right: 10px;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.mobile-profile-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown Header */
+.mobile-dropdown-header {
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.mobile-dropdown-header strong {
+  font-size: 14px;
+  color: #050505;
+}
+
+/* Dropdown Menu Items */
+.mobile-dropdown-menu {
+  padding: 5px 0;
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #050505;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.mobile-menu-item:hover {
+  background: #f0f2f5;
+}
+
+.mobile-menu-item i {
+  width: 24px;
+  font-size: 18px;
+  margin-right: 12px;
+  color: #65676b;
+}
+
+.logout-item {
+  color: #e41e3f !important;
+}
+
+.logout-item i {
+  color: #e41e3f !important;
+}
+
+/* Toggle Switch for Dark Mode */
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background: #ccc;
+  border-radius: 20px;
+  margin-left: auto;
+  transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+  background: #1877f2;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(20px);
+}
+
+/* Overlay */
+.mobile-dropdown-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+.mobile-dropdown-overlay.show {
+  display: block;
+}
+
+/* Add this for clickable links */
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #050505;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  cursor: pointer; /* Add cursor pointer */
+}
+
+/* Make sure links work */
+.mobile-dropdown-menu a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+
+
+
+
+/* --- Base Styling for the Custom Icon --- */
+.age-ai-icon {
+    font-weight: 800; /* Extra bold text for impact */
+    font-size: 1rem; /* Default size for larger screens */
+    line-height: 1; /* Ensure clean vertical alignment */
+    /* padding: 2px 4px; */
+    /* border-radius: 4px; */
+    
+    /* Using a text gradient to mimic the multi-color effect */
+    background: linear-gradient(
+        90deg, 
+        #00BFFF, /* Deep Sky Blue */
+        #FFD700, /* Gold */
+        #FF4500, /* Orange Red */
+        #8A2BE2  /* Blue Violet */
+    );
+    
+    /* FIX: Add standard property for compatibility */
+    -webkit-background-clip: text;
+    background-clip: text; /* Fixes the 'vendorPrefix' warning */
+    
+    /* Include both prefixed and standard versions of the fill color property */
+    -webkit-text-fill-color: transparent;
+    
+    
+    /* Optional: Add a slight shadow for depth */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* AGE AI Icon Styling */
+        .age-ai-icon {
+            font-weight: 800;
+            font-size: 50px;
+            /* line-height: 1; */
+            background: linear-gradient(90deg, #00BFFF, #FFD700, #FF4500, #8A2BE2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+       .age-ai-icon:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #8A2BE2, #FF4500, #FFD700, #00BFFF);
+    
+    /* 1. Vendor Prefixes (Needed for current broad compatibility) */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* 2. Standard Property (Added to address the warning) */
+    background-clip: text; /* This addresses the "background-clip" warning */
+    /* text-fill-color: transparent; (Standard property that corresponds to the webkit one) */
+}
+        /* Plus Icon Styling */
+        .plus-menu-trigger {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .plus-menu-trigger i {
+            font-size: 1.5rem;
+            color: #1DA1F2;
+            transition: transform 0.3s ease;
+        }
+
+        .plus-menu-trigger:hover i {
+            transform: rotate(90deg);
+            color: #0d8bd9;
+        }
+
+        /* Dropdown Menu for Plus Icon */
+        .plus-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            min-width: 280px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .plus-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .plus-dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .plus-dropdown-item:hover {
+            background: #f0f8ff;
+        }
+
+        .plus-dropdown-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .plus-dropdown-section {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        .plus-dropdown-section:first-child {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        /* Mobile Bottom Nav Enhancement */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            text-decoration: none;
+            padding: 4px 8px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-item span {
+            font-size: 0.7rem;
+        }
+
+        .nav-item.active {
+            color: #1DA1F2;
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: 0;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        /* Mobile Plus Dropdown */
+        .mobile-plus-dropdown {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
+            padding: 8px 0;
+            width: 90%;
+            max-width: 350px;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+        }
+
+        .mobile-plus-dropdown.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Overlay */
+        .dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 998;
+            display: none;
+        }
+
+        .dropdown-overlay.show {
+            display: block;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .age-ai-icon {
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+
+            .plus-menu-trigger i {
+                font-size: 1.3rem;
+            }
+
+            .desktop-icons {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-bottom-nav {
+                display: none;
+            }
+        }
+
+
+
+        .fb-header {
+    /* Modern Container Styling */
+    position: sticky; /* Make it stick to the top */
+    top: 0;
+    z-index: 1000; /* Ensure it floats above content */
+    background-color: #ffffff; /* Clean white background */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    padding: 10px 10px;
+    height: 60px; /* Standard modern header height */
+    
+    /* Ensure Flex properties are correctly applied to the header itself */
+    display: flex;
+    justify-content: space-between; 
+    /* Space out the left and right sections */
+    align-items: center;
+}
+
+.fb-left {
+    /* Ensure left side elements are aligned */
+    /* display: flex; */
+    /* align-items: center; */
+    /* gap: 12px;  */
+    /* Uniform spacing between elements */
+}
+
+.fb-logo span {
+    font-size: 1.4rem; /* Larger, more prominent logo text */
+    font-weight: 700; /* Bold text */
+    color: #19c1ebff; /* Dark text color */
+}
+
+
+.search-bar {
+    /* Pill Shape and Clean Border */
+    width: 280px;
+    height: 40px;
+    border-radius: 20px !important; /* The key modern look */
+    border: none !important; /* Remove default Bootstrap border */
+    background-color: #f0f2f5 !important; /* Light gray fill */
+    padding: 8px 15px !important;
+    
+    /* Focus Effect */
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.search-bar::placeholder {
+    color: #65676b; /* Subtler placeholder text */
+}
+
+.search-bar:focus {
+    background-color: #ffffff !important; /* White background when typing */
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.4); /* Custom blue/purple shadow on focus */
+}
+
+
+.fb-icons.desktop-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Spacing between icon groups */
+    height: 100%; /* Important for centering in the header */
+}
+
+/* Styling for each individual icon container */
+.fb-icons .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px; /* Match header height for centering */
+    cursor: pointer;
+    position: relative;
+}
+
+/* Styling for the links inside icons (Home, Friends, etc.) */
+.fb-icons .icon a {
+    display: flex;
+    flex-direction: row; /* Stack icon and text */
+    align-items: center;
+    text-decoration: none;
+    padding: 7px 7px;
+    /* height: 100%; */
+    justify-content: center;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    color: #65676b; /* Default icon color */
+}
+
+/* Hover and Active State for Navigation Items */
+.fb-icons .icon a:hover {
+    background-color: #f0f2f5; /* Light hover background */
+    color: #000000ff;
+
+}
+
+.fb-icons .icon a .crc {
+    font-size: 1px; /* Larger icons */
+}
+
+.fb-icons .icon a .hss {
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* Plus Menu Trigger */
+.plus-menu-trigger {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; /* Rounded button */
+    background-color: #e4e6eb; /* Light gray button background */
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.plus-menu-trigger:hover {
+    background-color: #d8dade; /* Darker on hover */
+}
+
+.plus-menu-trigger .fas.fa-plus-circle {
+    font-size: 20px;
+    color: #1c1e21;
+}
+
+/* AGE AI Link - Styled as a prominent button/badge */
+.age-ai-icon {
+    /* Use the gradient text properties you refined */
+    font-weight: 800;
+    font-size: 0.9rem; 
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 16px; /* Pill shape */
+
+    
+    /* Ensure the gradient effect is applied */
+    background: linear-gradient(90deg, #8A2BE2, #00BFFF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for lift */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.age-ai-icon:hover {
+    transform: translateY(-1px); /* Slight lift on hover */
+    box-shadow: 0 3px 6px rgba(138, 43, 226, 0.2);
+}
+
+/* Profile Image */
+.icon.profile .profile-label img {
+    width: 40px !important; 
+    height: 40px !important; 
+    border-radius: 50% !important; 
+    border: 3px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.icon.profile:hover .profile-label img {
+    border-color: #44829eff; /* Highlight border on hover */
+}
+
+/* Profile Badge positioning */
+.icon.profile .profile-label img[alt="Verified"] {
+    width: 16px !important;
+    height: 16px !important;
+    position: absolute;
+    bottom: 0px; 
+    right: -4px; /* Adjust as needed */
+    border: 2px solid white !important; /* Clean badge border */
+    z-index: 10;
+}

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /broadcasting/
+Disallow: /calls/
+Disallow: /messages/
+Disallow: /account-settings
+Disallow: /mywallet
+Disallow: /wallet/
+Disallow: /saved-posts
+Disallow: /my-posts
+Disallow: /notifications
+Disallow: /logout
+
+Sitemap: https://supperage.com/sitemap.xml

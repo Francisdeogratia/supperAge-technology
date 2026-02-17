@@ -1,0 +1,359 @@
+ 
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+    background-color: #0e0d0d0a;
+
+    scrollbar-width: none; /* Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+   #colorPreview {
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+
+.cards {
+    flex: 0 0 auto;
+    width: 100px;
+    height: 140px; /* Add height to define space */
+    background-color: #fff;
+    border: 1px solid #fcfcfc;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden; /* Ensures content doesn't spill */
+    margin-top: 3px;
+}
+
+.cards video,
+.cards img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+
+.cards p {
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    font-size: 10px;
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+    background: rgba(0,0,0,0.4); /* Optional: adds contrast */
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.cards .p {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    right: 0;
+    font-size: 10px;
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+    background: rgba(0,0,0,0.4); /* Optional: adds contrast */
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+
+.scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.scroll-btn {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 1;
+   
+}
+
+.scroll-btn.left {
+    margin-right: 10px;
+
+}
+
+.scroll-btn.right {
+    margin-left: 10px;
+   
+}
+
+.scroll-btn:hover {
+    background-color: #555;
+}
+
+
+
+
+
+/* Light mode (default) */
+body {
+  background: #fff;
+  color: #000;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.fb-header {
+  position: sticky;
+  top: 0;
+  background: #fff; /* So it doesn't look weird when stuck */
+  z-index: 1000;
+}
+
+.crc{
+  border-radius: 50%;
+  color: blue;
+}
+
+.fb-header {
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  padding: 2px 6px;
+}
+
+
+
+.fb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 10px 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+}
+
+.fb-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+ .fb-logo {
+  /* font-size: 24px; */
+  color: #1877f2;
+  /* font-weight: bold; */
+  /* margin-right: 10px; */
+} 
+
+.search-bar {
+  display: none;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.fb-icons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  position: relative;
+}
+.fb-icons img{
+  width: 24px;
+}
+.profile-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fb-icons span{
+  margin-left: 5px;
+}
+
+.icon {
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+}
+.notificon{
+ font-size: 20px;
+  cursor: pointer;
+  position: relative;
+}
+ .notimg{
+ width: 24px;
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 10px;
+  min-width: 400px;
+  z-index: 100;
+}
+
+
+.icon a:hover {
+  background-color: gray;
+  border-radius: 8px;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.icon a:active {
+  transform: scale(0.98);
+  background-color: blue;
+  border-radius: 8px;
+}
+.icon a {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+
+
+
+
+.dropdown p{
+  margin-left: 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid darkblue;
+  border-radius: 9px;
+}
+
+.showmemore{
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .fb-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fb-icons {
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .fb-left .search{
+    position: absolute;
+    right: 20px;
+    /* margin-left: 12px; */
+  }
+
+  .fb-left a img{
+    display: none;
+  }
+  .fb-icons {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  /* justify-content: space-between; */
+
+  position: relative;
+}
+
+.hss{
+   display: none;
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+    
+  right: -100px;  /*Align to the right edge */
+  width: 100px; /* Full viewport width */
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 10px 20px;
+  z-index: 100;
+}
+.dropdown .divmenu{
+  position: absolute;
+  top: 30px;
+  right: -100px;  /*Align to the right edge */
+  width: 100px; /* Full viewport width */
+}
+#left-column{
+  display: none;
+}
+.showmemore{
+  display: block;
+}
+
+.scroll-btn{
+  display: none;
+}
+.icon a:hover {
+  background-color: lightgrey;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.icon a:active {
+  transform: scale(0.98);
+  background-color: rgb(66, 66, 68);
+  border-radius: 8px;
+}
+.icon a {
+  display: flex;
+  align-items: center;
+
+  text-decoration: none;
+  color: inherit;
+}
+.fb-logo {
+ position: absolute;
+ left: 0;
+  color: #1877f2;
+  font-weight: bold;
+  margin-left: 10px;
+} 
+
+.fb-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+}

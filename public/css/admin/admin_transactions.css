@@ -1,0 +1,211 @@
+/* Admin Transaction Styles */
+/* Add this to your admin CSS file or create a separate transactions.css */
+
+.transaction-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.transaction-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.currency-converter-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar-initial {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.transaction-table td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.transaction-type-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.amount-positive {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.currency-badge {
+    padding: 4px 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.filter-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.summary-card h6 {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.summary-card .amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.transaction-detail-modal .modal-body {
+    background: #f8f9fa;
+}
+
+.transaction-detail-modal table {
+    background: white;
+}
+
+.export-button {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.export-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+    color: white;
+}
+
+.convert-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.convert-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .transaction-table {
+        font-size: 0.8rem;
+    }
+    
+    .user-avatar,
+    .user-avatar-initial {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .transaction-table td,
+    .transaction-table th {
+        padding: 8px 4px;
+    }
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Collapsible details */
+.collapse-details {
+    background: #f8f9fa;
+    border-left: 3px solid #667eea;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+/* Status badges */
+.status-successful {
+    background: #28a745;
+    color: white;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: #000;
+}
+
+.status-failed {
+    background: #dc3545;
+    color: white;
+}
+
+/* Empty state */
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-state p {
+    color: #6c757d;
+    font-size: 1.1rem;
+}

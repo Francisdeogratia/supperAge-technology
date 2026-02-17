@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr:*)",
+      "Bash(php artisan:*)",
+      "Bash(php:*)",
+      "Bash(curl -s -X POST \"http://127.0.0.1:8000/messages/transcribe-voice\" -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d \"{\"\"voice_url\"\":\"\"https://res.cloudinary.com/test.webm\"\",\"\"message_id\"\":1}\")",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(for file in mutual_followers.blade.php tasks/leaderboard.blade.php wallet/transfer.blade.php wallet/mywallet.blade.php messages/chat.blade.php blue-badge.blade.php settings2.blade.php messages/index.blade.php auth/register.blade.php about.blade.php account.blade.php wallet/withdraw.blade.php friends/index.blade.php groups/index.blade.php live/index.blade.php advertising/index.blade.php events/index.blade.php update.blade.php age-ai/chat.blade.php all_posts.blade.php profile.blade.php contact.blade.php saved_posts.blade.php calls/show.blade.php admin/layouts/app.blade.php viewtales.blade.php edit_post.blade.php account-settings.blade.php inbox/show.blade.php inbox/index.blade.php layouts/admin.blade.php admin/monetization/index.blade.php groups/chat.blade.php advertising/show.blade.php advertising/create.blade.php events/show.blade.php events/create.blade.php integration_guide.blade.php admin/advertising/show.blade.php admin/advertising/index.blade.php live/stream.blade.php events/edit.blade.php group-calls/show.blade.php premium.blade.php)",
+      "Bash(do echo \"$file\")",
+      "Bash(done)"
+    ]
+  }
+}

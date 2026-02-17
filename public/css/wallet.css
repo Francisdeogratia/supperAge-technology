@@ -1,0 +1,815 @@
+/* ============================================
+   WALLET WITHDRAWAL PAGE - COMPLETE STYLES
+   Add this to your CSS file or in <style> tag
+   ============================================ */
+
+:root {
+    --primary-color: #4a90e2;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --dark-bg: #2c3e50;
+    --light-bg: #ecf0f1;
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --hover-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+/* Body Background for Wallet Page */
+body.wallet-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+/* Container Styling */
+.wallet-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 15px;
+}
+
+/* ============================================
+   VERIFICATION CARDS (No Badge / Expired)
+   ============================================ */
+
+.verification-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+    margin-top: 50px;
+    animation: slideUp 0.5s ease;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verification-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 25px;
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #667eea30;
+}
+
+.verification-icon i {
+    font-size: 3rem;
+    color: #667eea;
+}
+
+.warning-icon {
+    background: linear-gradient(135deg, #f39c1215 0%, #e67e2215 100%);
+    border-color: #f39c1230;
+}
+
+.warning-icon i {
+    color: var(--warning-color);
+}
+
+.verification-card h3 {
+    color: var(--dark-bg);
+    margin-bottom: 15px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.3;
+}
+
+.verification-card p {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    padding: 0 10px;
+}
+
+.verification-card form {
+    margin-top: 25px;
+}
+
+.btn-verification {
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border: none;
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-verification i {
+    font-size: 1.2rem;
+}
+
+.btn-verification .btn-text {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-verification .btn-price {
+    font-weight: 600;
+    opacity: 0.9;
+    padding-left: 10px;
+    border-left: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-info.btn-verification {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-warning.btn-verification {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+}
+
+.btn-verification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.btn-verification:active {
+    transform: translateY(0);
+}
+
+.verification-note {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    margin-top: 15px;
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+.expired-card {
+    border: 2px solid #f39c1230;
+}
+
+/* ============================================
+   WITHDRAW FORM CARD
+   ============================================ */
+
+.withdraw-card {
+    background: white;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: var(--card-shadow);
+    margin-top: 30px;
+    animation: slideUp 0.5s ease;
+}
+
+.withdraw-card h3 {
+    color: var(--dark-bg);
+    font-weight: 700;
+    margin-bottom: 30px;
+    font-size: 1.4rem;
+    position: relative;
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.withdraw-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+/* ============================================
+   PROFILE SECTION
+   ============================================ */
+
+.profile-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    color: white;
+    text-align: center;
+}
+
+.profile-section img.rounded-circle {
+    border: 5px solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.profile-section .badge-icon {
+    display: inline-block;
+    background: white;
+    border-radius: 50%;
+    padding: 3px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+.profile-section .badge-icon img {
+    width: 19px;
+    height: 19px;
+    display: block;
+}
+
+.profile-section p {
+    margin: 10px 0 0 0;
+}
+
+.profile-section strong {
+    font-size: 1.3rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ============================================
+   BALANCE DISPLAY
+   ============================================ */
+
+.balance-header {
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.balance-header strong {
+    color: var(--dark-bg);
+    font-size: 1.1rem;
+}
+
+.balance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.balance-item {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 2px solid #667eea30;
+    transition: all 0.3s ease;
+}
+
+.balance-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.balance-item b {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--success-color);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.balance-item .currency-label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-weight: 600;
+}
+
+/* Net Available Balance */
+.net-available {
+    background: #e8f5e9;
+    border-left: 4px solid var(--success-color);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-weight: 600;
+    color: var(--success-color);
+    font-size: 0.95rem;
+}
+
+.net-available i {
+    margin-right: 5px;
+}
+
+/* ============================================
+   FORM CONTROLS
+   ============================================ */
+
+.withdraw-card .form-group,
+.withdraw-card .mb-3 {
+    margin-bottom: 20px;
+}
+
+.withdraw-card label {
+    font-weight: 600;
+    color: var(--dark-bg);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: block;
+}
+
+.withdraw-card label i {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+.withdraw-card .form-control,
+.withdraw-card select.form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    height: auto;
+}
+
+.withdraw-card .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    outline: none;
+}
+
+/* Input Group (Amount Field) */
+.withdraw-card .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px 0 0 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px 15px;
+}
+
+.withdraw-card .input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+}
+
+/* Progress Bar */
+.withdraw-card .progress {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e0e0e0;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.withdraw-card .progress-bar {
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 10px;
+}
+
+/* ============================================
+   DYNAMIC INFO BOXES
+   ============================================ */
+
+/* Withdraw Breakdown */
+#withdrawBreakdown {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+    border: 2px solid var(--danger-color) !important;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 12px;
+    animation: fadeIn 0.3s ease;
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#withdrawBreakdown strong {
+    color: var(--danger-color);
+}
+
+/* NGN Equivalent */
+#ngnEquivalent {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: block;
+    font-size: 0.9rem;
+}
+
+/* Remaining Balance */
+#remainingBalance {
+    background: #f3e5f5;
+    border-left: 4px solid #9c27b0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    display: block;
+    font-size: 0.9rem;
+}
+
+/* Amount Warning */
+#amountWarning {
+    background: #ffebee;
+    color: var(--danger-color);
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: 600;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
+
+#withdrawBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    padding: 15px 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+#withdrawBtn i {
+    margin-right: 8px;
+}
+
+#withdrawBtn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+#withdrawBtn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#withdrawBtn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+#withdrawBtn:not(:disabled):active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+
+.withdraw-card .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 15px 20px;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+    margin-bottom: 20px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.withdraw-card .alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.withdraw-card .alert-success i {
+    margin-right: 8px;
+}
+
+.withdraw-card .alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+/* ============================================
+   SELECT2 CUSTOMIZATION
+   ============================================ */
+
+.select2-container--default .select2-selection--single {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    height: auto !important;
+    padding: 5px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 24px !important;
+    padding-left: 10px !important;
+    color: #333 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #667eea !important;
+}
+
+.select2-dropdown {
+    border: 2px solid #667eea !important;
+    border-radius: 10px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #667eea !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #667eea !important;
+    outline: none !important;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 576px) {
+    .wallet-container {
+        padding: 15px 10px;
+    }
+
+    .withdraw-card {
+        padding: 25px 20px;
+    }
+
+    .verification-card {
+        padding: 30px 20px;
+        margin-top: 20px;
+        border-radius: 15px;
+    }
+
+    .verification-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+    }
+
+    .verification-icon i {
+        font-size: 2.5rem;
+    }
+
+    .verification-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+
+    .verification-card p {
+        font-size: 0.95rem;
+        margin-bottom: 25px;
+        padding: 0 5px;
+    }
+
+    .btn-verification {
+        padding: 14px 25px;
+        font-size: 0.9rem;
+        flex-direction: column;
+        gap: 5px;
+        max-width: 100%;
+    }
+
+    .btn-verification .btn-price {
+        padding-left: 0;
+        border-left: none;
+        padding-top: 5px;
+        border-top: 1px solid rgba(255,255,255,0.3);
+        width: 100%;
+    }
+
+    .verification-note {
+        font-size: 0.8rem;
+        margin-top: 12px;
+    }
+
+    .profile-section {
+        padding: 20px 15px;
+    }
+
+    .profile-section img.rounded-circle {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profile-section strong {
+        font-size: 1.1rem;
+    }
+
+    .balance-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .balance-item {
+        padding: 12px;
+    }
+
+    .balance-item b {
+        font-size: 1.1rem;
+    }
+
+    .withdraw-card h3 {
+        font-size: 1.2rem;
+    }
+
+    #withdrawBtn {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+
+    .net-available {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .withdraw-card .form-control {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+    }
+
+    .withdraw-card .input-group-text {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+
+    #withdrawBreakdown {
+        font-size: 0.85rem;
+        padding: 12px;
+    }
+
+    #ngnEquivalent,
+    #remainingBalance {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+
+    .withdraw-card .alert {
+        font-size: 0.9rem;
+        padding: 12px 15px;
+    }
+}
+
+@media (max-width: 400px) {
+    .verification-card {
+        padding: 25px 15px;
+        margin-top: 15px;
+    }
+
+    .verification-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .verification-icon i {
+        font-size: 2rem;
+    }
+
+    .verification-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .verification-card p {
+        font-size: 0.9rem;
+    }
+
+    .btn-verification {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+    }
+
+    .btn-verification i {
+        font-size: 1rem;
+    }
+
+    .balance-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .withdraw-card {
+        padding: 20px 15px;
+    }
+
+    .profile-section img.rounded-circle {
+        width: 60px;
+        height: 60px;
+    }
+
+    .profile-section strong {
+        font-size: 1rem;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .verification-card {
+        margin-top: 20px;
+        padding: 25px 30px;
+    }
+
+    .verification-icon {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 15px;
+    }
+
+    .verification-icon i {
+        font-size: 2rem;
+    }
+
+    .verification-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .verification-card p {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .btn-verification {
+        padding: 10px 25px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.icon-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
