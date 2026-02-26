@@ -775,7 +775,7 @@ private function tryLocalPostPreview($url)
     $postId = (int) $m[1];
     $post = \DB::table('sample_posts')
         ->where('id', $postId)
-        ->where('status', 'published')
+        ->whereNull('deleted_at')
         ->first();
 
     if (!$post) {
