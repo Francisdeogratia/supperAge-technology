@@ -50,6 +50,49 @@ class PostController extends Controller
     $userId = Session::get('id');
     $user = DB::table('users_record')->where('id', $userId)->first();
 
+    // Guest / bot visit: return a lightweight OG page instead of crashing
+    if (!$user) {
+        $postAuthor  = DB::table('users_record')->where('id', $post->user_id)->first();
+        $authorName  = $postAuthor->name ?? ($post->username ?? 'SupperAge');
+        $content     = strip_tags($post->post_content ?? '');
+        $ogTitle     = $authorName . (strlen($content) ? ': ' . Str::limit($content, 80) : "'s post on SupperAge");
+        $ogDesc      = strlen($content) > 80 ? Str::limit($content, 200) : 'Check this post on SupperAge — your African digital community.';
+        $ogImage     = asset('images/best3.png');
+        $files       = json_decode($post->file_path, true);
+        if (is_array($files) && count($files) > 0) {
+            $first = $files[0];
+            $ext   = strtolower(pathinfo(parse_url($first, PHP_URL_PATH), PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $ogImage = $first;
+            }
+        }
+        $ogUrl    = route('posts.show', $post->id);
+        $loginUrl = url('/') . '?redirect=' . urlencode($ogUrl);
+
+        return response(
+            '<!DOCTYPE html><html lang="en"><head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>' . e($ogTitle) . ' | SupperAge</title>
+            <meta property="og:type"        content="website">
+            <meta property="og:url"         content="' . e($ogUrl) . '">
+            <meta property="og:title"       content="' . e($ogTitle) . '">
+            <meta property="og:description" content="' . e($ogDesc) . '">
+            <meta property="og:image"       content="' . e($ogImage) . '">
+            <meta property="og:site_name"   content="SupperAge">
+            <meta name="twitter:card"        content="summary_large_image">
+            <meta name="twitter:title"       content="' . e($ogTitle) . '">
+            <meta name="twitter:description" content="' . e($ogDesc) . '">
+            <meta name="twitter:image"       content="' . e($ogImage) . '">
+            <script>window.location.href="' . $loginUrl . '";</script>
+            </head><body>
+            <p>Please <a href="' . e($loginUrl) . '">log in</a> to view this post.</p>
+            </body></html>',
+            200,
+            ['Content-Type' => 'text/html']
+        );
+    }
+
     PostView::create([
         'user_id' => $userId,
         'post_id' => $post->id
