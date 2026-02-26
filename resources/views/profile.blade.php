@@ -14,7 +14,28 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-site-verification" content="IWdPOFToacXu8eoMwOYWPxqja5IAyAd_cQSBAILNfWo" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $profileUser->name }}'s Profile - Supperage</title>
+    @php
+        $ogName  = $profileUser->name ?? 'SupperAge User';
+        $ogBio   = $profileUser->bio ?? 'Check out this profile on SupperAge — your African digital community.';
+        $ogImg   = $profileUser->profileimg ? asset($profileUser->profileimg) : asset('images/best3.png');
+        $ogPUrl  = route('profile.show', $profileUser->id);
+    @endphp
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type"        content="profile">
+    <meta property="og:url"         content="{{ $ogPUrl }}">
+    <meta property="og:title"       content="{{ $ogName }} on SupperAge">
+    <meta property="og:description" content="{{ \Illuminate\Support\Str::limit($ogBio, 200) }}">
+    <meta property="og:image"       content="{{ $ogImg }}">
+    <meta property="og:site_name"   content="SupperAge">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="{{ $ogName }} on SupperAge">
+    <meta name="twitter:description" content="{{ \Illuminate\Support\Str::limit($ogBio, 200) }}">
+    <meta name="twitter:image"       content="{{ $ogImg }}">
+
+    <title>{{ $ogName }}'s Profile - Supperage</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
