@@ -20,7 +20,48 @@
     <meta http-equiv="X-UA-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>SupperAge all post and updates</title>
+    @php
+        $ogTitle       = 'SupperAge — Your African Digital Community';
+        $ogDescription = 'Step into SupperAge — your global African village online. Forge connections, celebrate culture, and tap into new opportunities.';
+        $ogImage       = asset('images/best3.png');
+        $ogUrl         = url()->current();
+
+        if (!empty($post)) {
+            $postAuthor  = \DB::table('users_record')->where('id', $post->user_id)->first();
+            $authorName  = $postAuthor->name ?? ($post->username ?? 'SupperAge');
+            $postText    = strip_tags($post->post_content ?? '');
+            $ogTitle     = $authorName . (strlen($postText) ? ': ' . \Illuminate\Support\Str::limit($postText, 80) : '\'s post on SupperAge');
+            $ogDescription = strlen($postText) ? \Illuminate\Support\Str::limit($postText, 200) : $ogDescription;
+
+            // First image file
+            $files = json_decode($post->file_path, true);
+            if (is_array($files) && count($files) > 0) {
+                $firstFile = $files[0];
+                $ext = strtolower(pathinfo(parse_url($firstFile, PHP_URL_PATH), PATHINFO_EXTENSION));
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    $ogImage = $firstFile;
+                }
+            }
+
+            $ogUrl = route('posts.show', $post->id);
+        }
+    @endphp
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="{{ $ogUrl }}">
+    <meta property="og:title"       content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDescription }}">
+    <meta property="og:image"       content="{{ $ogImage }}">
+    <meta property="og:site_name"   content="SupperAge">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $ogDescription }}">
+    <meta name="twitter:image"       content="{{ $ogImage }}">
+
+    <title>@if(!empty($post)){{ $ogTitle }} | SupperAge @else SupperAge — Posts & Updates @endif</title>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
