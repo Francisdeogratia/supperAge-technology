@@ -1423,13 +1423,48 @@
     margin-top: 6px;
 }
 
-/* Before Sending (in input area) */
-#messageLinkPreviewContainer {
-    margin-top: 10px;
+/* Centered link preview bar above input */
+#linkPreviewBar {
+    display: flex;
+    justify-content: center;
+    padding: 8px 16px;
+    background: transparent;
 }
 
-#messageLinkPreviewContainer .link-preview-card {
-    max-width: 100%;
+#linkPreviewBar .link-preview-card {
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-radius: 14px;
+    animation: lpFadeIn 0.22s ease;
+}
+
+@keyframes lpFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#linkPreviewBar .link-preview-loading {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+    color: #0EA5E9;
+    font-size: 13px;
+    animation: lpFadeIn 0.18s ease;
+}
+
+#linkPreviewBar .link-preview-image {
+    height: 160px;
+}
+
+/* Legacy container no longer used */
+#messageLinkPreviewContainer {
+    display: none !important;
 }
 
 /* Mobile Optimization */
@@ -1459,7 +1494,7 @@
         font-size: 9px;
     }
     
-    #messageLinkPreviewContainer .link-preview-card {
+    #linkPreviewBar .link-preview-card {
         max-width: 100%;
     }
 }
@@ -2055,6 +2090,9 @@
 
     </div>
     
+    {{-- Link Preview Bar (centered above input) --}}
+    <div id="linkPreviewBar" style="display:none;"></div>
+
     {{-- Message Input Area --}}
 <div class="chat-input-area">
     {{-- Reply Preview --}}
@@ -3671,6 +3709,26 @@ function playBeep(frequency = 800, duration = 100, volume = 0.1) {
 // -------------------------
 
 
+// Show loading preview immediately on paste if a URL is detected
+document.getElementById('messageInput').addEventListener('paste', function(e) {
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+    const urls = pasted ? pasted.match(urlRegex) : null;
+    if (urls && urls.length > 0) {
+        clearTimeout(messageUrlDetectionTimeout);
+        // Show loading spinner immediately
+        $('#linkPreviewBar').html(`
+            <div class="link-preview-loading">
+                <i class="fa fa-spinner fa-spin"></i> Loading preview…
+            </div>
+        `).show();
+        // Fetch after a short delay so the pasted text is in the textarea
+        messageUrlDetectionTimeout = setTimeout(() => {
+            fetchMessageLinkPreview(urls[0]);
+        }, 300);
+    }
+});
+
 // Detect URLs in message input
 document.getElementById('messageInput').addEventListener('input', function() {
     const text = this.value;
@@ -3719,16 +3777,13 @@ function detectAndPreviewMessageLinks(text) {
     }
 }
 
-// ✅ NEW: Fetch link preview
+// Fetch link preview — shows loading immediately in the centered bar
 function fetchMessageLinkPreview(url) {
-    // Check if container exists, if not create it
-    if ($('#messageLinkPreviewContainer').length === 0) {
-        $('#messageInput').after('<div id="messageLinkPreviewContainer" style="margin-top:10px;"></div>');
-    }
-    
-    $('#messageLinkPreviewContainer').html(`
+    const $bar = $('#linkPreviewBar');
+
+    $bar.html(`
         <div class="link-preview-loading">
-            <i class="fa fa-spinner fa-spin"></i> Loading preview...
+            <i class="fa fa-spinner fa-spin"></i> Loading preview…
         </div>
     `).show();
 
@@ -3750,7 +3805,7 @@ function fetchMessageLinkPreview(url) {
     });
 }
 
-// ✅ NEW: Display link preview
+// Display link preview card centered above the input
 function displayMessageLinkPreview(data) {
     const previewHtml = `
         <div class="link-preview-card">
@@ -3775,14 +3830,14 @@ function displayMessageLinkPreview(data) {
             </div>
         </div>
     `;
-    
-    $('#messageLinkPreviewContainer').html(previewHtml).show();
+
+    $('#linkPreviewBar').html(previewHtml).show();
 }
 
-// ✅ NEW: Clear link preview
+// Clear link preview
 function clearMessageLinkPreview() {
     messageLinkPreviewData = null;
-    $('#messageLinkPreviewContainer').empty().hide();
+    $('#linkPreviewBar').empty().hide();
 }
 
 
