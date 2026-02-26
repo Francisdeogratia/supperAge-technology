@@ -491,12 +491,18 @@ public function showAllPosts()
 public function fetchLinkPreview(Request $request)
 {
     $url = $request->input('url');
-    
+
     // Validate URL
     if (!filter_var($url, FILTER_VALIDATE_URL)) {
         return response()->json(['error' => 'Invalid URL'], 400);
     }
-    
+
+    // Handle own-site post URLs directly from DB (avoids auth + missing OG tag issues)
+    $localPreview = $this->tryLocalPostPreview($url);
+    if ($localPreview) {
+        return response()->json($localPreview);
+    }
+
     try {
         // Set up HTTP client with headers to mimic browser
         $ch = curl_init();
@@ -531,6 +537,49 @@ public function fetchLinkPreview(Request $request)
         \Log::error('Link preview error: ' . $e->getMessage());
         return response()->json(['error' => 'Failed to generate preview'], 500);
     }
+}
+
+private function tryLocalPostPreview($url)
+{
+    $path = parse_url($url, PHP_URL_PATH);
+    if (!preg_match('#^/posts/(\d+)$#', $path, $m)) {
+        return null;
+    }
+
+    $postId = (int) $m[1];
+    $post = DB::table('sample_posts')
+        ->where('id', $postId)
+        ->whereNull('deleted_at')
+        ->first();
+
+    if (!$post) {
+        return null;
+    }
+
+    $author     = DB::table('users_record')->where('id', $post->user_id)->first();
+    $authorName = $author->name ?? $post->username ?? 'SupperAge';
+    $content    = strip_tags($post->post_content ?? '');
+    $title      = $authorName . (strlen($content) ? ': ' . Str::limit($content, 80) : '\'s post');
+    $description = strlen($content) > 80 ? Str::limit($content, 200) : '';
+
+    $image = null;
+    $files = json_decode($post->file_path, true);
+    if (is_array($files) && count($files) > 0) {
+        $first = $files[0];
+        $ext   = strtolower(pathinfo(parse_url($first, PHP_URL_PATH), PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            $image = $first;
+        }
+    }
+
+    return [
+        'url'         => $url,
+        'title'       => $title,
+        'description' => $description,
+        'image'       => $image,
+        'site_name'   => 'SupperAge',
+        'favicon'     => config('app.url') . '/favicon.ico',
+    ];
 }
 
 private function parseMetaTags($html, $url)

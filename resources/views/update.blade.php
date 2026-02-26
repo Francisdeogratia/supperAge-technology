@@ -2418,6 +2418,7 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
                     <!-- Hidden Fields -->
                     <input type="hidden" name="action" value="insert">
                     <input type="hidden" name="post_type" id="post_type" value="text">
+                    <input type="hidden" name="link_preview" id="postLinkPreviewData" value="">
                     
                     <!-- User Name Display -->
                     <div class="user-info-display">
@@ -8223,8 +8224,173 @@ document.getElementById('modernVideoOverlay').addEventListener('click', function
 })();
 </script>
 
+<script>
+// ── Link preview for Create Post modal & Story modal ──────────────────────────
+(function () {
+    let postPreviewData   = null;
+    let talesPreviewData  = null;
+    let postUrlTimeout    = null;
+    let talesUrlTimeout   = null;
+    const URL_REGEX       = /(https?:\/\/[^\s]+)/gi;
 
+    function buildPreviewHtml(data, clearFn) {
+        return `
+            <div class="link-preview-card-display" style="margin-top:10px;">
+                <button type="button" onclick="${clearFn}()" style="
+                    position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);
+                    color:#fff;border:none;border-radius:50%;width:22px;height:22px;
+                    display:flex;align-items:center;justify-content:center;cursor:pointer;
+                    font-size:12px;z-index:10;">
+                    <i class="fa fa-times"></i>
+                </button>
+                ${data.image ? `
+                <div class="link-preview-image" style="height:140px;overflow:hidden;background:#f5f5f5;">
+                    <img src="${data.image}" style="width:100%;height:100%;object-fit:cover;"
+                         onerror="this.parentElement.style.display='none'">
+                </div>` : ''}
+                <div class="link-preview-content" style="padding:10px;">
+                    <div class="link-preview-site" style="display:flex;align-items:center;gap:5px;margin-bottom:4px;color:#888;font-size:11px;">
+                        <img src="${data.favicon}" style="width:12px;height:12px;border-radius:2px;"
+                             onerror="this.style.display='none'">
+                        <span>${data.site_name || ''}</span>
+                    </div>
+                    <h4 class="link-preview-title" style="font-size:13px;font-weight:700;margin:0 0 4px;color:#222;">${data.title}</h4>
+                    ${data.description ? `<p class="link-preview-description" style="font-size:11px;color:#666;margin:0 0 6px;">${data.description}</p>` : ''}
+                    <a href="${data.url}" target="_blank" rel="noopener"
+                       style="font-size:10px;color:#1877f2;word-break:break-all;">
+                        <i class="fas fa-external-link-alt"></i> ${data.url}
+                    </a>
+                </div>
+            </div>`;
+    }
 
-    
+    function fetchPreview(url, $container, storeFn) {
+        $container.html(`
+            <div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;
+                        color:#0EA5E9;font-size:13px;margin-top:10px;">
+                <i class="fa fa-spinner fa-spin"></i> Loading preview…
+            </div>
+        `).show();
+
+        $.ajax({
+            url: '{{ route("posts.fetchLinkPreview") }}',
+            method: 'POST',
+            data: { _token: '{{ csrf_token() }}', url: url },
+            success: function (data) {
+                storeFn(data);
+            },
+            error: function () {
+                $container.hide().empty();
+                storeFn(null);
+            }
+        });
+    }
+
+    // ── Post modal ──────────────────────────────────────────────────────────────
+    function clearPostPreview() {
+        postPreviewData = null;
+        $('#postLinkPreviewData').val('');
+        $('#linkPreviewContainer').hide().empty();
+    }
+    window.clearPostPreview = clearPostPreview;
+
+    function storePostPreview(data) {
+        postPreviewData = data;
+        if (data) {
+            $('#postLinkPreviewData').val(JSON.stringify(data));
+            $('#linkPreviewContainer').html(buildPreviewHtml(data, 'clearPostPreview')).show();
+        } else {
+            clearPostPreview();
+        }
+    }
+
+    // Paste: show loading immediately
+    document.getElementById('post_contents').addEventListener('paste', function (e) {
+        const pasted = (e.clipboardData || window.clipboardData).getData('text');
+        const urls   = pasted ? pasted.match(URL_REGEX) : null;
+        if (urls && urls.length > 0) {
+            clearTimeout(postUrlTimeout);
+            $('#linkPreviewContainer').html(`
+                <div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;
+                            color:#0EA5E9;font-size:13px;margin-top:10px;">
+                    <i class="fa fa-spinner fa-spin"></i> Loading preview…
+                </div>
+            `).show();
+            postUrlTimeout = setTimeout(() => {
+                fetchPreview(urls[0], $('#linkPreviewContainer'), storePostPreview);
+            }, 300);
+        }
+    });
+
+    // Input: detect URL on typing (debounced)
+    document.getElementById('post_contents').addEventListener('input', function () {
+        const urls = this.value.match(URL_REGEX);
+        clearTimeout(postUrlTimeout);
+        if (urls && urls.length > 0) {
+            postUrlTimeout = setTimeout(() => {
+                fetchPreview(urls[0], $('#linkPreviewContainer'), storePostPreview);
+            }, 1000);
+        } else if (!postPreviewData) {
+            $('#linkPreviewContainer').hide().empty();
+        }
+    });
+
+    // Clear preview when post form resets / modal closes
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-bs-dismiss="modal"]') || e.target.closest('.btn-close-modal')) {
+            clearPostPreview();
+        }
+    });
+
+    // ── Story (Tales) modal ─────────────────────────────────────────────────────
+    function clearTalesPreview() {
+        talesPreviewData = null;
+        $('#talesLinkPreviewContainer').hide().empty();
+    }
+    window.clearTalesPreview = clearTalesPreview;
+
+    function storeTalesPreview(data) {
+        talesPreviewData = data;
+        if (data) {
+            $('#talesLinkPreviewContainer').html(buildPreviewHtml(data, 'clearTalesPreview')).show();
+        } else {
+            clearTalesPreview();
+        }
+    }
+
+    const talesEl = document.getElementById('tales_msg');
+    if (talesEl) {
+        talesEl.addEventListener('paste', function (e) {
+            const pasted = (e.clipboardData || window.clipboardData).getData('text');
+            const urls   = pasted ? pasted.match(URL_REGEX) : null;
+            if (urls && urls.length > 0) {
+                clearTimeout(talesUrlTimeout);
+                $('#talesLinkPreviewContainer').html(`
+                    <div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;
+                                color:#0EA5E9;font-size:13px;margin-top:10px;">
+                        <i class="fa fa-spinner fa-spin"></i> Loading preview…
+                    </div>
+                `).show();
+                talesUrlTimeout = setTimeout(() => {
+                    fetchPreview(urls[0], $('#talesLinkPreviewContainer'), storeTalesPreview);
+                }, 300);
+            }
+        });
+
+        talesEl.addEventListener('input', function () {
+            const urls = this.value.match(URL_REGEX);
+            clearTimeout(talesUrlTimeout);
+            if (urls && urls.length > 0) {
+                talesUrlTimeout = setTimeout(() => {
+                    fetchPreview(urls[0], $('#talesLinkPreviewContainer'), storeTalesPreview);
+                }, 1000);
+            } else if (!talesPreviewData) {
+                $('#talesLinkPreviewContainer').hide().empty();
+            }
+        });
+    }
+})();
+</script>
+
 </body>
 </html>
