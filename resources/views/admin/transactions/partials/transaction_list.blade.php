@@ -171,21 +171,21 @@
                 <tr>
                     <!-- ID -->
                     <td>{{ $transaction->id }}</td>
-                    
+
                     <!-- Transaction ID -->
                     <td>
                         <span class="txn-id">{{ $transaction->transaction_id }}</span>
                         <span class="txn-id" style="color: #6c757d;">{{ $transaction->tx_ref }}</span>
                     </td>
-                    
+
                     <!-- Wallet Owner -->
                     <td>
                         @if($transaction->walletOwner)
                             <div class="txn-user-cell">
                                 <div class="txn-user-avatar">
                                     @if($transaction->walletOwner->profilepix)
-                                        <img src="{{ asset($transaction->walletOwner->profilepix) }}" 
-                                             alt="{{ $transaction->walletOwner->name }}" 
+                                        <img src="{{ asset($transaction->walletOwner->profilepix) }}"
+                                             alt="{{ $transaction->walletOwner->name }}"
                                              class="txn-avatar-img">
                                     @else
                                         <div class="txn-avatar-initial" style="background: #6c757d;">
@@ -202,15 +202,15 @@
                             <span style="color: #6c757d;">N/A</span>
                         @endif
                     </td>
-                    
+
                     <!-- Payer -->
                     <td>
                         @if($transaction->payer)
                             <div class="txn-user-cell">
                                 <div class="txn-user-avatar">
                                     @if($transaction->payer->profilepix)
-                                        <img src="{{ asset($transaction->payer->profilepix) }}" 
-                                             alt="{{ $transaction->payer->name }}" 
+                                        <img src="{{ asset($transaction->payer->profilepix) }}"
+                                             alt="{{ $transaction->payer->name }}"
                                              class="txn-avatar-img">
                                     @else
                                         <div class="txn-avatar-initial" style="background: #0d6efd;">
@@ -227,19 +227,19 @@
                             <span style="color: #6c757d;">N/A</span>
                         @endif
                     </td>
-                    
+
                     <!-- Amount -->
                     <td style="text-align: right;">
                         <span class="{{ $transaction->amount >= 0 ? 'txn-amount-positive' : 'txn-amount-negative' }}">
                             {{ $transaction->amount >= 0 ? '+' : '' }}{{ number_format($transaction->amount, 2) }}
                         </span>
                     </td>
-                    
+
                     <!-- Currency -->
                     <td>
                         <span class="txn-badge txn-badge-secondary">{{ $transaction->currency }}</span>
                     </td>
-                    
+
                     <!-- Type -->
                     <td>
                         @php
@@ -254,95 +254,22 @@
                             {{ ucfirst(str_replace('_', ' ', $transaction->type)) }}
                         </span>
                     </td>
-                    
+
                     <!-- Date -->
                     <td>
                         <span class="txn-date">{{ \Carbon\Carbon::parse($transaction->created_at)->format('M d, Y') }}</span>
                         <span class="txn-time">{{ \Carbon\Carbon::parse($transaction->created_at)->format('h:i A') }}</span>
                     </td>
-                    
+
                     <!-- Actions -->
                     <td style="text-align: center;">
-                        <button class="txn-btn" 
-                                data-bs-toggle="modal" 
+                        <button class="txn-btn"
+                                data-bs-toggle="modal"
                                 data-bs-target="#detailModal{{ $transaction->id }}">
                             👁 View
                         </button>
                     </td>
                 </tr>
-
-                <!-- Modal -->
-                <div class="modal fade" id="detailModal{{ $transaction->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Transaction #{{ $transaction->id }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d; width: 40%;">Transaction ID:</td>
-                                        <td style="padding: 10px; font-family: monospace; font-size: 12px;">{{ $transaction->transaction_id }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Reference:</td>
-                                        <td style="padding: 10px; font-family: monospace; font-size: 12px;">{{ $transaction->tx_ref }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Wallet Owner:</td>
-                                        <td style="padding: 10px;">
-                                            @if($transaction->walletOwner)
-                                                <strong>{{ $transaction->walletOwner->name }}</strong><br>
-                                                <small style="color: #6c757d;">{{ '@' . $transaction->walletOwner->username }}</small>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Payer:</td>
-                                        <td style="padding: 10px;">
-                                            @if($transaction->payer)
-                                                <strong>{{ $transaction->payer->name }}</strong><br>
-                                                <small style="color: #6c757d;">{{ '@' . $transaction->payer->username }}</small>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Amount:</td>
-                                        <td style="padding: 10px;">
-                                            <strong style="font-size: 20px; color: {{ $transaction->amount >= 0 ? '#28a745' : '#dc3545' }};">
-                                                {{ number_format($transaction->amount, 2) }} {{ $transaction->currency }}
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Type:</td>
-                                        <td style="padding: 10px;">{{ ucfirst(str_replace('_', ' ', $transaction->type)) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Status:</td>
-                                        <td style="padding: 10px;"><span class="txn-badge txn-badge-success">{{ ucfirst($transaction->status) }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Description:</td>
-                                        <td style="padding: 10px;">{{ $transaction->description }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Date:</td>
-                                        <td style="padding: 10px;">{{ \Carbon\Carbon::parse($transaction->created_at)->format('M d, Y h:i A') }}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             @empty
                 <tr>
                     <td colspan="9" style="padding: 60px; text-align: center;">
@@ -354,3 +281,78 @@
         </tbody>
     </table>
 </div>
+
+{{-- Modals rendered OUTSIDE the table so they don't break table HTML --}}
+@foreach($transactions as $transaction)
+<div class="modal fade" id="detailModal{{ $transaction->id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transaction #{{ $transaction->id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d; width: 40%;">Transaction ID:</td>
+                        <td style="padding: 10px; font-family: monospace; font-size: 12px;">{{ $transaction->transaction_id }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Reference:</td>
+                        <td style="padding: 10px; font-family: monospace; font-size: 12px;">{{ $transaction->tx_ref }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Wallet Owner:</td>
+                        <td style="padding: 10px;">
+                            @if($transaction->walletOwner)
+                                <strong>{{ $transaction->walletOwner->name }}</strong><br>
+                                <small style="color: #6c757d;">{{ '@' . $transaction->walletOwner->username }}</small>
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Payer:</td>
+                        <td style="padding: 10px;">
+                            @if($transaction->payer)
+                                <strong>{{ $transaction->payer->name }}</strong><br>
+                                <small style="color: #6c757d;">{{ '@' . $transaction->payer->username }}</small>
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Amount:</td>
+                        <td style="padding: 10px;">
+                            <strong style="font-size: 20px; color: {{ $transaction->amount >= 0 ? '#28a745' : '#dc3545' }};">
+                                {{ number_format($transaction->amount, 2) }} {{ $transaction->currency }}
+                            </strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Type:</td>
+                        <td style="padding: 10px;">{{ ucfirst(str_replace('_', ' ', $transaction->type)) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Status:</td>
+                        <td style="padding: 10px;"><span class="txn-badge txn-badge-success">{{ ucfirst($transaction->status) }}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Description:</td>
+                        <td style="padding: 10px;">{{ $transaction->description }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #6c757d;">Date:</td>
+                        <td style="padding: 10px;">{{ \Carbon\Carbon::parse($transaction->created_at)->format('M d, Y h:i A') }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach

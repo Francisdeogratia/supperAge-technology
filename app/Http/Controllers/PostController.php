@@ -1108,6 +1108,7 @@ public function viewers(Request $request, $id)
     $offset = ($page - 1) * $limit;
 
     $viewers = PostView::where('post_id', $id)
+        ->whereHas('user')
         ->with('user')
         ->orderByDesc('created_at')
         ->skip($offset)
@@ -1125,7 +1126,7 @@ public function viewers(Request $request, $id)
             ];
         });
 
-    $total = PostView::where('post_id', $id)->count();
+    $total = PostView::where('post_id', $id)->whereHas('user')->count();
 
     return response()->json([
         'users' => $viewers,
@@ -1295,27 +1296,61 @@ public function trackShare(Request $request)
 public function markNotificationRead($id)
 {
     $userId = Session::get('id');
-    
+
     if (!$userId) {
         return response()->json(['error' => 'Not logged in'], 401);
     }
-    
+
     $notification = Notification::find($id);
-    
+
     if (!$notification) {
         return response()->json(['error' => 'Notification not found'], 404);
     }
-    
+
     if ($notification->notification_reciever_id == $userId) {
         $notification->update([
             'read_notification' => 'yes',
             'read_at' => now()
         ]);
-        
+
         return response()->json(['success' => true]);
     }
-    
+
     return response()->json(['error' => 'Unauthorized'], 403);
+}
+
+public function markAllNotificationsRead()
+{
+    $userId = Session::get('id');
+    if (!$userId) return response()->json(['error' => 'Not logged in'], 401);
+
+    Notification::where('notification_reciever_id', $userId)
+        ->where('read_notification', 'no')
+        ->update(['read_notification' => 'yes', 'read_at' => now()]);
+
+    return response()->json(['success' => true]);
+}
+
+public function deleteNotification($id)
+{
+    $userId = Session::get('id');
+    if (!$userId) return response()->json(['error' => 'Not logged in'], 401);
+
+    $notification = Notification::find($id);
+    if (!$notification) return response()->json(['error' => 'Not found'], 404);
+    if ($notification->notification_reciever_id != $userId) return response()->json(['error' => 'Unauthorized'], 403);
+
+    $notification->delete();
+    return response()->json(['success' => true]);
+}
+
+public function deleteAllNotifications()
+{
+    $userId = Session::get('id');
+    if (!$userId) return response()->json(['error' => 'Not logged in'], 401);
+
+    Notification::where('notification_reciever_id', $userId)->delete();
+    return response()->json(['success' => true]);
 }
 
 public function toggleSave(Request $request)
@@ -1348,9 +1383,9 @@ public function savedPosts()
 
     $savedPosts = SavedPost::where('user_id', $userId)
         ->with(['post.user'])
+        ->whereHas('post')
         ->orderByDesc('created_at')
-        ->get()
-        ->filter(fn($sp) => $sp->post !== null);
+        ->paginate(10);
 
     $notifications = DB::table('notifications')
         ->where('notification_reciever_id', $userId)

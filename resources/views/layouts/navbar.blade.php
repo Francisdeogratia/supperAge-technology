@@ -307,10 +307,12 @@
             alt="Profile" 
             style="border-radius:50%; width:30px; height:30px;"
           >
-          @if($user->badge_status)
-            <img src="{{ asset($user->badge_status) }}" 
-                 alt="Verified" 
-                 title="Verified User" 
+          @if($user->badge_expired)
+            <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:16px;margin-right:10px;"></i>
+          @elseif($user->badge_status)
+            <img src="{{ asset($user->badge_status) }}"
+                 alt="Verified"
+                 title="Verified User"
                  style="width:19px;height:19px;margin-right:10px;">
           @endif
           <span style="margin-left: 6px;"></span>
@@ -405,10 +407,12 @@
             alt="Profile" 
             class="nav-profile-img"
           >
-          @if($user->badge_status)
-            <img src="{{ asset($user->badge_status) }}" 
-                 alt="Verified" 
-                 title="Verified User" 
+          @if($user->badge_expired)
+            <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:13px;position:absolute;bottom:-2px;right:-2px;"></i>
+          @elseif($user->badge_status)
+            <img src="{{ asset($user->badge_status) }}"
+                 alt="Verified"
+                 title="Verified User"
                  style="width:15px;height:15px;position:absolute;bottom:-2px;right:-2px;border-radius:50%;border:1px solid white;">
           @endif
         </div>

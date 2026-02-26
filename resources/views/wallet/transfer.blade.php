@@ -904,5 +904,7 @@
         });
     });
     </script>
+
+@include('partials.global-calls')
 </body>
 </html>

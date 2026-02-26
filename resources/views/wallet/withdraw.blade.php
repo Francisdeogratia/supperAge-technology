@@ -62,7 +62,7 @@
                 <form action="{{ route('badge.verify.wallet') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-info mt-2">
-                        <i class="fas fa-check-circle"></i> Apply Now – NGN 4000 (From Wallet)
+                        <i class="fas fa-check-circle"></i> Apply Now – NGN 5000 (From Wallet)
                     </button>
                 </form>
             </div>
@@ -76,7 +76,7 @@
                 <form action="{{ route('badge.verify.wallet') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-warning mt-2">
-                        <i class="fas fa-redo"></i> Renew Badge – NGN 4000 (From Wallet)
+                        <i class="fas fa-redo"></i> Renew Badge – NGN 8000 (From Wallet)
                     </button>
                 </form>
             </div>
@@ -121,7 +121,7 @@
 
                 {{-- Net available balance (updates dynamically) --}}
                 <div id="netAvailableBalance" class="net-available">
-                    <i class="fas fa-info-circle"></i> Net Available (60% rule): –
+                    <i class="fas fa-info-circle"></i> Net Available (50% rule): –
                 </div>
 
                 @if(session('success'))
@@ -243,7 +243,7 @@
         function updateProgressBar(){
             const code = $('#currencySelect').val();
             const balance = balances[code] || 0;
-            const net = balance * 0.60;
+            const net = balance * 0.50;
             const input = parseFloat($('input[name="amount"]').val());
 
             const bar = $('#amountProgress');
@@ -267,16 +267,16 @@
         function updateNetAvailable(){
             const code = $('#currencySelect').val();
             const balance = balances[code] || 0;
-            const net = balance * 0.60;
+            const net = balance * 0.50;
             $('#netAvailableBalance').html(
-                `<i class="fas fa-info-circle"></i> Net Available (60% rule): ${getSymbol(code)} ${formatCurrency(net, code)}`
+                `<i class="fas fa-info-circle"></i> Net Available (50% rule): ${getSymbol(code)} ${formatCurrency(net, code)}`
             );
         }
 
         function validateWithdrawAmount(){
             const code = $('#currencySelect').val();
             const balance = balances[code] || 0;
-            const net = balance * 0.60;
+            const net = balance * 0.50;
             const input = parseFloat($('input[name="amount"]').val());
             $('#amountWarning').remove();
             if(!isNaN(input) && input>0 && input<=net){
@@ -298,12 +298,12 @@
             const input = parseFloat($('input[name="amount"]').val());
             $('#withdrawBreakdown').remove();
             if(!isNaN(input) && input > 0){
-                const receive = input*0.60, trash = input*0.40;
+                const receive = input*0.50, trash = input*0.50;
                 $('input[name="amount"]').after(
                     `<div id="withdrawBreakdown" class="form-text mt-1 p-2">
                         <strong>You entered:</strong> ${getSymbol(code)} ${formatCurrency(input, code)} <br>
-                        <strong>You will receive (60%):</strong> ${getSymbol(code)} ${formatCurrency(receive, code)} <br>
-                        <strong>System charge (40%):</strong> ${getSymbol(code)} ${formatCurrency(trash, code)}
+                        <strong>You will receive (50%):</strong> ${getSymbol(code)} ${formatCurrency(receive, code)} <br>
+                        <strong>System charge (50%):</strong> ${getSymbol(code)} ${formatCurrency(trash, code)}
                     </div>`
                 );
             }
@@ -317,7 +317,7 @@
             if(!isNaN(input) && input > 0 && code && typeof exchangeRates[code] !== 'undefined'){
                 const rate = exchangeRates[code];
                 const ngnValue = input / rate;
-                const ngnReceive = (input*0.60) / rate;
+                const ngnReceive = (input*0.50) / rate;
 
                 const ngnBalance = balances['NGN'] || 0;
                 const ngnRemaining = ngnBalance - ngnValue;
@@ -327,7 +327,7 @@
                 $('input[name="amount"]').after(
                     `<small id="ngnEquivalent" class="form-text">
                         ≈ ₦${formatCurrency(ngnValue, 'NGN')} will be deducted from your wallet <br>
-                        ≈ ₦${formatCurrency(ngnReceive, 'NGN')} will actually be paid out (60%)
+                        ≈ ₦${formatCurrency(ngnReceive, 'NGN')} will actually be paid out (50%)
                     </small>
                     <small id="remainingBalance" class="form-text">
                         <strong>Remaining balance after withdrawal:</strong> ${getSymbol(code)} ${formatCurrency(remainingCurrency, code)} 

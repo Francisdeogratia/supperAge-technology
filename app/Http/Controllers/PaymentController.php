@@ -24,7 +24,7 @@ class PaymentController extends Controller
     }
 
     // ✅ Base fee in NGN
-    $baseFeeNgn = 4000;
+    $baseFeeNgn = 5000;
 
     // ✅ Detect user country (from profile or IP)
     $userCountry = $user->country ?? 'NG'; // fallback Nigeria
@@ -178,7 +178,7 @@ class PaymentController extends Controller
     }
 
     // ✅ Base fee in NGN
-    $baseFeeNgn = 4000;
+    $baseFeeNgn = 5000;
 
     // ✅ Currency chosen by user (default NGN)
     $selectedCurrency = $request->input('currency', 'NGN');
@@ -244,7 +244,7 @@ class PaymentController extends Controller
 public function getRate(Request $request)
 {
     $currency = $request->query('currency', 'NGN');
-    $baseFeeNgn = 4000;
+    $baseFeeNgn = 5000;
 
     if ($currency === 'NGN') {
         return response()->json([

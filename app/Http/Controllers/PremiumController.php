@@ -51,10 +51,9 @@ class PremiumController extends Controller
         $user = UserRecord::find(Session::get('id'));
 
         if ($user) {
-            // ✅ Clear expired badge
+            // ✅ Mark expired badge
             if ($user->badge_expires_at && now()->gte($user->badge_expires_at)) {
-                $user->badge_status = null;
-                $user->badge_expires_at = null;
+                $user->badge_status = 'expired';
                 $user->save();
             }
 
@@ -81,7 +80,7 @@ class PremiumController extends Controller
     ];
 
     // ✅ Base fee in NGN
-    $baseFeeNgn = 4000;
+    $baseFeeNgn = 5000;
 
     // ✅ Detect default currency (based on user country if available)
     $userCountry = $user->country ?? 'NG';

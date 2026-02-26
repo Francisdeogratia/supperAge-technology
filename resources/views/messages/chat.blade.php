@@ -2350,6 +2350,7 @@
 
 const friendId = {{ $friend->id }};
 const userId = {{ $user->id }};
+window._inPrivateChat = friendId;
 let lastMessageId = {{ $messages->last()->id ?? 0 }};
 let typingTimeout;
 let selectedMessage = null;
@@ -4621,6 +4622,11 @@ const ChatCallApp = {
 
     // ---- Join Agora Channel ----
     async joinAgoraChannel() {
+        if (this._joiningAgora) {
+            console.log('⚠️ Already joining Agora channel, skipping duplicate call');
+            return;
+        }
+        this._joiningAgora = true;
         try {
             console.log('🔗 Joining Agora channel:', this.agoraChannel);
 
@@ -4680,7 +4686,57 @@ const ChatCallApp = {
                 }
             });
 
+            // Auto-renew token before it expires
+            this.agoraClient.on('token-privilege-will-expire', async () => {
+                console.log('🔄 Token expiring soon, renewing...');
+                try {
+                    const renewResponse = await fetch('/agora/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ channel: this.agoraChannel })
+                    });
+                    const renewData = await renewResponse.json();
+                    if (renewData.success && renewData.token) {
+                        await this.agoraClient.renewToken(renewData.token);
+                        console.log('✅ Token renewed successfully');
+                    }
+                } catch (err) {
+                    console.error('❌ Token renewal failed:', err);
+                }
+            });
+
+            this.agoraClient.on('token-privilege-did-expire', async () => {
+                console.log('⚠️ Token expired, attempting to rejoin...');
+                try {
+                    const renewResponse = await fetch('/agora/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ channel: this.agoraChannel })
+                    });
+                    const renewData = await renewResponse.json();
+                    if (renewData.success && renewData.token) {
+                        await this.agoraClient.renewToken(renewData.token);
+                        console.log('✅ Token renewed after expiry');
+                    }
+                } catch (err) {
+                    console.error('❌ Token renewal after expiry failed:', err);
+                }
+            });
+
             // Join channel
+            console.log('🔑 Agora join params:', {
+                app_id: tokenData.app_id,
+                channel: this.agoraChannel,
+                token: tokenData.token ? tokenData.token.substring(0, 20) + '...' : 'NULL',
+                uid: tokenData.uid,
+                full_response: tokenData
+            });
             await this.agoraClient.join(tokenData.app_id, this.agoraChannel, tokenData.token, tokenData.uid);
             console.log('✅ Joined Agora channel successfully');
 
@@ -4859,6 +4915,7 @@ const ChatCallApp = {
         this.isMuted = false;
         this.isVideoOff = false;
         this.agoraChannel = null;
+        this._joiningAgora = false;
     }
 };
 

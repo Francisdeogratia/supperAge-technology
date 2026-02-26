@@ -15,7 +15,7 @@ class AgoraTokenBuilder
         int $role = self::ROLE_PUBLISHER,
         int $privilegeExpiredTs = 0
     ): string {
-        $token = new AccessToken($appId, $appCertificate, $channelName, (string)$uid);
+        $token = new AccessToken($appId, $appCertificate);
         $serviceRtc = new ServiceRtc($channelName, (string)$uid);
         $serviceRtc->addPrivilege(ServiceRtc::PRIVILEGE_JOIN_CHANNEL, $privilegeExpiredTs);
         if ($role === self::ROLE_PUBLISHER) {
@@ -31,23 +31,18 @@ class AgoraTokenBuilder
 class AccessToken
 {
     const VERSION = '007';
-    const VERSION_LENGTH = 3;
 
     private string $appId;
-    private string $appCertificate;
-    private string $channelName;
-    private string $uid;
+    private string $appCert;
     private int $issueTs;
     private int $salt;
-    private int $expire = 900;
+    private int $expire = 86400;
     private array $services = [];
 
-    public function __construct(string $appId, string $appCertificate, string $channelName, string $uid)
+    public function __construct(string $appId, string $appCert)
     {
         $this->appId = $appId;
-        $this->appCertificate = $appCertificate;
-        $this->channelName = $channelName;
-        $this->uid = $uid === '0' ? '' : $uid;
+        $this->appCert = $appCert;
         $this->issueTs = time();
         $this->salt = random_int(1, 99999999);
     }
@@ -62,21 +57,27 @@ class AccessToken
         if (!$this->appId || strlen($this->appId) !== 32) {
             return '';
         }
-        if (!$this->appCertificate || strlen($this->appCertificate) !== 32) {
+        if (!$this->appCert || strlen($this->appCert) !== 32) {
             return '';
         }
 
         $signing = $this->getSign();
-        $data = Packer::packUint32($this->issueTs)
-            . Packer::packUint32($this->salt)
+
+        // Data includes appId (as packString), then issueTs, expire, salt, services
+        $data = Packer::packString($this->appId)
+            . Packer::packUint32($this->issueTs)
             . Packer::packUint32($this->expire)
+            . Packer::packUint32($this->salt)
             . Packer::packUint16(count($this->services));
 
+        ksort($this->services);
         foreach ($this->services as $service) {
             $data .= $service->pack();
         }
 
         $signature = hash_hmac('sha256', $data, $signing, true);
+
+        // Content: signature + data (appId is already inside data)
         $content = Packer::packString($signature) . $data;
         $compressed = zlib_encode($content, ZLIB_ENCODING_DEFLATE);
 
@@ -85,8 +86,10 @@ class AccessToken
 
     private function getSign(): string
     {
-        $hmac = hash_hmac('sha256', $this->channelName, $this->appCertificate, true);
-        return hash_hmac('sha256', $this->uid, $hmac, true);
+        // Official: hmac(data=appCert, key=packUint32(issueTs))
+        // then hmac(data=result, key=packUint32(salt))
+        $hh = hash_hmac('sha256', $this->appCert, Packer::packUint32($this->issueTs), true);
+        return hash_hmac('sha256', $hh, Packer::packUint32($this->salt), true);
     }
 }
 
@@ -96,11 +99,15 @@ abstract class Service
     protected array $privileges = [];
 
     abstract public function getServiceType(): int;
-    abstract public function pack(): string;
 
     public function addPrivilege(int $privilege, int $expire): void
     {
         $this->privileges[$privilege] = $expire;
+    }
+
+    public function pack(): string
+    {
+        return Packer::packUint16($this->type) . $this->packPrivileges();
     }
 
     protected function packPrivileges(): string
@@ -136,10 +143,12 @@ class ServiceRtc extends Service
         return self::SERVICE_TYPE;
     }
 
+    // Official order: parent::pack() (type + privileges) THEN channelName + uid
     public function pack(): string
     {
-        return Packer::packUint16($this->type)
-            . $this->packPrivileges();
+        return parent::pack()
+            . Packer::packString($this->channelName)
+            . Packer::packString($this->uid);
     }
 }
 

@@ -21,7 +21,7 @@
 
     
     <style>
-/* Chat Container Styles */
+/* Chat Container Styles — Matching 1-on-1 Chat */
 .chat-wrapper {
     position: fixed;
     top: 0;
@@ -30,64 +30,88 @@
     bottom: 0;
     display: flex;
     flex-direction: column;
-    background: #f0f2f5;
+    background: #E8EFF5;
 }
 
 .chat-header {
-    background: #6cd4ff;
+    background: #0EA5E9;
     color: white;
-    padding: 15px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     z-index: 10;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0icGF0dGVybiIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiPjxyZWN0IGZpbGw9IiNmMGYyZjUiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCBmaWxsPSJ1cmwoI3BhdHRlcm4pIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIi8+PC9zdmc+');
+    padding: 20px 60px;
+    background-color: #E8EFF5;
+    background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='p' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M10 10h5v5h-5z' fill='%23c8d8e8' opacity='.3'/%3E%3Cpath d='M30 20h4v4h-4z' fill='%23c8d8e8' opacity='.2'/%3E%3Cpath d='M60 15h3v6h-3z' fill='%23c8d8e8' opacity='.25'/%3E%3Cpath d='M80 40h5v3h-5z' fill='%23c8d8e8' opacity='.2'/%3E%3Cpath d='M20 60h4v5h-4z' fill='%23c8d8e8' opacity='.3'/%3E%3Cpath d='M50 50h6v3h-6z' fill='%23c8d8e8' opacity='.2'/%3E%3Cpath d='M70 70h3v5h-3z' fill='%23c8d8e8' opacity='.25'/%3E%3Cpath d='M40 85h5v4h-5z' fill='%23c8d8e8' opacity='.2'/%3E%3Cpath d='M85 80h4v4h-4z' fill='%23c8d8e8' opacity='.3'/%3E%3Ccircle cx='15' cy='40' r='2' fill='%23c8d8e8' opacity='.2'/%3E%3Ccircle cx='55' cy='80' r='1.5' fill='%23c8d8e8' opacity='.25'/%3E%3Ccircle cx='90' cy='15' r='2' fill='%23c8d8e8' opacity='.2'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23p)'/%3E%3C/svg%3E");
 }
 
 .chat-input-area {
-    background: white;
-    padding: 10px 15px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    background: #F0F2F5;
+    padding: 8px 16px;
+    box-shadow: none;
     position: sticky;
     bottom: 0;
     z-index: 100;
 }
 
-/* Message Bubbles */
+/* Message Bubbles — Matching 1-on-1 Chat */
 .message-bubble {
-    max-width: 70%;
-    padding: 10px 15px;
-    border-radius: 18px;
-    margin-bottom: 10px;
+    max-width: 65%;
+    padding: 6px 7px 8px 9px;
+    border-radius: 7.5px;
+    margin-bottom: 2px;
     position: relative;
     word-wrap: break-word;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: none;
+    box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
 }
 
 .message-bubble:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: none;
+    box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
 }
 
 .message-bubble.sent {
-    background: #6cd4ff;
-    color: white;
+    background: #D9FDD3;
+    color: #111B21;
     margin-left: auto;
-    border-bottom-right-radius: 4px;
+    border-top-right-radius: 0;
+}
+
+.message-bubble.sent::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -8px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid #D9FDD3;
+    border-top: 0px solid transparent;
+    border-bottom: 8px solid transparent;
 }
 
 .message-bubble.received {
-    background: white;
-    color: #333;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: #FFFFFF;
+    color: #111B21;
+    border-top-left-radius: 0;
+    box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
+}
+
+.message-bubble.received::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-right: 8px solid #FFFFFF;
+    border-top: 0px solid transparent;
+    border-bottom: 8px solid transparent;
 }
 
 .message-bubble.highlighted {
@@ -96,40 +120,54 @@
 }
 
 .message-sender-name {
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    color: #667eea;
-    margin-bottom: 5px;
+    color: #06CF9C;
+    margin-bottom: 2px;
 }
 
 .reply-reference {
-    opacity: 0.7;
+    background: rgba(0,0,0,0.05);
     font-size: 12px;
     margin-bottom: 5px;
-    padding-left: 10px;
-    border-left: 2px solid currentColor;
+    padding: 5px 10px;
+    border-left: 3px solid #06CF9C;
+    border-radius: 4px;
     font-style: italic;
+    opacity: 1;
     cursor: pointer;
 }
 
+.message-bubble.sent .reply-reference {
+    background: rgba(0,0,0,0.06);
+    border-left-color: #06CF9C;
+}
+
 .message-time {
-    font-size: 10px;
-    opacity: 0.7;
-    margin-top: 5px;
+    font-size: 11px;
+    color: #667781;
+    float: right;
+    margin-left: 8px;
+    margin-top: 4px;
+    opacity: 1;
+}
+
+.message-bubble.sent .message-time {
+    color: #667781;
 }
 
 .message-status {
     font-size: 12px;
-    margin-left: 5px;
+    margin-left: 3px;
 }
 
-/* Message Actions Menu */
+/* Message Actions Menu — WhatsApp Style */
 .message-actions {
     position: fixed;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    padding: 8px 0;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+    padding: 6px 0;
     z-index: 1000;
     display: none;
     min-width: 200px;
@@ -142,29 +180,31 @@
 }
 
 .message-action-item {
-    padding: 12px 20px;
+    padding: 10px 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: background 0.2s;
+    gap: 12px;
+    transition: background 0.15s;
+    font-size: 14.5px;
+    color: #111B21;
 }
 
 .message-action-item:hover {
-    background: #f0f2f5;
+    background: #F0F2F5;
 }
 
-/* Menu Options */
+/* Menu Options — WhatsApp Style */
 .chat-menu {
     position: absolute;
-    right: 20px;
-    top: 60px;
+    right: 12px;
+    top: 52px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    padding: 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    padding: 6px 0;
     display: none;
-    min-width: 180px;
+    min-width: 200px;
     z-index: 1000;
 }
 
@@ -173,23 +213,25 @@
 }
 
 .menu-item {
-    padding: 12px 20px;
+    padding: 10px 22px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    font-size: 14.5px;
+    color: #111B21;
 }
 
 .menu-item:hover {
-    background: #f0f2f5;
+    background: #F5F6F6;
 }
 
 /* Reply Preview */
 .reply-preview-container {
-    background: #e3f2fd;
+    background: #D9FDD3;
     padding: 8px 12px;
     margin-bottom: 8px;
-    border-left: 4px solid #2196f3;
+    border-left: 4px solid #06CF9C;
     border-radius: 8px;
     display: none;
     font-size: 14px;
@@ -201,7 +243,7 @@
 
 /* Voice Recording Interface */
 .voice-recording-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0EA5E9;
     padding: 15px;
     border-radius: 12px;
     display: none;
@@ -296,7 +338,7 @@
 
 .btn-send-recording {
     background: white;
-    color: #667eea;
+    color: #0EA5E9;
 }
 
 /* Voice Note Bubble */
@@ -318,8 +360,18 @@
 }
 
 .voice-note-bubble.sent {
-    background: #6cd4ff;
+    background: #D9FDD3;
+    color: #111B21;
+}
+
+.voice-play-btn {
+    background: #0EA5E9;
     color: white;
+}
+
+.voice-play-btn:hover {
+    background: #0284C7;
+    transform: scale(1.1);
 }
 
 .voice-note-bubble.received {
@@ -364,7 +416,7 @@
 
 .voice-wave-bar.active {
     opacity: 1;
-    background: #2196f3;
+    background: #0EA5E9;
 }
 
 .voice-duration {
@@ -444,7 +496,7 @@
 }
 
 .btn-camera {
-    background: #4CAF50;
+    background: #0EA5E9;
     color: white;
 }
 
@@ -459,22 +511,22 @@
 }
 
 .btn-voice {
-    background: #6cd4ff;
+    background: #0EA5E9;
     color: white;
 }
 
 .btn-voice.recording {
-    background: #ff4444;
+    background: #EF4444;
     animation: pulse-button 1.5s infinite;
 }
 
 @keyframes pulse-button {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-    50% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
 }
 
 .btn-send {
-    background: #6cd4ff;
+    background: #0EA5E9;
     color: white;
 }
 
@@ -491,7 +543,7 @@
 
 #messageInput:focus {
     outline: none;
-    border-color: #6cd4ff;
+    border-color: #0EA5E9;
 }
 
 .hide-on-recording {
@@ -545,12 +597,12 @@
 }
 
 .btn-capture {
-    background: #4CAF50;
+    background: #0EA5E9;
     color: white;
 }
 
 .btn-switch-camera {
-    background: #2196F3;
+    background: #0EA5E9;
     color: white;
 }
 
@@ -665,7 +717,7 @@
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: #0EA5E9;
     transition: width 0.3s;
 }
 
@@ -758,7 +810,7 @@
 .typing-dot {
     width: 8px;
     height: 8px;
-    background: #667eea;
+    background: #0EA5E9;
     border-radius: 50%;
     animation: typing 1.4s infinite;
 }
@@ -797,30 +849,34 @@
     .chat-wrapper {
         top: 0;
     }
-    
+
+    .chat-messages {
+        padding: 12px 12px;
+    }
+
     .message-bubble {
         max-width: 85%;
     }
-    
+
     .chat-header {
-        padding: 10px 15px;
+        padding: 8px 12px;
     }
-    
+
     .chat-input-area {
         padding: 8px 10px;
     }
-    
+
     .input-btn {
         width: 38px;
         height: 38px;
         font-size: 16px;
     }
-    
+
     #messageInput {
         font-size: 16px;
         padding: 9px 12px;
     }
-    
+
     .voice-note-bubble {
         max-width: 240px;
     }
@@ -831,7 +887,7 @@
     position: fixed;
     top: 80px;
     right: 20px;
-    background: linear-gradient(135deg, #00a884 0%, #008069 100%);
+    background: #0EA5E9;
     color: white;
     padding: 12px 20px;
     border-radius: 30px;
@@ -841,7 +897,7 @@
     gap: 10px;
     font-weight: 600;
     z-index: 1000;
-    box-shadow: 0 4px 20px rgba(0, 168, 132, 0.4);
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
     animation: callBtnBounce 2s infinite;
     transition: all 0.3s;
 }
@@ -850,7 +906,7 @@
     transform: scale(1.05);
     text-decoration: none;
     color: white;
-    box-shadow: 0 6px 25px rgba(0, 168, 132, 0.6);
+    box-shadow: 0 6px 25px rgba(14, 165, 233, 0.6);
 }
 
 .active-call-btn i {
@@ -884,7 +940,7 @@
     width: 100%;
     height: 100%;
     border-radius: 30px;
-    border: 2px solid #00a884;
+    border: 2px solid #0EA5E9;
     animation: pulse 2s infinite;
     top: 0;
     left: 0;
@@ -922,19 +978,19 @@
 
 /* Pinned Message Banner */
 .pinned-message-banner {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 12px 20px;
+    background: #fff3cd;
+    color: #111B21;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #ffc107;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .pinned-message-banner:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: #fff0b3;
 }
 
 .pinned-content {
@@ -954,9 +1010,9 @@
 }
 
 .unpin-btn {
-    background: rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.1);
     border: none;
-    color: white;
+    color: #666;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -968,15 +1024,15 @@
 }
 
 .unpin-btn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.15);
     transform: scale(1.1);
 }
 
 .typing-indicator {
-    padding: 8px 20px;
-    background: #f0f2f5;
+    padding: 6px 16px;
+    background: #E8EFF5;
     font-size: 13px;
-    color: #667eea;
+    color: #0EA5E9;
     font-style: italic;
     display: none;
 }
@@ -989,7 +1045,7 @@
 /* ✅ NEW: Link Preview Styles */
     .link-preview-container {
         background: #f8f9fa;
-        border-left: 3px solid #6cd4ff;
+        border-left: 3px solid #0EA5E9;
         border-radius: 8px;
         padding: 8px;
         margin-top: 8px;
@@ -1110,7 +1166,7 @@
     
     .message-bubble.received .message-link-preview {
         background: #f8f9fa;
-        border-left-color: #6cd4ff;
+        border-left-color: #0EA5E9;
     }
     
     .message-link-preview:hover {
@@ -1183,12 +1239,12 @@
                     
                     <div class="position-relative me-3">
                         @if($group->group_image)
-                            <img src="{{ $group->group_image }}" 
-                                 class="rounded-circle mr-2" 
-                                 style="width:45px;height:45px;object-fit:cover;border:2px solid white;">
+                            <img src="{{ $group->group_image }}"
+                                 class="rounded-circle mr-2"
+                                 style="width:40px;height:40px;object-fit:cover;">
                         @else
-                            <div class="rounded-circle mr-2" 
-                                 style="width:45px;height:45px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;border:2px solid white;">
+                            <div class="rounded-circle mr-2"
+                                 style="width:40px;height:40px;background:#0EA5E9;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;">
                                 {{ strtoupper(substr($group->name, 0, 1)) }}
                             </div>
                         @endif
@@ -1280,18 +1336,20 @@
     @forelse($messages as $message)
         {{-- ✅ CHECK IF IT'S A CALL MESSAGE --}}
         @if($message->message_type === 'call')
-            <div class="call-message-wrapper" style="text-align: center; margin: 20px 0;">
-                <div class="call-message" style="display: inline-block; background: #e3f2fd; padding: 12px 20px; border-radius: 20px; font-size: 14px; color: #1976d2;">
-                    <i class="fa fa-{{ $message->call_type === 'video' ? 'video' : 'phone' }}" style="margin-right: 8px;"></i>
-                    <strong>{{ $message->sender->name }}</strong> started a {{ $message->call_type }} call
-                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
-                        {{ $message->created_at->format('g:i A') }}
+            <div class="call-message-wrapper" style="text-align: center; margin: 8px 0;">
+                <div class="call-message" style="display: inline-flex; align-items:center; gap:8px; background: white; padding: 8px 16px; border-radius: 7.5px; font-size: 13px; color: #111B21; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#0EA5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa fa-{{ $message->call_type === 'video' ? 'video' : 'phone' }}" style="color:white;font-size:14px;"></i>
                     </div>
-                    @if($message->call_duration)
-                        <div style="font-size: 12px; color: #666;">
-                            Duration: {{ gmdate('H:i:s', $message->call_duration) }}
+                    <div style="text-align:left;">
+                        <div><strong>{{ $message->sender->name }}</strong> started a {{ $message->call_type }} call</div>
+                        <div style="font-size: 11px; color: #667781; margin-top: 2px;">
+                            {{ $message->created_at->format('g:i A') }}
+                            @if($message->call_duration)
+                                &middot; {{ gmdate('H:i:s', $message->call_duration) }}
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         @else
@@ -1491,9 +1549,9 @@
                         {{-- Show read receipts only for sent messages --}}
                         @if($message->sender_id == $user->id)
                             @if($message->status === 'seen')
-                                <span style="color: #dfe3e6ff;">✓✓</span>
+                                <span style="color: #53BDEB;">✓✓</span>
                             @else
-                                <span style="color: #999;">✓</span>
+                                <span style="color: #667781;">✓</span>
                             @endif
                         @endif
                     </div>
@@ -1811,6 +1869,7 @@
 
 const groupId = {{ $group->id }};
 const userId = {{ $user->id }};
+window._inGroupChat = groupId;
 const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
 const isCreator = {{ $isCreator ? 'true' : 'false' }};
 let lastMessageId = {{ $messages->last()->id ?? 0 }};
@@ -3093,7 +3152,7 @@ function displayForwardModal(friends) {
                 </div>
                 <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                     <button onclick="closeForwardModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer;">Cancel</button>
-                    <button onclick="confirmForward()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #6cd4ff; color: white; cursor: pointer;">Forward</button>
+                    <button onclick="confirmForward()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #0EA5E9; color: white; cursor: pointer;">Forward</button>
                 </div>
             </div>
         </div>
@@ -3895,64 +3954,66 @@ document.addEventListener('DOMContentLoaded', () => {
      GROUP CALL OVERLAY — WhatsApp-style in-page
      ============================================ --}}
 
-{{-- Full-screen call overlay --}}
-<div id="groupCallOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:5000; background:linear-gradient(180deg, #0B3D35 0%, #0A1E1A 100%); flex-direction:column;">
+{{-- Full-screen call overlay — WhatsApp Style --}}
+<div id="groupCallOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:5000; background:linear-gradient(180deg, #0B3D35 0%, #0B141A 40%); flex-direction:column;">
     {{-- Header --}}
-    <div style="background:rgba(0,0,0,0.4); padding:15px 20px; display:flex; align-items:center; justify-content:space-between;">
+    <div style="background:transparent; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
         <div>
-            <h3 id="gcOverlayGroupName" style="color:white; margin:0; font-size:18px;">{{ $group->name }}</h3>
-            <p id="gcOverlayStatus" style="color:#8696A0; margin:4px 0 0; font-size:14px;">Calling...</p>
-            <p id="gcOverlayTimer" style="color:white; margin:4px 0 0; font-size:16px; font-weight:bold; display:none;">00:00</p>
+            <h3 id="gcOverlayGroupName" style="color:#E9EDEF; margin:0; font-size:17px; font-weight:500;">{{ $group->name }}</h3>
+            <p id="gcOverlayStatus" style="color:#8696A0; margin:4px 0 0; font-size:13px;">Calling...</p>
+            <p id="gcOverlayTimer" style="color:#E9EDEF; margin:4px 0 0; font-size:18px; font-weight:500; display:none;">00:00</p>
         </div>
-        <button onclick="GroupCallApp.minimize()" style="background:rgba(255,255,255,0.15); border:none; color:white; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:16px;" title="Minimize"><i class="fa fa-compress"></i></button>
+        <button onclick="GroupCallApp.minimize()" style="background:rgba(255,255,255,0.08); border:none; color:#AEBAC1; width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:15px;" title="Minimize"><i class="fa fa-compress"></i></button>
     </div>
 
     {{-- Participant video grid --}}
-    <div id="gcParticipantsGrid" style="flex:1; display:grid; gap:8px; padding:8px; overflow-y:auto; grid-template-columns:1fr;">
+    <div id="gcParticipantsGrid" style="flex:1; display:grid; gap:4px; padding:4px; overflow-y:auto; grid-template-columns:1fr; align-content:center;">
         {{-- Local user --}}
-        <div id="gcLocalParticipant" style="position:relative; background:#2a2a2a; border-radius:12px; overflow:hidden; min-height:200px; display:flex; align-items:center; justify-content:center;">
+        <div id="gcLocalParticipant" style="position:relative; background:#1B2B32; border-radius:16px; overflow:hidden; min-height:200px; display:flex; align-items:center; justify-content:center;">
             <div id="gcLocalVideo" style="width:100%;height:100%;"></div>
-            <div id="gcLocalPlaceholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; position:absolute;">
-                <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, #00a884 0%, #008069 100%); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; margin-bottom:12px; border:3px solid rgba(255,255,255,0.2);">
+            <div id="gcLocalPlaceholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; color:#E9EDEF; position:absolute;">
+                <div style="width:80px; height:80px; border-radius:50%; background:#0EA5E9; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:500; margin-bottom:10px; color:white;">
                     {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                 </div>
-                <p>You</p>
+                <p style="margin:0; font-size:14px;">You</p>
             </div>
-            <div style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.75); color:white; padding:6px 12px; border-radius:16px; font-size:13px;">You</div>
+            <div style="position:absolute; bottom:10px; left:10px; background:rgba(11,20,26,0.7); color:#E9EDEF; padding:4px 10px; border-radius:6px; font-size:13px;">You</div>
         </div>
         {{-- Remote participants are added dynamically --}}
     </div>
 
     {{-- Incoming call buttons (for receivers) --}}
-    <div id="gcIncomingButtons" style="display:none; justify-content:center; gap:40px; padding:20px;">
-        <button onclick="GroupCallApp.declineCall()" style="width:65px; height:65px; border-radius:50%; background:#f44336; border:none; color:white; font-size:24px; cursor:pointer;"><i class="fa fa-phone-slash"></i></button>
-        <button onclick="GroupCallApp.joinCall(GroupCallApp.callId)" style="width:65px; height:65px; border-radius:50%; background:#4CAF50; border:none; color:white; font-size:24px; cursor:pointer;"><i class="fa fa-phone"></i></button>
+    <div id="gcIncomingButtons" style="display:none; justify-content:center; gap:48px; padding:24px 20px 40px;">
+        <div style="text-align:center;">
+            <button onclick="GroupCallApp.declineCall()" style="width:60px; height:60px; border-radius:50%; background:#EA4335; border:none; color:white; font-size:22px; cursor:pointer;"><i class="fa fa-phone-slash"></i></button>
+            <div style="color:#8696A0; font-size:12px; margin-top:8px;">Decline</div>
+        </div>
+        <div style="text-align:center;">
+            <button onclick="GroupCallApp.joinCall(GroupCallApp.callId)" style="width:60px; height:60px; border-radius:50%; background:#4CAF50; border:none; color:white; font-size:22px; cursor:pointer;"><i class="fa fa-phone"></i></button>
+            <div style="color:#8696A0; font-size:12px; margin-top:8px;">Join</div>
+        </div>
     </div>
 
     {{-- Active call controls --}}
-    <div id="gcActiveButtons" style="display:flex; justify-content:center; align-items:center; gap:15px; padding:20px; background:rgba(0,0,0,0.5);">
-        <button id="gcMuteBtn" onclick="GroupCallApp.toggleMute()" style="width:55px; height:55px; border-radius:50%; background:rgba(60,60,60,1); border:none; color:white; font-size:20px; cursor:pointer;" title="Mute"><i class="fa fa-microphone"></i></button>
-        <button id="gcVideoBtn" onclick="GroupCallApp.toggleVideo()" style="width:55px; height:55px; border-radius:50%; background:rgba(60,60,60,1); border:none; color:white; font-size:20px; cursor:pointer; display:none;" title="Camera"><i class="fa fa-video"></i></button>
-        <button onclick="GroupCallApp.leaveCall()" style="width:65px; height:65px; border-radius:50%; background:#dc3545; border:none; color:white; font-size:24px; cursor:pointer;" title="Leave Call"><i class="fa fa-phone-slash"></i></button>
-        <button onclick="GroupCallApp.minimize()" style="width:55px; height:55px; border-radius:50%; background:rgba(60,60,60,1); border:none; color:white; font-size:20px; cursor:pointer;" title="Minimize"><i class="fa fa-compress"></i></button>
+    <div id="gcActiveButtons" style="display:flex; justify-content:center; align-items:center; gap:20px; padding:20px 0 34px; background:rgba(11,20,26,0.95);">
+        <button id="gcMuteBtn" onclick="GroupCallApp.toggleMute()" style="width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:#E9EDEF; font-size:20px; cursor:pointer;" title="Mute"><i class="fa fa-microphone"></i></button>
+        <button id="gcVideoBtn" onclick="GroupCallApp.toggleVideo()" style="width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:#E9EDEF; font-size:20px; cursor:pointer; display:none;" title="Camera"><i class="fa fa-video"></i></button>
+        <button onclick="GroupCallApp.leaveCall()" style="width:60px; height:60px; border-radius:50%; background:#EA4335; border:none; color:white; font-size:22px; cursor:pointer;" title="Leave Call"><i class="fa fa-phone-slash"></i></button>
+        <button onclick="GroupCallApp.minimize()" style="width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:#E9EDEF; font-size:20px; cursor:pointer;" title="Minimize"><i class="fa fa-compress"></i></button>
     </div>
 </div>
 
-{{-- Minimized Group Call Bar --}}
-<div id="gcMinimizedBar" style="display:none; position:fixed; top:0; left:0; right:0; z-index:4999; background:#00a884; color:white; padding:10px 16px; align-items:center; justify-content:space-between;">
+{{-- Minimized Group Call Bar — WhatsApp Style --}}
+<div id="gcMinimizedBar" style="display:none; position:fixed; top:0; left:0; right:0; z-index:4999; background:#0EA5E9; color:white; padding:8px 16px; align-items:center; justify-content:space-between;">
     <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="GroupCallApp.maximize()">
-        <i class="fa fa-phone" style="animation:callPulseRing 2s infinite;"></i>
-        <span id="gcBarTimer">00:00</span>
-        <span>{{ $group->name }} - Group Call</span>
+        <i class="fa fa-phone" style="font-size:14px;"></i>
+        <span id="gcBarTimer" style="font-size:14px; font-weight:500;">00:00</span>
+        <span style="font-size:14px;">{{ $group->name }}</span>
     </div>
-    <button onclick="GroupCallApp.leaveCall()" style="background:#f44336; color:white; border:none; border-radius:20px; padding:5px 16px; cursor:pointer; font-weight:bold;">Leave</button>
+    <button onclick="GroupCallApp.leaveCall()" style="background:#EA4335; color:white; border:none; border-radius:16px; padding:4px 14px; cursor:pointer; font-weight:500; font-size:13px;">Leave</button>
 </div>
 
 <style>
-@keyframes gcPulseRing {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 168, 132, 0.4); }
-    50% { box-shadow: 0 0 0 15px rgba(0, 168, 132, 0); }
-}
 #gcParticipantsGrid[data-count="2"] { grid-template-columns: repeat(2, 1fr); }
 #gcParticipantsGrid[data-count="3"],
 #gcParticipantsGrid[data-count="4"] { grid-template-columns: repeat(2, 1fr); }
@@ -3983,6 +4044,7 @@ const GroupCallApp = {
     audioContext: null,
     ringbackInterval: null,
     remoteUsers: {},
+    _joiningAgora: false,
 
     // ---- Start outgoing group call ----
     async start(type) {
@@ -4101,6 +4163,11 @@ const GroupCallApp = {
 
     // ---- Join Agora Channel ----
     async joinAgoraChannel() {
+        if (this._joiningAgora) {
+            console.log('⚠️ Already joining Agora channel, skipping duplicate call');
+            return;
+        }
+        this._joiningAgora = true;
         try {
             console.log('🔗 Joining Agora channel:', this.agoraChannel);
 
@@ -4146,6 +4213,49 @@ const GroupCallApp = {
                 this.handleRemoteLeft(user);
             });
 
+            // Auto-renew token before it expires
+            this.agoraClient.on('token-privilege-will-expire', async () => {
+                console.log('🔄 Token expiring soon, renewing...');
+                try {
+                    const renewResponse = await fetch('/agora/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ channel: this.agoraChannel })
+                    });
+                    const renewData = await renewResponse.json();
+                    if (renewData.success && renewData.token) {
+                        await this.agoraClient.renewToken(renewData.token);
+                        console.log('✅ Token renewed successfully');
+                    }
+                } catch (err) {
+                    console.error('❌ Token renewal failed:', err);
+                }
+            });
+
+            this.agoraClient.on('token-privilege-did-expire', async () => {
+                console.log('⚠️ Token expired, attempting to renew...');
+                try {
+                    const renewResponse = await fetch('/agora/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ channel: this.agoraChannel })
+                    });
+                    const renewData = await renewResponse.json();
+                    if (renewData.success && renewData.token) {
+                        await this.agoraClient.renewToken(renewData.token);
+                        console.log('✅ Token renewed after expiry');
+                    }
+                } catch (err) {
+                    console.error('❌ Token renewal after expiry failed:', err);
+                }
+            });
+
             // Join
             await this.agoraClient.join(tokenData.app_id, this.agoraChannel, tokenData.token, tokenData.uid);
             console.log('✅ Joined Agora channel');
@@ -4177,6 +4287,7 @@ const GroupCallApp = {
 
         } catch (error) {
             console.error('❌ Agora join error:', error);
+            this._joiningAgora = false;
             alert('Failed to connect call. Check microphone/camera permissions.');
             this.cleanup();
             this.hideOverlay();
@@ -4191,15 +4302,15 @@ const GroupCallApp = {
         if (!participantDiv) {
             participantDiv = document.createElement('div');
             participantDiv.id = `gc-remote-${uid}`;
-            participantDiv.style.cssText = 'position:relative; background:#2a2a2a; border-radius:12px; overflow:hidden; min-height:200px; display:flex; align-items:center; justify-content:center;';
+            participantDiv.style.cssText = 'position:relative; background:#1B2B32; border-radius:16px; overflow:hidden; min-height:200px; display:flex; align-items:center; justify-content:center;';
             participantDiv.innerHTML = `
                 <div id="gc-remote-video-${uid}" style="width:100%;height:100%;"></div>
-                <div id="gc-remote-placeholder-${uid}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; position:absolute;">
-                    <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, #00a884 0%, #008069 100%); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; margin-bottom:12px; border:3px solid rgba(255,255,255,0.2);">U</div>
-                    <p>User ${uid}</p>
+                <div id="gc-remote-placeholder-${uid}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; color:#E9EDEF; position:absolute;">
+                    <div style="width:80px; height:80px; border-radius:50%; background:#0EA5E9; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:500; margin-bottom:10px; color:white;">U</div>
+                    <p style="margin:0; font-size:14px;">User ${uid}</p>
                 </div>
-                <div style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.75); color:white; padding:6px 12px; border-radius:16px; font-size:13px;">User ${uid}</div>
-                <div style="position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; background:rgba(0,168,132,0.9); color:white;">Joined</div>
+                <div style="position:absolute; bottom:10px; left:10px; background:rgba(11,20,26,0.7); color:#E9EDEF; padding:4px 10px; border-radius:6px; font-size:13px;">User ${uid}</div>
+                <div style="position:absolute; top:10px; right:10px; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:500; background:rgba(14,165,233,0.85); color:white;">Joined</div>
             `;
             document.getElementById('gcParticipantsGrid').appendChild(participantDiv);
             this.remoteUsers[uid] = user;
@@ -4264,7 +4375,7 @@ const GroupCallApp = {
         this.localAudioTrack.setEnabled(!this.isMuted);
         const btn = document.getElementById('gcMuteBtn');
         btn.querySelector('i').className = this.isMuted ? 'fa fa-microphone-slash' : 'fa fa-microphone';
-        btn.style.background = this.isMuted ? '#dc3545' : 'rgba(60,60,60,1)';
+        btn.style.background = this.isMuted ? '#EA4335' : 'rgba(255,255,255,0.1)';
     },
 
     // ---- Toggle video ----
@@ -4274,7 +4385,7 @@ const GroupCallApp = {
         this.localVideoTrack.setEnabled(!this.isVideoOff);
         const btn = document.getElementById('gcVideoBtn');
         btn.querySelector('i').className = this.isVideoOff ? 'fa fa-video-slash' : 'fa fa-video';
-        btn.style.background = this.isVideoOff ? '#dc3545' : 'rgba(60,60,60,1)';
+        btn.style.background = this.isVideoOff ? '#EA4335' : 'rgba(255,255,255,0.1)';
     },
 
     // ---- Minimize / Maximize ----
@@ -4382,8 +4493,21 @@ const GroupCallApp = {
         this.isVideoOff = false;
         this.remoteUsers = {};
         this.agoraChannel = null;
+        this._joiningAgora = false;
     }
 };
+
+// Auto-join group call from URL parameter (when navigating from global notification)
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinCallId = urlParams.get('join_call');
+    const joinCallType = urlParams.get('call_type');
+    if (joinCallId) {
+        GroupCallApp.callType = joinCallType || 'audio';
+        GroupCallApp.joinCall(joinCallId);
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+})();
 </script>
 
 @endsection

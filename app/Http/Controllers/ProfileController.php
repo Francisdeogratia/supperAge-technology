@@ -29,6 +29,27 @@ class ProfileController extends Controller
         ));
     }
 
+    public function uploadCover(Request $request)
+    {
+        $userId = Session::get('id');
+        $user = UserRecord::find($userId);
+
+        if (!$user) {
+            return response()->json(['success' => false, 'error' => 'Not logged in'], 401);
+        }
+
+        $request->validate(['cover' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120']);
+
+        $file = $request->file('cover');
+        $filename = 'cover_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/covers'), $filename);
+
+        $user->bgimg = 'uploads/covers/' . $filename;
+        $user->save();
+
+        return response()->json(['success' => true, 'url' => asset('uploads/covers/' . $filename)]);
+    }
+
     public function update(Request $request)
     {
         $username = Session::get('username');

@@ -329,6 +329,74 @@ body.dark-mode .op-card .badge.bg-secondary { background: #3A3B3C !important; co
   color: #000;
 }
 
+/* Inline Feed Video Auto-play */
+.inline-video-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+}
+.inline-feed-video {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+.inline-video-mute-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.2s;
+}
+.inline-video-mute-btn:hover {
+  background: rgba(0,0,0,0.85);
+}
+.inline-video-expand-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 52px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.2s;
+}
+.inline-video-expand-btn:hover {
+  background: rgba(0,0,0,0.85);
+}
+.inline-video-paused-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: rgba(255,255,255,0.8);
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.3s;
+}
+
 /* ===== Facebook-style Media Grid ===== */
 .fb-media-grid {
   display: grid;
@@ -2003,7 +2071,9 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
         </a>
         <div class="sb-name-row">
             <h3 class="sb-name">{{ $user->name }}
-                @if($user->badge_status)
+                @if($user->badge_expired)
+                    <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:15px;"></i>
+                @elseif($user->badge_status)
                     <img src="{{ asset($user->badge_status) }}" alt="Verified" title="Verified User" class="sb-badge">
                 @endif
             </h3>
@@ -2583,7 +2653,9 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
       </a>
       <div>
         <strong>{{ $author->name ?? 'Unknown' }}</strong>
-        @if(isset($author->badge_status) && $author->badge_status)
+        @if(isset($author) && $author->badge_expired)
+            <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:15px;margin-left:5px;"></i>
+        @elseif(isset($author->badge_status) && $author->badge_status)
             <img src="{{ asset($author->badge_status) }}" style="width:18px;height:18px;margin-left:5px;">
         @endif
         <br>
@@ -2634,17 +2706,19 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
           $shortContent = $isLong ? mb_substr($content, 0, 8) . '...' : $content;
         @endphp
 
+        @if(trim($content) !== '[media-only post]')
         <p class="single-post-content-{{ $post->id }}">
           {!! nl2br(e($shortContent)) !!}
           @if($isLong)
             <a href="#" class="read-more-link text-primary" onclick="toggleSingleContent(event, {{ $post->id }})">Read more</a>
           @endif
         </p>
-        
+
         <p class="single-post-content-full-{{ $post->id }}" style="display: none;">
           {!! nl2br(e($post->post_content)) !!}
           <a href="#" class="read-less-link text-primary" onclick="toggleSingleContent(event, {{ $post->id }})">Read less</a>
         </p>
+        @endif
 
         {{-- Media --}}
         @php
@@ -2698,14 +2772,24 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
                     $currentVideoIndex = $videoIndexCounter;
                     $videoIndexCounter++;
                   @endphp
-                  <a href="javascript:void(0);"
-                     data-post-id="{{ $post->id }}"
-                     onclick='openModernVideo(null, null, null, {{ $videoGalleryJsonForPost }}, {{ $currentVideoIndex }}, {{ $post->id }})'>
-                    <div class="video-thumb-wrapper">
-                      <img src="{{ $cloudinaryThumb }}" alt="Video thumbnail" />
-                      <span class="fb-play-icon">&#9658;</span>
+                  <div class="inline-video-wrapper" data-post-id="{{ $post->id }}" data-video-gallery='{{ $videoGalleryJsonForPost }}' data-video-index="{{ $currentVideoIndex }}">
+                    <video
+                      class="inline-feed-video"
+                      src="{{ $file }}"
+                      poster="{{ $cloudinaryThumb }}"
+                      loop
+                      muted
+                      playsinline
+                      preload="metadata"
+                      onclick="expandInlineVideo(this.closest('.inline-video-wrapper').querySelector('.inline-video-expand-btn'))"
+                    ></video>
+                    <div class="inline-video-mute-btn" onclick="toggleInlineMute(event, this)">
+                      <i class="fas fa-volume-mute"></i>
                     </div>
-                  </a>
+                    <div class="inline-video-expand-btn" onclick="expandInlineVideo(this)">
+                      <i class="fas fa-expand"></i>
+                    </div>
+                  </div>
                 @endif
                 @if($i === $displayCount - 1 && $mediaCount > 4)
                   <div class="fb-media-overlay" onclick="document.querySelector('[data-fancybox=&quot;{{ $fancyboxGroupSingle }}&quot;]').click();">
@@ -2832,6 +2916,7 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
             @endphp
 
             {{-- Post Content --}}
+@if(trim($content) !== '[media-only post]')
 <p class="post-content-{{ $post->id }}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; font-size: 13px;">
   {{ $shortContent }}
   @if($isLong)
@@ -2843,6 +2928,7 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
   {!! nl2br(e($post->post_content)) !!}
   <a href="#" class="read-less-link" style="font-size: 12px;" onclick="toggleContent(event, {{ $post->id }})">Read less</a>
 </p>
+@endif
 
 {{-- ✅ ADD THIS: Link Preview for Promoted Posts --}}
 @if($post->link_preview)
@@ -2927,14 +3013,24 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
             $currentVidIdx = $videoIdxSmall;
             $videoIdxSmall++;
           @endphp
-          <a href="javascript:void(0);"
-             data-post-id="{{ $post->id }}"
-             onclick='openModernVideo(null, null, null, {{ $videoGalleryJson }}, {{ $currentVidIdx }}, {{ $post->id }})'>
-            <div class="video-thumb-wrapper">
-              <img src="{{ $cloudinaryThumb }}" alt="Video thumbnail" />
-              <span class="fb-play-icon">&#9658;</span>
+          <div class="inline-video-wrapper" data-post-id="{{ $post->id }}" data-video-gallery='{{ $videoGalleryJson }}' data-video-index="{{ $currentVidIdx }}">
+            <video
+              class="inline-feed-video"
+              src="{{ $file }}"
+              poster="{{ $cloudinaryThumb }}"
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              onclick="expandInlineVideo(this.closest('.inline-video-wrapper').querySelector('.inline-video-expand-btn'))"
+            ></video>
+            <div class="inline-video-mute-btn" onclick="toggleInlineMute(event, this)">
+              <i class="fas fa-volume-mute"></i>
             </div>
-          </a>
+            <div class="inline-video-expand-btn" onclick="expandInlineVideo(this)">
+              <i class="fas fa-expand"></i>
+            </div>
+          </div>
         @endif
         @if($k === $displayCountSm - 1 && $fileCount > 4)
           <div class="fb-media-overlay" onclick="document.querySelector('[data-fancybox=&quot;{{ $fancyboxGroup }}&quot;]').click();">
@@ -3164,7 +3260,9 @@ function trackAdClick(adId, targetUrl) {
           <div class="op-author-info">
             <div class="op-author-name">
               <a href="{{ route('profile.show', $author->id) }}">{{ $author->name }}</a>
-              @if($author->badge_status)
+              @if($author->badge_expired)
+                <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:14px;"></i>
+              @elseif($author->badge_status)
                 <img src="{{ asset($author->badge_status) }}" alt="Verified" style="width:16px;height:16px;">
               @endif
             </div>
@@ -3215,6 +3313,7 @@ function trackAdClick(adId, targetUrl) {
             $shortContent = $isLong ? mb_substr($content, 0, 90) . '...' : $content;
           @endphp
 
+          @if(trim($content) !== '[media-only post]')
           <p class="other-post-content-{{ $post->id }}">
             {!! nl2br(e($shortContent)) !!}
             @if($isLong)
@@ -3225,7 +3324,8 @@ function trackAdClick(adId, targetUrl) {
           <p class="other-post-content-full-{{ $post->id }}" style="display: none;">
             {!! nl2br(e($post->post_content)) !!}
             <a href="#" class="read-less-link" onclick="toggleOtherContent(event, {{ $post->id }})">Read less</a>
-          </p> 
+          </p>
+          @endif 
 
           <!-- ✅ NEW: Display Link Preview -->
             @if($post->link_preview)
@@ -3296,14 +3396,24 @@ function trackAdClick(adId, targetUrl) {
             $currentVideoIdx = $videoIndexCounter2;
             $videoIndexCounter2++;
           @endphp
-          <a href="javascript:void(0);"
-             data-post-id="{{ $post->id }}"
-             onclick='openModernVideo(null, null, null, {{ $videoGalleryJson }}, {{ $currentVideoIdx }}, {{ $post->id }})'>
-            <div class="video-thumb-wrapper">
-              <img src="{{ $cloudinaryThumb }}" alt="Video thumbnail" />
-              <span class="fb-play-icon">&#9658;</span>
+          <div class="inline-video-wrapper" data-post-id="{{ $post->id }}" data-video-gallery='{{ $videoGalleryJson }}' data-video-index="{{ $currentVideoIdx }}">
+            <video
+              class="inline-feed-video"
+              src="{{ $file }}"
+              poster="{{ $cloudinaryThumb }}"
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              onclick="expandInlineVideo(this.closest('.inline-video-wrapper').querySelector('.inline-video-expand-btn'))"
+            ></video>
+            <div class="inline-video-mute-btn" onclick="toggleInlineMute(event, this)">
+              <i class="fas fa-volume-mute"></i>
             </div>
-          </a>
+            <div class="inline-video-expand-btn" onclick="expandInlineVideo(this)">
+              <i class="fas fa-expand"></i>
+            </div>
+          </div>
         @endif
         @if($j === $displayCount2 - 1 && $fileCount > 4)
           <div class="fb-media-overlay" onclick="document.querySelector('[data-fancybox=&quot;{{ $fancyboxGroup }}&quot;]').click();">
@@ -3505,7 +3615,9 @@ function trackAdClick(adId, targetUrl) {
                            class="rounded-circle" style="width:35px; height:35px; object-fit: cover; margin-right: 10px;">
                       <div>
                         <strong>{{ $person->name }}</strong>
-                        @if($person->badge_status)
+                        @if($person->badge_expired)
+                          <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:15px;vertical-align:middle;"></i>
+                        @elseif($person->badge_status)
                           <img src="{{ asset($person->badge_status) }}" alt="Verified" title="Verified User" style="width:18px; height:18px; vertical-align: middle;">
                         @endif
                         <small class="text-muted d-block">{{ '@' . $person->username }}</small>
@@ -5784,6 +5896,7 @@ document.addEventListener('DOMContentLoaded', function() {
               $shortContent = $isLong ? mb_substr($content, 0, 10) . '...' : $content;
             @endphp
 
+            @if(trim($content) !== '[media-only post]')
             <p class="post-content-{{ $post->id }}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; font-size: 13px;">
               {{ $shortContent }}
               @if($isLong)
@@ -5795,6 +5908,7 @@ document.addEventListener('DOMContentLoaded', function() {
               {!! nl2br(e($post->post_content)) !!}
               <a href="#" class="read-less-link" style="font-size: 12px;" onclick="toggleContent(event, {{ $post->id }})">Read less</a>
             </p>
+            @endif
 
             @php
               // --- Attachment Logic Setup ---
@@ -5850,14 +5964,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         $currentVidIdxSm2 = $videoIdxSm2;
                         $videoIdxSm2++;
                       @endphp
-                      <a href="javascript:void(0);"
-                         data-post-id="{{ $post->id }}"
-                         onclick='openModernVideo(null, null, null, {{ $videoGalleryJsonSm2 }}, {{ $currentVidIdxSm2 }}, {{ $post->id }})'>
-                        <div class="video-thumb-wrapper">
-                          <img src="{{ $cloudinaryThumb }}" alt="Video thumbnail" />
-                          <span class="fb-play-icon">&#9658;</span>
+                      <div class="inline-video-wrapper" data-post-id="{{ $post->id }}" data-video-gallery='{{ $videoGalleryJsonSm2 }}' data-video-index="{{ $currentVidIdxSm2 }}">
+                        <video
+                          class="inline-feed-video"
+                          src="{{ $file }}"
+                          poster="{{ $cloudinaryThumb }}"
+                          loop
+                          muted
+                          playsinline
+                          preload="metadata"
+                          onclick="expandInlineVideo(this.closest('.inline-video-wrapper').querySelector('.inline-video-expand-btn'))"
+                        ></video>
+                        <div class="inline-video-mute-btn" onclick="toggleInlineMute(event, this)">
+                          <i class="fas fa-volume-mute"></i>
                         </div>
-                      </a>
+                        <div class="inline-video-expand-btn" onclick="expandInlineVideo(this)">
+                          <i class="fas fa-expand"></i>
+                        </div>
+                      </div>
                     @endif
                     @if($m === $displayCountSm2 - 1 && $fileCount > 4)
                       <div class="fb-media-overlay" onclick="document.querySelector('[data-fancybox=&quot;{{ $fancyboxGroup }}&quot;]').click();">
@@ -6492,15 +6616,40 @@ function copyToClipboard(text) {
     });
 }
 
+function _showBtnSpinner(el) {
+    if (!el) return;
+    el._origHTML = el.innerHTML;
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0.7';
+    el.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Please wait...';
+}
+
+function _hideBtnSpinner(el, html) {
+    if (!el) return;
+    el.style.pointerEvents = '';
+    el.style.opacity = '';
+    el.innerHTML = html || el._origHTML || '';
+}
+
 function copyPostLink(url) {
+    var el = event ? event.currentTarget : null;
+    _showBtnSpinner(el);
     navigator.clipboard.writeText(url).then(() => {
-        alert("Post link copied to clipboard!");
+        if (el) {
+            el.innerHTML = '<i class="fa fa-check" style="color:#28a745;"></i> Link copied!';
+            el.style.pointerEvents = '';
+            el.style.opacity = '';
+            setTimeout(() => _hideBtnSpinner(el), 1500);
+        }
     }).catch(err => {
         console.error('Error copying link: ', err);
+        _hideBtnSpinner(el);
     });
 }
 
 function downloadFile(url) {
+    var el = event ? event.currentTarget : null;
+    _showBtnSpinner(el);
     fetch(url)
         .then(response => response.blob())
         .then(blob => {
@@ -6513,14 +6662,17 @@ function downloadFile(url) {
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(blobUrl);
+            _hideBtnSpinner(el);
         })
         .catch(err => {
             console.error('Download failed:', err);
+            _hideBtnSpinner(el);
             window.open(url, '_blank');
         });
 }
 
 function toggleSavePost(postId, el) {
+    _showBtnSpinner(el);
     fetch('{{ route("posts.toggleSave") }}', {
         method: 'POST',
         headers: {
@@ -6532,21 +6684,24 @@ function toggleSavePost(postId, el) {
     .then(res => res.json())
     .then(data => {
         if (data.status === 'saved') {
-            el.innerHTML = '<i class="fa fa-bookmark" style="color: #dc3545;"></i> Unsave post';
+            _hideBtnSpinner(el, '<i class="fa fa-bookmark" style="color: #dc3545;"></i> Unsave post');
             el.style.color = '#dc3545';
-            el.querySelector('i').style.color = '#dc3545';
         } else {
-            el.innerHTML = '<i class="fa fa-bookmark" style="color: #28a745;"></i> Save post';
+            _hideBtnSpinner(el, '<i class="fa fa-bookmark" style="color: #28a745;"></i> Save post');
             el.style.color = '#28a745';
-            el.querySelector('i').style.color = '#28a745';
         }
     })
-    .catch(err => console.error('Save toggle failed:', err));
+    .catch(err => {
+        console.error('Save toggle failed:', err);
+        _hideBtnSpinner(el);
+    });
 }
 
 function shareAsTale(postId) {
     if (!confirm('Share this post as a Tale?')) return;
 
+    var el = event ? event.currentTarget : null;
+    _showBtnSpinner(el);
     fetch('{{ route("posts.shareAsTale") }}', {
         method: 'POST',
         headers: {
@@ -6557,6 +6712,7 @@ function shareAsTale(postId) {
     })
     .then(res => res.json())
     .then(data => {
+        _hideBtnSpinner(el);
         if (data.status === 'success') {
             alert(data.message);
         } else {
@@ -6565,6 +6721,7 @@ function shareAsTale(postId) {
     })
     .catch(err => {
         console.error('Share as tale failed:', err);
+        _hideBtnSpinner(el);
         alert('Something went wrong.');
     });
 }
@@ -7702,7 +7859,6 @@ $(document).ready(function() {
                 controlsList="nodownload"
                 playsinline
                 preload="metadata"
-                crossorigin="anonymous"
             >
                 Your browser does not support the video tag.
             </video>
@@ -7941,7 +8097,90 @@ document.getElementById('modernVideoOverlay').addEventListener('click', function
 });
 </script>
 
+<script>
+// ===== Inline Feed Video Auto-Play on Scroll =====
+(function() {
+    var inlineMuted = true;
 
+    // Auto-play/pause videos based on visibility
+    var videoObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            var video = entry.target;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                video.play().catch(function() {});
+            } else {
+                video.pause();
+            }
+        });
+    }, { threshold: 0.5 });
+
+    // Observe all inline feed videos
+    function observeInlineVideos() {
+        document.querySelectorAll('.inline-feed-video').forEach(function(video) {
+            if (!video.dataset.observed) {
+                video.dataset.observed = '1';
+                videoObserver.observe(video);
+            }
+        });
+    }
+
+    // Initial observe
+    observeInlineVideos();
+
+    // Re-observe after new content loads (infinite scroll, AJAX)
+    var feedObserver = new MutationObserver(function() {
+        observeInlineVideos();
+    });
+    var feedContainer = document.querySelector('.op-card-area') || document.body;
+    feedObserver.observe(feedContainer, { childList: true, subtree: true });
+
+    // Toggle play/pause on tap
+    window.toggleInlineVideo = function(video) {
+        if (video.paused) {
+            video.play().catch(function() {});
+        } else {
+            video.pause();
+        }
+    };
+
+    // Toggle mute/unmute
+    window.toggleInlineMute = function(e, btn) {
+        e.stopPropagation();
+        var video = btn.parentElement.querySelector('video');
+        var icon = btn.querySelector('i');
+        if (video.muted) {
+            // Unmute this video, mute all others
+            document.querySelectorAll('.inline-feed-video').forEach(function(v) {
+                v.muted = true;
+            });
+            video.muted = false;
+            icon.className = 'fas fa-volume-up';
+            inlineMuted = false;
+        } else {
+            video.muted = true;
+            icon.className = 'fas fa-volume-mute';
+            inlineMuted = true;
+        }
+        // Update all mute button icons
+        document.querySelectorAll('.inline-video-mute-btn i').forEach(function(ic) {
+            if (ic !== icon) ic.className = 'fas fa-volume-mute';
+        });
+    };
+
+    // Expand to full video player modal
+    window.expandInlineVideo = function(btn) {
+        var wrapper = btn.closest('.inline-video-wrapper');
+        var postId = wrapper.dataset.postId;
+        var gallery = wrapper.dataset.videoGallery;
+        var index = parseInt(wrapper.dataset.videoIndex) || 0;
+        // Pause the inline video
+        var video = wrapper.querySelector('video');
+        if (video) video.pause();
+        // Open in the modal player
+        openModernVideo(null, null, null, gallery, index, postId);
+    };
+})();
+</script>
 
 
 

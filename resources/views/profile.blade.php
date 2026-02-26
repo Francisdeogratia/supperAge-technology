@@ -41,6 +41,40 @@
         border-radius: 15px 15px 0 0;
         position: relative;
     }
+    .profile-cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 15px 15px 0 0;
+        position: absolute;
+        top: 0; left: 0;
+    }
+    .cover-upload-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+        z-index: 20;
+        white-space: nowrap;
+    }
+    .cover-upload-btn:hover { background: rgba(0,0,0,0.75); }
+    .cover-upload-btn .btn-label { display: inline; }
+    @media (max-width: 480px) {
+        .cover-upload-btn { padding: 7px 10px; font-size: 14px; border-radius: 50%; gap: 0; }
+        .cover-upload-btn .btn-label { display: none; }
+    }
     
     .profile-picture-container {
         position: absolute;
@@ -206,21 +240,36 @@
 @section('content')
 <div class="container mt-4" style="margin-bottom: 80px;">
     {{-- Profile Header --}}
-    <div class="profile-cover">
+    <div class="profile-cover" id="profileCoverBox">
+        {{-- Cover background image --}}
+        @if($profileUser->bgimg)
+            <img src="{{ asset($profileUser->bgimg) }}" class="profile-cover-img" alt="Cover Photo" id="coverPreview">
+        @else
+            <img src="" class="profile-cover-img" id="coverPreview" style="display:none;">
+        @endif
+
+        {{-- Upload cover button (own profile only) --}}
+        @if(isset($isOwnProfile) && $isOwnProfile)
+            <input type="file" id="coverFileInput" accept="image/*" style="display:none;">
+            <button class="cover-upload-btn" onclick="document.getElementById('coverFileInput').click()">
+                <i class="fa fa-camera"></i><span class="btn-label"> Edit Cover</span>
+            </button>
+        @endif
+
         <div class="profile-picture-container">
             @if($profileUser->profileimg)
-                <img src="{{ str_replace('/upload/', '/upload/w_150,h_150,c_fill,r_max,q_70/', $profileUser->profileimg) }}" 
-                     class="profile-picture" 
+                <img src="{{ str_replace('/upload/', '/upload/w_150,h_150,c_fill,r_max,q_70/', $profileUser->profileimg) }}"
+                     class="profile-picture"
                      alt="{{ $profileUser->name }}">
             @else
                 <div class="profile-picture" style="background: #ddd; display: flex; align-items: center; justify-content: center;">
                     <i class="fa fa-user" style="font-size: 60px; color: #999;"></i>
                 </div>
             @endif
-            
+
             @if($profileUser->badge_status)
-                <img src="{{ asset($profileUser->badge_status) }}" 
-                     alt="Verified" 
+                <img src="{{ asset($profileUser->badge_status) }}"
+                     alt="Verified"
                      style="width:40px;height:40px;position:absolute;bottom:5px;right:5px;border-radius:50%;border:3px solid white;">
             @endif
         </div>
@@ -228,7 +277,14 @@
     
     {{-- Profile Info --}}
     <div style="text-align: center; margin-top: 60px;">
-        <h2>{{ $profileUser->name }}</h2>
+        <h2 style="display:inline-flex;align-items:center;gap:8px;justify-content:center;">
+            {{ $profileUser->name }}
+            @if($profileUser->badge_status)
+                <img src="{{ asset($profileUser->badge_status) }}"
+                     alt="Verified" title="Verified User"
+                     style="width:26px;height:26px;border-radius:50%;vertical-align:middle;">
+            @endif
+        </h2>
         <p class="text-muted">{{ '@' . $profileUser->username }}</p>
         
         {{-- ✅ MONETIZATION BADGE --}}
@@ -368,6 +424,10 @@
             @if($friendStatus === 'friends')
                 <button type="button" class="btn btn-success" disabled>
                     <i class="fa fa-check"></i> Friends
+                </button>
+                <button type="button" class="btn btn-outline-danger unfriend-btn"
+                        data-user-id="{{ $profileUser->id }}">
+                    <i class="fa fa-user-times"></i> Unfriend
                 </button>
             @elseif($friendStatus === 'pending_sent')
                 <button type="button" class="btn btn-warning friend-action-btn" 
@@ -519,6 +579,55 @@
 <script>
 $(document).ready(function() {
     
+    // Cover photo upload
+    const coverInput = document.getElementById('coverFileInput');
+    if (coverInput) {
+        coverInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('cover', file);
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+            const btn = document.querySelector('.cover-upload-btn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading...';
+            btn.disabled = true;
+
+            fetch('{{ route("profile.uploadCover") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const preview = document.getElementById('coverPreview');
+                    preview.src = data.url;
+                    preview.style.display = 'block';
+                    // Remove default gradient once image loads
+                    document.getElementById('profileCoverBox').style.background = 'none';
+                    btn.innerHTML = '<i class="fa fa-check"></i> Saved!';
+                    setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; }, 2000);
+                } else {
+                    alert(data.error || 'Upload failed. Try again.');
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            })
+            .catch(() => {
+                alert('Upload failed. Try again.');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            });
+        });
+    }
+
+    // Remove gradient if cover image exists
+    @if($profileUser->bgimg)
+        document.getElementById('profileCoverBox').style.background = 'none';
+    @endif
+
     // Follow/Unfollow Button Handler
     $('.follow-toggle-btn').on('click', function() {
         const btn = $(this);
@@ -601,6 +710,39 @@ $(document).ready(function() {
         });
     });
     
+    // Unfriend Handler
+    $('.unfriend-btn').on('click', function() {
+        if (!confirm('Are you sure you want to unfriend this person?')) return;
+        const btn = $(this);
+        const userId = btn.data('user-id');
+        const originalHtml = btn.html();
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Removing...');
+
+        $.ajax({
+            url: '{{ url("/friends/unfriend") }}/' + userId,
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(response) {
+                if (response.success) {
+                    // Replace both buttons with Add Friend button
+                    btn.closest('.profile-actions').find('.btn-success[disabled]').remove();
+                    btn.replaceWith(
+                        '<button type="button" class="btn btn-info send-friend-request-btn" data-user-id="' + userId + '">' +
+                        '<i class="fa fa-user-plus"></i> Add Friend</button>'
+                    );
+                } else {
+                    alert(response.error || 'Something went wrong.');
+                    btn.prop('disabled', false).html(originalHtml);
+                }
+            },
+            error: function() {
+                alert('Something went wrong. Please try again.');
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
     // Accept/Cancel Friend Request Handler
     $('.friend-action-btn').on('click', function() {
         const btn = $(this);

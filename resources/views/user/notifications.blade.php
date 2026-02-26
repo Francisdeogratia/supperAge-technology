@@ -13,830 +13,652 @@
 
     <meta charset="utf-8">
     <meta name="author" content="omoha Ekenedilichukwu Francis">
-    <meta name="description" content="SupperAge is the social-financial app where you can chat, share, earn, shop, create stores, fund wallets, and withdraw money.">
-    <meta name="keywords" content="SupperAge, social financial app, earn money online, chat and earn, online marketplace, digital wallet, social networking, e-commerce platform">
-   <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="SupperAge notifications">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-site-verification" content="IWdPOFToacXu8eoMwOYWPxqja5IAyAd_cQSBAILNfWo" />
-
     <meta http-equiv="X-UA-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Notifications</title>
+    <title>Notifications – SupperAge</title>
 
-    <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
 
-    <!-- Stylesheets -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <!-- Font Awesome 4.7 (matches your fa fa-user-circle class) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    
-    <!-- Your Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/post.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/bar.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/finebtn.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/mobilenavbar.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/searchuser.css') }}">
 
-
-    <!-- Scripts -->
-    <style>
-  .notification-card.unread {
-    background-color: #f5faff;
-    border-left: 4px solid #007bff;
-  }
-  .hover-card {
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  z-index: 10;
-  display: none;
-  width: 250px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+<style>
+/* ── Page wrapper ── */
+.notif-page {
+    max-width: 720px;
+    margin: 20px auto;
+    padding: 0 14px 80px;
 }
 
-.sender-name:hover + .hover-card {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
+/* ── Header bar ── */
+.notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.notif-header h4 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c1e21;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.notif-header h4 .notif-count {
+    background: #1877f2;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+.notif-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.btn-notif-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-read-all  { background: #e7f3ff; color: #1877f2; }
+.btn-read-all:hover  { background: #1877f2; color: #fff; }
+.btn-delete-all { background: #fff0f0; color: #e74c3c; }
+.btn-delete-all:hover { background: #e74c3c; color: #fff; }
+
+/* ── Notification card ── */
+.notif-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border-left: 4px solid transparent;
+    transition: box-shadow 0.2s, background 0.2s;
+    position: relative;
+}
+.notif-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+.notif-card.unread {
+    background: #f0f7ff;
+    border-left-color: #1877f2;
+}
+.notif-card.missed-call {
+    background: #fff8f0;
+    border-left-color: #ff9800;
+}
+.notif-card.missed-call.unread {
+    background: #ffe8cc;
 }
 
-
-
-
-.notification-card.unread {
-  background-color: #f0f8ff;
-  border-left: 4px solid #007bff;
+/* ── Avatar ── */
+.notif-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+.notif-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e4e6eb;
+}
+.notif-device-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    font-size: 10px;
+    line-height: 1;
 }
 
-.notification-card {
-  transition: all 0.3s ease;
+/* ── Body ── */
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+.notif-sender {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1c1e21;
+}
+.notif-sender a { color: #1877f2; text-decoration: none; }
+.notif-sender a:hover { text-decoration: underline; }
+.notif-sender .status-text { font-weight: 400; color: #65676b; font-size: 12px; margin-left: 4px; }
+.notif-message { font-size: 14px; color: #3e4150; margin: 4px 0 8px; line-height: 1.45; }
+.missed-call-badge { font-weight: 600; color: #e65100; }
+.notif-time { font-size: 12px; color: #8a8d91; }
+.notif-actions { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── Delete btn ── */
+.notif-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #bec3c9;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+}
+.notif-delete-btn:hover { color: #e74c3c; background: #fff0f0; }
+
+/* ── Empty state ── */
+.notif-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.notif-empty i { font-size: 52px; color: #d0d3d9; margin-bottom: 14px; display: block; }
+.notif-empty p { font-size: 16px; color: #65676b; font-weight: 500; }
+
+/* ── Thumbnail ── */
+.notif-thumb { max-width: 120px; border-radius: 8px; margin-top: 6px; }
+
+/* ── Modern pagination ── */
+.notif-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    padding-bottom: 20px;
+}
+.notif-pagination a,
+.notif-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.notif-pagination a {
+    background: #fff;
+    color: #1877f2;
+    border: 1.5px solid #d8dadf;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.notif-pagination a:hover {
+    background: #1877f2;
+    color: #fff;
+    border-color: #1877f2;
+    box-shadow: 0 4px 10px rgba(24,119,242,0.25);
+}
+.notif-pagination span.current {
+    background: linear-gradient(135deg, #1877f2, #42a5f5);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(24,119,242,0.35);
+}
+.notif-pagination span.dots {
+    background: none;
+    border: none;
+    color: #8a8d91;
+    box-shadow: none;
+    font-size: 16px;
 }
 
-.notification-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* ── Toast ── */
+.notif-toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1c1e21;
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+}
+.notif-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.notif-toast.error { background: #e74c3c; }
+
+/* Dark mode */
+body.dark-mode .notif-header h4 { color: #E4E6EB; }
+body.dark-mode .notif-card { background: #242526; border-left-color: transparent; }
+body.dark-mode .notif-card.unread { background: #1c2a3a; border-left-color: #2D88FF; }
+body.dark-mode .notif-sender { color: #E4E6EB; }
+body.dark-mode .notif-message { color: #B0B3B8; }
+body.dark-mode .notif-pagination a { background: #3A3B3C; color: #2D88FF; border-color: #4E4F50; }
+body.dark-mode .notif-pagination a:hover { background: #2D88FF; color: #fff; border-color: #2D88FF; }
+
+@media (max-width: 480px) {
+    .notif-card { padding: 12px 12px 12px 14px; }
+    .notif-avatar { width: 40px; height: 40px; }
+    .btn-notif-action { padding: 6px 11px; font-size: 12px; }
+    .notif-header h4 { font-size: 17px; }
 }
 </style>
-
-
-    
 </head>
 <body>
-  @extends('layouts.app')
-<!-- Your notify  navbar content  -->
-    @include('layouts.navbar')
-
-
+@extends('layouts.app')
+@include('layouts.navbar')
 
 @php
   use Jenssegers\Agent\Agent;
-@endphp
-
-
-
-@php
   use App\Helpers\GeoHelper;
 @endphp
 
-
-
-
-
 @section('content')
-<div class="container position-relative">
-  <h4>Your Notifications</h4>
+<div class="notif-page">
 
-  {{-- Loop through notifications --}}
-  @forelse($notifications as $note)
+    {{-- Header --}}
+    <div class="notif-header">
+        <h4>
+            <i class="fas fa-bell" style="color:#1877f2;"></i>
+            Notifications
+            @php $unreadCount = $notifications->where('read_notification','no')->count(); @endphp
+            @if($unreadCount > 0)
+                <span class="notif-count">{{ $unreadCount }} new</span>
+            @endif
+        </h4>
+        @if($notifications->count() > 0)
+        <div class="notif-header-actions">
+            <button class="btn-notif-action btn-read-all" id="readAllBtn">
+                <i class="fas fa-check-double"></i> Read All
+            </button>
+            <button class="btn-notif-action btn-delete-all" id="deleteAllBtn">
+                <i class="fas fa-trash-alt"></i> Delete All
+            </button>
+        </div>
+        @endif
+    </div>
+
+    {{-- Notifications list --}}
+    @forelse($notifications as $note)
     @php
-      $sender = $note->sender;
-      $loginSession = $sender ? $sender->loginSession : null;
-      $isOnline = $sender ? $sender->isOnline : false;
-      $lastSeen = $sender ? $sender->lastSeen : 'Never';
-      $statusColor = $isOnline ? 'Online' : 'Offline';
-      $device = $loginSession ? $loginSession->device : 'Unknown';
-      $location = $loginSession ? GeoHelper::lookup($loginSession->ip_address ?? '') : 'Unknown';
-      $isUnread = $note->read_notification === 'no';
-      
-      
-// Check notification type
-      $isFriendNotification = in_array($note->type, ['friend_request', 'friend_request_accepted', 'friend_request_rejected']);
-      $isMessageNotification = $note->type === 'new_message';
-      $isMissedCallNotification = $note->type === 'missed_call';
+        $sender       = $note->sender;
+        $loginSession = $sender ? $sender->loginSession : null;
+        $isOnline     = $sender ? $sender->isOnline : false;
+        $lastSeen     = $sender ? $sender->lastSeen : 'Never';
+        $isMobile     = $loginSession ? $loginSession->isMobile : false;
+        $isUnread     = $note->read_notification === 'no';
 
-// Get related data based on type
-      if ($isFriendNotification) {
-          $friendRequest = \App\Models\FriendRequest::find($note->notifiable_id);
-      } elseif ($isMissedCallNotification) {
-          $callData = json_decode($note->data, true);
-          $callType = $callData['call_type'] ?? 'audio';
-          $callReason = $callData['reason'] ?? 'no_answer';
-      } elseif (!$isMessageNotification) {
-          $post = \App\Models\SamplePost::find($note->notifiable_id);
-          $files = $post ? json_decode($post->file_path, true) : [];
-          $firstFile = $files[0] ?? null;
-      }
-      
-      $isMobile = $loginSession ? $loginSession->isMobile : false;
+        $isFriendNotification  = in_array($note->type, ['friend_request','friend_request_accepted','friend_request_rejected']);
+        $isMessageNotification = $note->type === 'new_message';
+        $isMissedCall          = $note->type === 'missed_call';
+
+        if ($isFriendNotification) {
+            $friendRequest = \App\Models\FriendRequest::find($note->notifiable_id);
+        } elseif ($isMissedCall) {
+            $callData   = json_decode($note->data, true);
+            $callType   = $callData['call_type'] ?? 'audio';
+            $callReason = $callData['reason'] ?? 'no_answer';
+        } elseif (!$isMessageNotification) {
+            $post      = \App\Models\SamplePost::find($note->notifiable_id);
+            $files     = $post ? json_decode($post->file_path, true) : [];
+            $firstFile = $files[0] ?? null;
+        }
     @endphp
 
-    <div class="card mb-3 notification-card {{ $isUnread ? 'unread' : '' }} {{ $isMissedCallNotification ? 'missed-call-notification' : '' }}">
-      <div class="card-body d-flex flex-column flex-md-row align-items-start">
-        {{-- Sender avatar --}}
-        <div class="position-relative me-3 mb-3 mb-md-0">
-          <img src="{{ $sender && $sender->profileimg ? $sender->profileimg : asset('images/best3.png') }}"
-               alt="Profile Image"
-               class="rounded-circle"
-               style="width: 50px; height: 50px; object-fit: cover; border-radius:50%;"
-               title="{{ $isOnline ? 'Online now' : 'Last seen ' . $lastSeen }}">
-          @if($isMobile)
-            <span style="position: absolute; top: -5px; left: -5px; background-color: #007bff; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px;">📱</span>
-          @else
-            <span style="position: absolute; top: 5px; left: 5px; background-color: #28a745; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px;">🖥️</span>
-          @endif
+    <div class="notif-card {{ $isUnread ? 'unread' : '' }} {{ $isMissedCall ? 'missed-call' : '' }}"
+         id="notif-{{ $note->id }}">
+
+        {{-- Delete btn --}}
+        <button class="notif-delete-btn" data-id="{{ $note->id }}" title="Delete">
+            <i class="fas fa-times"></i>
+        </button>
+
+        {{-- Avatar --}}
+        <div class="notif-avatar-wrap">
+            <img src="{{ $sender && $sender->profileimg ? $sender->profileimg : asset('images/best3.png') }}"
+                 class="notif-avatar"
+                 alt="avatar"
+                 title="{{ $isOnline ? 'Online now' : 'Last seen '.$lastSeen }}">
+            <span class="notif-device-badge">{{ $isMobile ? '📱' : '🖥️' }}</span>
         </div>
 
-        {{-- Notification details --}}
-        <div style="flex: 1; position: relative;">
-          <strong class="sender-name" style="cursor: pointer;">
-            @if($sender && $sender->exists)
-              <a href="{{ url('/profile/' . $sender->id) }}">{{ $sender->username }}</a>
-              <i class="text-muted">{{ $statusColor }}</i>
+        {{-- Body --}}
+        <div class="notif-body">
+            <div class="notif-sender">
+                @if($sender && $sender->exists)
+                    <a href="{{ url('/profile/'.$sender->id) }}">{{ $sender->username }}</a>
+                    @if($sender->badge_status)
+                        <img src="{{ asset($sender->badge_status) }}"
+                             alt="Verified" title="Verified"
+                             style="width:14px;height:14px;border-radius:50%;vertical-align:middle;margin-left:3px;">
+                    @endif
+                    <span class="status-text">· {{ $isOnline ? 'Online' : 'Offline' }}</span>
+                @else
+                    <span class="text-muted">Unknown User</span>
+                @endif
+            </div>
+
+            <div class="notif-message">
+                @if($note->type === 'friend_request')              👥 {{ $note->message }}
+                @elseif($note->type === 'friend_request_accepted') ✅ {{ $note->message }}
+                @elseif($note->type === 'friend_request_rejected') ❌ {{ $note->message }}
+                @elseif($note->type === 'new_message')             💬 {{ $note->message }}
+                @elseif($note->type === 'group_message')           💬 {{ $note->message }}
+                @elseif($note->type === 'group_added')             👥 {{ $note->message }}
+                @elseif($note->type === 'group_joined')            👥 {{ $note->message }}
+                @elseif($isMissedCall)
+                    @php $callIcon=$callType==='video'?'📹':'📞'; $reasonIcon=$callReason==='no_answer'?'⏰':'❌'; @endphp
+                    <span class="missed-call-badge">{{ $reasonIcon }} {{ $callIcon }} {{ $note->message }}</span>
+                @else
+                    {{ $note->message }}
+                @endif
+            </div>
+
+            {{-- Thumbnail --}}
+            @if(!$isFriendNotification && !$isMessageNotification && !$isMissedCall && isset($firstFile))
+                @if(Str::contains($firstFile,['image','jpg','jpeg','png','gif']))
+                    <img src="{{ $firstFile }}" class="notif-thumb" alt="media">
+                @elseif(Str::contains($firstFile,['video']))
+                    <video src="{{ $firstFile }}" controls class="notif-thumb"></video>
+                @endif
+            @endif
+
+            {{-- Action buttons --}}
+            <div class="notif-actions">
+            @if($note->type === 'new_message')
+                <a href="{{ route('messages.chat',$note->user_id) }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">
+                    <i class="fa fa-reply"></i> Reply
+                </a>
+            @elseif($note->type === 'group_message')
+                @php $data=json_decode($note->data,true); $groupId=$data['group_id']??null; @endphp
+                @if($groupId)
+                <a href="{{ route('groups.show',$groupId) }}" class="btn btn-sm btn-success notification-link" data-notification-id="{{ $note->id }}">
+                    <i class="fa fa-comments"></i> View Group
+                </a>
+                @endif
+            @elseif($note->type==='group_added'||$note->type==='group_joined')
+                @php $data=json_decode($note->data,true); $groupId=$data['group_id']??null; @endphp
+                @if($groupId)
+                <a href="{{ route('groups.show',$groupId) }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">
+                    <i class="fa fa-users"></i> View Group
+                </a>
+                @endif
+            @elseif($isMissedCall)
+                <a href="{{ route('messages.chat',$note->user_id) }}" class="btn btn-sm btn-success notification-link" data-notification-id="{{ $note->id }}">
+                    <i class="fa fa-phone"></i> Call Back
+                </a>
+                <a href="{{ route('messages.chat',$note->user_id) }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">
+                    <i class="fa fa-comment"></i> Message
+                </a>
+            @elseif($note->type==='friend_request' && isset($friendRequest))
+                <button class="btn btn-sm btn-success accept-friend-btn" data-request-id="{{ $friendRequest->id }}" data-notification-id="{{ $note->id }}">✓ Accept</button>
+                <button class="btn btn-sm btn-danger reject-friend-btn" data-request-id="{{ $friendRequest->id }}" data-notification-id="{{ $note->id }}">✗ Reject</button>
+                <a href="{{ route('friends.index') }}" class="btn btn-sm btn-outline-secondary notification-link" data-notification-id="{{ $note->id }}">Friends Page</a>
+            @elseif($isFriendNotification)
+                <a href="{{ route('friends.index') }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">View Friends</a>
+            @elseif($note->type==='live_started')
+                <a href="{{ $note->link }}" class="btn btn-sm btn-danger notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-video"></i> Watch Live</a>
+            @elseif($note->type==='event_rsvp'||$note->type==='event_created'||$note->type==='event_reminder'||$note->type==='event_updated'||$note->type==='event_cancelled')
+                @php $data=json_decode($note->data,true); $eventId=$data['event_id']??null; @endphp
+                @if($eventId)
+                <a href="{{ route('events.show',$eventId) }}" class="btn btn-sm btn-info notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-calendar"></i> View Event</a>
+                @endif
+            @elseif($note->type==='marketplace_store')
+                <a href="{{ route('marketplace.my-store') }}" class="btn btn-sm btn-success notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-store"></i> My Store</a>
+            @elseif($note->type==='marketplace_order'||$note->type==='marketplace_order_update')
+                @php $data=json_decode($note->data,true); $orderNumber=$data['order_number']??null; @endphp
+                @if($orderNumber)
+                <a href="{{ route('marketplace.order-details',$orderNumber) }}" class="btn btn-sm btn-warning notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-shopping-cart"></i> View Order</a>
+                @endif
+            @elseif($note->type==='marketplace_order_placed')
+                <a href="{{ route('marketplace.my-orders') }}" class="btn btn-sm btn-success notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-receipt"></i> My Orders</a>
+            @elseif(in_array($note->type,['marketplace_subscription_expired','marketplace_subscription_reminder_7','marketplace_subscription_reminder_3','marketplace_subscription_reminder_1']))
+                <a href="{{ route('marketplace.renew-subscription') }}" class="btn btn-sm btn-danger notification-link" data-notification-id="{{ $note->id }}"><i class="fas fa-exclamation-triangle"></i> Renew</a>
+            @elseif($note->type==='ad_approved'||$note->type==='ad_rejected')
+                <a href="{{ route('advertising.show',$note->notifiable_id) }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">View Ad</a>
             @else
-              <span class="text-muted">Unknown User (deleted account)</span>
+                <a href="{{ route('notifications.markAndRedirect',$note->notifiable_id) }}" class="btn btn-sm btn-primary notification-link" data-notification-id="{{ $note->id }}">View Post</a>
             @endif
-          </strong>
+            </div>
 
-          <div class="hover-card">
-            @if($sender)
-              <strong>{{ $sender->name }}</strong><br>
-              <small>{{ $sender->bio }}</small><br>
-              <small>{{ $sender->country }}, {{ $sender->state }}</small><br>
-              <small>Role: {{ ucfirst($sender->role) }}</small><br>
-              @if($sender->badge_status === 'verified')
-                <span style="color: green;">✔ Verified</span>
-              @endif
-              <small>Gender: {{ ucfirst($sender->gender) }}</small><br>
-              <small>DOB: {{ \Carbon\Carbon::parse($sender->dob)->format('M d, Y') }}</small><br>
-              <small>Status: {{ $isOnline ? 'Online now' : 'Last seen ' . $lastSeen }}</small><br>
-              <small>Location: {{ $location }}</small><br>
-              <small>Device: {{ $device }}</small><br>
-            @else
-              <small>User no longer exists</small><br>
-            @endif
-          </div>
-
-         <p class="mb-1 mt-2">
-    @if($note->type === 'friend_request')
-        👥 {{ $note->message }}
-    @elseif($note->type === 'friend_request_accepted')
-        ✅ {{ $note->message }}
-    @elseif($note->type === 'friend_request_rejected')
-        ❌ {{ $note->message }}
-    @elseif($note->type === 'new_message')
-        💬 {{ $note->message }}
-    @elseif($note->type === 'group_message')
-        💬 {{ $note->message }}
-    @elseif($note->type === 'group_added')
-        👥 {{ $note->message }}
-    @elseif($note->type === 'group_joined')
-        👥 {{ $note->message }}
-    @elseif($note->type === 'missed_call')
-        @php
-            $callIcon = $callType === 'video' ? '📹' : '📞';
-            $reasonIcon = $callReason === 'no_answer' ? '⏰' : '❌';
-        @endphp
-        <span class="missed-call-badge">
-            {{ $reasonIcon }} {{ $callIcon }} {{ $note->message }}
-        </span>
-    @else
-        {{ $note->message }}
-    @endif
-</p>
-         
-          {{-- Thumbnail preview for post notifications --}}
-          @if(!$isFriendNotification && !$isMessageNotification && !$isMissedCallNotification && isset($firstFile))
-            @if(Str::contains($firstFile, ['image', 'jpg', 'jpeg', 'png', 'gif']))
-                <img src="{{ $firstFile }}" alt="Shared Image" class="img-fluid rounded" style="max-width: 50%;">
-            @elseif(Str::contains($firstFile, ['video']))
-                <video src="{{ $firstFile }}" controls class="img-fluid rounded" style="max-width: 50%;"></video>
-            @endif
-          @endif
-
-         {{-- REPLACE the entire action buttons section in your notifications.blade.php --}}
-{{-- Action buttons based on notification type --}}
-@if($note->type === 'new_message')
-    <a href="{{ route('messages.chat', $note->user_id) }}" 
-       class="btn btn-sm btn-primary mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fa fa-reply"></i> Reply to Message
-    </a>
-
-@elseif($note->type === 'group_message')
-    @php
-        $data = json_decode($note->data, true);
-        $groupId = $data['group_id'] ?? null;
-    @endphp
-    @if($groupId)
-        <a href="{{ route('groups.show', $groupId) }}" 
-           class="btn btn-sm btn-success mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fa fa-comments"></i> View Group Chat
-        </a>
-    @endif
-
-@elseif($note->type === 'group_added' || $note->type === 'group_joined')
-    @php
-        $data = json_decode($note->data, true);
-        $groupId = $data['group_id'] ?? null;
-    @endphp
-    @if($groupId)
-        <a href="{{ route('groups.show', $groupId) }}" 
-           class="btn btn-sm btn-primary mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fa fa-users"></i> View Group
-        </a>
-    @endif
-
-@elseif($note->type === 'missed_call')
-    <div class="mt-2">
-        <a href="{{ route('messages.chat', $note->user_id) }}" 
-           class="btn btn-sm btn-success notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fa fa-phone"></i> Call Back
-        </a>
-        <a href="{{ route('messages.chat', $note->user_id) }}" 
-           class="btn btn-sm btn-primary ms-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fa fa-comment"></i> Send Message
-        </a>
-    </div>
-
-@elseif($note->type === 'friend_request' && isset($friendRequest))
-    <div class="mt-2">
-        <button class="btn btn-sm btn-success accept-friend-btn" 
-                data-request-id="{{ $friendRequest->id }}"
-                data-notification-id="{{ $note->id }}">
-            ✓ Accept
-        </button>
-        <button class="btn btn-sm btn-danger reject-friend-btn ms-2" 
-                data-request-id="{{ $friendRequest->id }}"
-                data-notification-id="{{ $note->id }}">
-            ✗ Reject
-        </button>
-        <a href="{{ route('friends.index') }}" 
-           class="btn btn-sm btn-primary ms-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            View Friends Page
-        </a>
-    </div>
-
-@elseif($isFriendNotification)
-    <a href="{{ route('friends.index') }}" 
-       class="btn btn-sm btn-primary mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        View Friends Page
-    </a>
-
-@elseif($note->type === 'live_started')
-    <a href="{{ $note->link }}" 
-        class="btn btn-sm btn-danger mt-2 notification-link"
-        data-notification-id="{{ $note->id }}">
-        <i class="fas fa-video"></i> Watch Live Stream
-    </a>
-
-{{-- 🎉 EVENT NOTIFICATIONS --}}
-@elseif($note->type === 'event_rsvp')
-    @php
-        $data = json_decode($note->data, true);
-        $eventId = $data['event_id'] ?? null;
-    @endphp
-    @if($eventId)
-        <a href="{{ route('events.show', $eventId) }}" 
-           class="btn btn-sm btn-info mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-calendar-check"></i> View Event
-        </a>
-    @endif
-
-@elseif($note->type === 'event_created')
-    @php
-        $data = json_decode($note->data, true);
-        $eventId = $data['event_id'] ?? null;
-    @endphp
-    @if($eventId)
-        <a href="{{ route('events.show', $eventId) }}" 
-           class="btn btn-sm btn-success mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-calendar-plus"></i> View New Event
-        </a>
-    @endif
-
-@elseif($note->type === 'event_reminder')
-    @php
-        $data = json_decode($note->data, true);
-        $eventId = $data['event_id'] ?? null;
-    @endphp
-    @if($eventId)
-        <a href="{{ route('events.show', $eventId) }}" 
-           class="btn btn-sm btn-warning mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-bell"></i> View Event Details
-        </a>
-    @endif
-
-@elseif($note->type === 'event_updated')
-    @php
-        $data = json_decode($note->data, true);
-        $eventId = $data['event_id'] ?? null;
-    @endphp
-    @if($eventId)
-        <a href="{{ route('events.show', $eventId) }}" 
-           class="btn btn-sm btn-primary mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-sync"></i> View Updated Event
-        </a>
-    @endif
-
-@elseif($note->type === 'event_cancelled')
-    @php
-        $data = json_decode($note->data, true);
-        $eventId = $data['event_id'] ?? null;
-    @endphp
-    @if($eventId)
-        <a href="{{ route('events.index') }}" 
-           class="btn btn-sm btn-danger mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-times-circle"></i> Browse Other Events
-        </a>
-    @endif
-
-{{-- 🛒 MARKETPLACE NOTIFICATIONS --}}
-@elseif($note->type === 'marketplace_store')
-    <a href="{{ route('marketplace.my-store') }}" 
-       class="btn btn-sm btn-success mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fas fa-store"></i> View My Store
-    </a>
-
-@elseif($note->type === 'marketplace_order')
-    @php
-        $data = json_decode($note->data, true);
-        $orderNumber = $data['order_number'] ?? null;
-    @endphp
-    @if($orderNumber)
-        <a href="{{ route('marketplace.order-details', $orderNumber) }}" 
-           class="btn btn-sm btn-warning mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-shopping-cart"></i> View Order Details
-        </a>
-    @else
-        <a href="{{ route('marketplace.my-store') }}" 
-           class="btn btn-sm btn-warning mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-shopping-cart"></i> View Orders
-        </a>
-    @endif
-
-@elseif($note->type === 'marketplace_order_placed')
-    <a href="{{ route('marketplace.my-orders') }}" 
-       class="btn btn-sm btn-success mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fas fa-receipt"></i> View My Orders
-    </a>
-
-@elseif($note->type === 'marketplace_order_update')
-    @php
-        $data = json_decode($note->data, true);
-        $orderNumber = $data['order_number'] ?? null;
-    @endphp
-    @if($orderNumber)
-        <a href="{{ route('marketplace.order-details', $orderNumber) }}" 
-           class="btn btn-sm btn-info mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-box"></i> Track Order
-        </a>
-    @endif
-
-@elseif($note->type === 'marketplace_new_product')
-    @php
-        $data = json_decode($note->data, true);
-        $productSlug = $data['product_slug'] ?? null;
-        $storeId = $data['store_id'] ?? null;
-    @endphp
-    @if($productSlug)
-        <a href="{{ route('marketplace.view-product', $productSlug) }}" 
-           class="btn btn-sm btn-primary mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-box-open"></i> View New Product
-        </a>
-    @elseif($storeId)
-        <a href="{{ route('marketplace.view-store', $storeId) }}" 
-           class="btn btn-sm btn-primary mt-2 notification-link"
-           data-notification-id="{{ $note->id }}">
-            <i class="fas fa-store"></i> View Store
-        </a>
-    @endif
-
-@elseif(in_array($note->type, ['marketplace_subscription_expired', 'marketplace_subscription_reminder_7', 'marketplace_subscription_reminder_3', 'marketplace_subscription_reminder_1']))
-    <a href="{{ route('marketplace.renew-subscription') }}" 
-       class="btn btn-sm btn-danger mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fas fa-exclamation-triangle"></i> Renew Subscription
-    </a>
-
-{{-- 📢 ADVERTISEMENT NOTIFICATIONS --}}
-@elseif($note->type === 'new_advertisement')
-    @php
-        $data = json_decode($note->data, true);
-        $adId = $data['ad_id'] ?? null;
-    @endphp
-    @if($adId)
-        <a href="{{ $note->link }}" 
-           class="btn btn-sm btn-primary mt-2 notification-link"
-           data-notification-id="{{ $note->id }}"
-           target="_blank">
-            <i class="fas fa-external-link-alt"></i> View Advertisement
-        </a>
-    @endif
-
-@elseif($note->type === 'ad_approved')
-    <a href="{{ route('advertising.show', $note->notifiable_id) }}" 
-       class="btn btn-sm btn-success mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fas fa-check-circle"></i> View Ad Campaign
-    </a>
-
-@elseif($note->type === 'ad_rejected')
-    <a href="{{ route('advertising.show', $note->notifiable_id) }}" 
-       class="btn btn-sm btn-danger mt-2 notification-link"
-       data-notification-id="{{ $note->id }}">
-        <i class="fas fa-times-circle"></i> View Rejection Reason
-    </a>
-
-{{-- Default fallback for post notifications --}}
-@else 
-    <a href="{{ route('notifications.markAndRedirect', $note->notifiable_id) }}" 
-        class="btn btn-sm btn-primary mt-2 notification-link"
-        data-notification-id="{{ $note->id }}">
-        View Post
-    </a>
-@endif
-
-
+            <div class="notif-time">{{ \Carbon\Carbon::parse($note->created_at)->diffForHumans() }}</div>
         </div>
-
-        <small class="text-muted ms-3">{{ \Carbon\Carbon::parse($note->created_at)->diffForHumans() }}</small>
-      </div>
     </div>
-@empty
-    <p>No notifications yet.</p>
-@endforelse
+    @empty
+    <div class="notif-empty">
+        <i class="fas fa-bell-slash"></i>
+        <p>You have no notifications yet</p>
+    </div>
+    @endforelse
 
-<style>
-.missed-call-notification {
-    border-left: 4px solid #ff9800 !important;
-    background-color: #fff3e0 !important;
-}
+    {{-- Modern Pagination --}}
+    @if($notifications->hasPages())
+    <nav class="notif-pagination">
+        {{-- Previous --}}
+        @if($notifications->onFirstPage())
+            <span style="opacity:.4;cursor:default;background:#f0f2f5;color:#8a8d91;border:1.5px solid #d8dadf;min-width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        @else
+            <a href="{{ $notifications->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
+        @endif
 
-.missed-call-notification.unread {
-    background-color: #ffe0b2 !important;
-}
+        {{-- Page numbers --}}
+        @foreach($notifications->getUrlRange(1, $notifications->lastPage()) as $page => $url)
+            @if($page == $notifications->currentPage())
+                <span class="current">{{ $page }}</span>
+            @elseif($page == 1 || $page == $notifications->lastPage() || abs($page - $notifications->currentPage()) <= 2)
+                <a href="{{ $url }}">{{ $page }}</a>
+            @elseif(abs($page - $notifications->currentPage()) == 3)
+                <span class="dots">···</span>
+            @endif
+        @endforeach
 
-.missed-call-badge {
-    font-weight: 600;
-    color: #e65100;
-}
-</style>
+        {{-- Next --}}
+        @if($notifications->hasMorePages())
+            <a href="{{ $notifications->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
+        @else
+            <span style="opacity:.4;cursor:default;background:#f0f2f5;color:#8a8d91;border:1.5px solid #d8dadf;min-width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        @endif
+    </nav>
+    @endif
 
-  {{-- Pagination --}}
-  <div class="d-flex justify-content-center mt-4">
-    {{ $notifications->links() }}
-  </div>
 </div>
 
-@endsection
+<div id="notifToast" class="notif-toast"></div>
 
-<!-- Load jQuery first -->
+<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-<!-- Then other jQuery-based scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
-<script src="{{ asset('myjs/bar.js') }}"></script> <!-- this should come last -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.1/dist/emoji-button.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="{{ asset('myjs/bar.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/js/all.min.js"></script> -->
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
-
-    
 <script src="{{ asset('myjs/more_lesstext.js') }}"></script>
-<script src="{{ asset('myjs/menu_pop_up_post.js') }}"></script>
+<script src="{{ asset('myjs/mobilenavbar.js') }}"></script>
 <script src="{{ asset('myjs/allpost.js') }}"></script>
 <script src="{{ asset('myjs/tales.js') }}"></script>
-<script src="{{ asset('myjs/mobilenavbar.js') }}"></script>
 <script src="{{ asset('myjs/searchuser.js') }}"></script>
 
 <script>
+const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+function showToast(msg, isError) {
+    const t = document.getElementById('notifToast');
+    t.textContent = msg;
+    t.className = 'notif-toast show' + (isError ? ' error' : '');
+    setTimeout(() => { t.className = 'notif-toast'; }, 2600);
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Get CSRF token
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
-  
-  // ========================================
-  // MARK NOTIFICATION AS READ (Generic)
-  // ========================================
-  function markNotificationAsRead(notificationId, callback) {
-    fetch(`/notifications/${notificationId}/mark-read`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken
-      }
+function removeCard(id) {
+    const el = document.getElementById('notif-' + id);
+    if (!el) return;
+    el.style.transition = 'opacity 0.3s, transform 0.3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(40px)';
+    setTimeout(() => el.remove(), 300);
+}
+
+// ── Delete single notification ──
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.notif-delete-btn');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    fetch(`/notifications/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Update the notification badge count
-        updateNotificationBadge();
-        
-        // Execute callback if provided
-        if (callback) callback();
-      }
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) { removeCard(id); showToast('Notification deleted'); }
+        else showToast(d.error || 'Failed', true);
     })
-    .catch(error => {
-      console.error('Error marking notification as read:', error);
-      // Still execute callback even if marking fails
-      if (callback) callback();
-    });
-  }
-  
-  // ========================================
-  // UPDATE NOTIFICATION BADGE COUNT
-  // ========================================
-  function updateNotificationBadge() {
-    const badges = document.querySelectorAll('.icon.notifications .badge, .nav-item .nav-badge');
-    badges.forEach(badge => {
-      let count = parseInt(badge.textContent) || 0;
-      if (count > 0) {
-        count--;
-        if (count === 0) {
-          badge.style.display = 'none';
-        } else {
-          badge.textContent = count;
-        }
-      }
-    });
-  }
-  
-  // ========================================
-  // HANDLE MESSAGE/CALL NOTIFICATION CLICKS
-  // ========================================
-  document.querySelectorAll('.notification-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const notificationId = this.getAttribute('data-notification-id');
-      const targetUrl = this.getAttribute('href');
-      
-      // Mark as read, then redirect
-      markNotificationAsRead(notificationId, () => {
-        window.location.href = targetUrl;
-      });
-    });
-  });
-  
-  // ========================================
-  // FRIEND REQUEST: ACCEPT
-  // ========================================
-  document.querySelectorAll('.accept-friend-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const requestId = this.getAttribute('data-request-id');
-      const notificationId = this.getAttribute('data-notification-id');
-      const button = this;
-      
-      // Disable button to prevent double clicks
-      button.disabled = true;
-      button.textContent = 'Processing...';
-      
-      fetch(`/friends/accept/${requestId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Mark notification as read
-          markNotificationAsRead(notificationId, () => {
-            button.closest('.notification-card').classList.remove('unread');
-            button.closest('.notification-card').classList.add('bg-success-subtle');
-            button.parentElement.innerHTML = '<span class="badge bg-success">✓ Friend request accepted</span>';
-            alert('Friend request accepted!');
-          });
-        } else {
-          alert(data.error || 'Failed to accept friend request');
-          button.disabled = false;
-          button.textContent = '✓ Accept';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while accepting the friend request');
-        button.disabled = false;
-        button.textContent = '✓ Accept';
-      });
-    });
-  });
-
-  // ========================================
-  // FRIEND REQUEST: REJECT
-  // ========================================
-  document.querySelectorAll('.reject-friend-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const requestId = this.getAttribute('data-request-id');
-      const notificationId = this.getAttribute('data-notification-id');
-      const button = this;
-      
-      if (confirm('Are you sure you want to reject this friend request?')) {
-        button.disabled = true;
-        button.textContent = 'Processing...';
-        
-        fetch(`/friends/reject/${requestId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Mark notification as read
-            markNotificationAsRead(notificationId, () => {
-              button.closest('.notification-card').classList.remove('unread');
-              button.closest('.notification-card').classList.add('bg-danger-subtle');
-              button.parentElement.innerHTML = '<span class="badge bg-danger">✗ Friend request rejected</span>';
-              alert('Friend request rejected');
-            });
-          } else {
-            alert(data.error || 'Failed to reject friend request');
-            button.disabled = false;
-            button.textContent = '✗ Reject';
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while rejecting the friend request');
-          button.disabled = false;
-          button.textContent = '✗ Reject';
-        });
-      }
-    });
-  });
+    .catch(() => showToast('Error deleting', true));
 });
 
+// ── Read All ──
+document.getElementById('readAllBtn')?.addEventListener('click', function() {
+    fetch('/notifications/read-all', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            document.querySelectorAll('.notif-card.unread').forEach(c => c.classList.remove('unread'));
+            const badge = document.querySelector('.notif-count');
+            if (badge) badge.remove();
+            showToast('All notifications marked as read');
+        } else showToast(d.error || 'Failed', true);
+    })
+    .catch(() => showToast('Error', true));
+});
 
+// ── Delete All ──
+document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
+    if (!confirm('Delete all notifications? This cannot be undone.')) return;
+    fetch('/notifications', {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            document.querySelectorAll('.notif-card').forEach(c => {
+                c.style.transition = 'opacity 0.3s';
+                c.style.opacity = '0';
+                setTimeout(() => c.remove(), 300);
+            });
+            document.querySelector('.notif-header-actions')?.remove();
+            document.querySelector('.notif-count')?.remove();
+            showToast('All notifications deleted');
+            setTimeout(() => {
+                const page = document.querySelector('.notif-page');
+                if (page && !page.querySelector('.notif-card')) {
+                    page.insertAdjacentHTML('beforeend',
+                        '<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>You have no notifications yet</p></div>'
+                    );
+                }
+            }, 400);
+        } else showToast(d.error || 'Failed', true);
+    })
+    .catch(() => showToast('Error', true));
+});
 
+// ── Mark read on link click ──
+document.querySelectorAll('.notification-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.dataset.notificationId;
+        const url = this.href;
+        fetch(`/notifications/${id}/mark-read`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf }
+        }).finally(() => { window.location.href = url; });
+    });
+});
 
+// ── Accept friend request ──
+document.querySelectorAll('.accept-friend-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const requestId = this.dataset.requestId;
+        const notifId   = this.dataset.notificationId;
+        this.disabled = true;
+        this.textContent = '...';
+        fetch(`/friends/accept/${requestId}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                fetch(`/notifications/${notifId}/mark-read`, { method:'POST', headers:{'X-CSRF-TOKEN':csrf} });
+                const card = document.getElementById('notif-' + notifId);
+                if (card) card.classList.remove('unread');
+                this.closest('.notif-actions').innerHTML = '<span class="badge badge-success">✓ Accepted</span>';
+                showToast('Friend request accepted!');
+            } else { showToast(d.error || 'Failed', true); this.disabled=false; this.textContent='✓ Accept'; }
+        })
+        .catch(() => { showToast('Error', true); this.disabled=false; this.textContent='✓ Accept'; });
+    });
+});
 
-// document.addEventListener('DOMContentLoaded', function() {
-//   // Get CSRF token
-//   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
-  
-//   // Accept friend request from notification
-//   document.querySelectorAll('.accept-friend-btn').forEach(btn => {
-//     btn.addEventListener('click', function() {
-//       const requestId = this.getAttribute('data-request-id');
-//       const notificationId = this.getAttribute('data-notification-id');
-//       const button = this;
-      
-//       // Disable button to prevent double clicks
-//       button.disabled = true;
-//       button.textContent = 'Processing...';
-      
-//       fetch(`/friends/accept/${requestId}`, {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'X-CSRF-TOKEN': csrfToken
-//         }
-//       })
-//       .then(response => {
-//         console.log('Response status:', response.status);
-//         return response.json();
-//       })
-//       .then(data => {
-//         console.log('Response data:', data);
-//         if (data.success) {
-//           // Mark notification as read
-//           fetch(`/notifications/${notificationId}/mark-read`, {
-//             method: 'POST',
-//             headers: {
-//               'Content-Type': 'application/json',
-//               'X-CSRF-TOKEN': csrfToken
-//             }
-//           });
-          
-//           button.closest('.notification-card').classList.add('bg-success-subtle');
-//           button.parentElement.innerHTML = '<span class="badge bg-success">✓ Friend request accepted</span>';
-//           alert('Friend request accepted!');
-//         } else {
-//           alert(data.error || 'Failed to accept friend request');
-//           button.disabled = false;
-//           button.textContent = '✓ Accept';
-//         }
-//       })
-//       .catch(error => {
-//         console.error('Error:', error);
-//         alert('An error occurred while accepting the friend request');
-//         button.disabled = false;
-//         button.textContent = '✓ Accept';
-//       });
-//     });
-//   });
-
-//   // Reject friend request from notification
-//   document.querySelectorAll('.reject-friend-btn').forEach(btn => {
-//     btn.addEventListener('click', function() {
-//       const requestId = this.getAttribute('data-request-id');
-//       const notificationId = this.getAttribute('data-notification-id');
-//       const button = this;
-      
-//       if (confirm('Are you sure you want to reject this friend request?')) {
-//         // Disable button
-//         button.disabled = true;
-//         button.textContent = 'Processing...';
-        
-//         fetch(`/friends/reject/${requestId}`, {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken
-//           }
-//         })
-//         .then(response => {
-//           console.log('Response status:', response.status);
-//           return response.json();
-//         })
-//         .then(data => {
-//           console.log('Response data:', data);
-//           if (data.success) {
-//             // Mark notification as read
-//             fetch(`/notifications/${notificationId}/mark-read`, {
-//               method: 'POST',
-//               headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRF-TOKEN': csrfToken
-//               }
-//             });
-            
-//             button.closest('.notification-card').classList.add('bg-danger-subtle');
-//             button.parentElement.innerHTML = '<span class="badge bg-danger">✗ Friend request rejected</span>';
-//             alert('Friend request rejected');
-//           } else {
-//             alert(data.error || 'Failed to reject friend request');
-//             button.disabled = false;
-//             button.textContent = '✗ Reject';
-//           }
-//         })
-//         .catch(error => {
-//           console.error('Error:', error);
-//           alert('An error occurred while rejecting the friend request');
-//           button.disabled = false;
-//           button.textContent = '✗ Reject';
-//         });
-//       }
-//     });
-//   });
-// });
+// ── Reject friend request ──
+document.querySelectorAll('.reject-friend-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!confirm('Reject this friend request?')) return;
+        const requestId = this.dataset.requestId;
+        const notifId   = this.dataset.notificationId;
+        this.disabled = true;
+        this.textContent = '...';
+        fetch(`/friends/reject/${requestId}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                fetch(`/notifications/${notifId}/mark-read`, { method:'POST', headers:{'X-CSRF-TOKEN':csrf} });
+                this.closest('.notif-actions').innerHTML = '<span class="badge badge-danger">✗ Rejected</span>';
+                showToast('Friend request rejected');
+            } else { showToast(d.error || 'Failed', true); this.disabled=false; this.textContent='✗ Reject'; }
+        })
+        .catch(() => { showToast('Error', true); this.disabled=false; this.textContent='✗ Reject'; });
+    });
+});
 </script>
 
+@endsection
 </body>
 </html>

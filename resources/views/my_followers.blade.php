@@ -183,17 +183,28 @@
         flex: 1;
         min-width: 0;
     }
+    .follower-name-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
     .follower-name {
         font-size: 14px;
         font-weight: 600;
         color: #050505;
         text-decoration: none;
-        display: block;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .follower-name:hover { color: #1877f2; text-decoration: none; }
+    .follower-badge {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        vertical-align: middle;
+    }
     .follower-status {
         font-size: 12px;
         color: #65676b;
@@ -357,7 +368,12 @@
                         <div class="{{ $isOnline ? 'follower-online-dot' : 'follower-offline-dot' }}"></div>
                     </div>
                     <div class="follower-info">
-                        <a href="{{ url('/profile/' . $follower->id) }}" class="follower-name">{{ $follower->name }}</a>
+                        <div class="follower-name-row">
+                            <a href="{{ url('/profile/' . $follower->id) }}" class="follower-name">{{ $follower->name }}</a>
+                            @if($follower->badge_status)
+                                <img src="{{ asset($follower->badge_status) }}" class="follower-badge" alt="Verified" title="Verified">
+                            @endif
+                        </div>
                         <div class="follower-status {{ $isOnline ? 'online' : '' }}">
                             {{ $isOnline ? 'Online now' : ($lastSeen && $lastSeen !== 'Never' ? 'Last seen ' . $lastSeen : 'Offline') }}
                         </div>
@@ -410,7 +426,12 @@
                         <div class="{{ $isOnline ? 'follower-online-dot' : 'follower-offline-dot' }}"></div>
                     </div>
                     <div class="follower-info">
-                        <a href="{{ url('/profile/' . $followed->id) }}" class="follower-name">{{ $followed->name }}</a>
+                        <div class="follower-name-row">
+                            <a href="{{ url('/profile/' . $followed->id) }}" class="follower-name">{{ $followed->name }}</a>
+                            @if($followed->badge_status)
+                                <img src="{{ asset($followed->badge_status) }}" class="follower-badge" alt="Verified" title="Verified">
+                            @endif
+                        </div>
                         <div class="follower-status {{ $isOnline ? 'online' : '' }}">
                             {{ $isOnline ? 'Online now' : ($lastSeen && $lastSeen !== 'Never' ? 'Last seen ' . $lastSeen : 'Offline') }}
                         </div>
@@ -536,5 +557,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
+@include('partials.global-calls')
 </body>
 </html>

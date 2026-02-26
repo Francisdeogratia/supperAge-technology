@@ -144,7 +144,7 @@
                 <i class="fas fa-bars"></i>
             </button>
 
-            <a class="navbar-brand fw-bold" href="{{ url('/admin') }}">
+            <a class="navbar-brand fw-bold" href="{{ route('admin.dashboard.now') }}">
                 <i class="fas fa-shield-alt me-2"></i>
                 SupperAge Admin
             </a>
@@ -186,13 +186,13 @@
     <nav class="sidebar" id="sidebar">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin') || request()->is('admin/dashboard') ? 'active' : '' }}" href="{{ url('/admin') }}">
+                <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard.now') }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ url('/admin/users') }}">
+                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ route('admin.users.now') }}">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
@@ -204,25 +204,31 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/posts*') ? 'active' : '' }}" href="{{ url('/admin/posts') }}">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Posts</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/tasks*') ? 'active' : '' }}" href="{{ url('/admin/tasks') }}">
-                    <i class="fas fa-tasks"></i>
-                    <span>Tasks</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}" href="{{ url('/admin/reports') }}">
-                    <i class="fas fa-chart-line"></i>
+                <a class="nav-link {{ request()->is('admin/user-reports*') ? 'active' : '' }}" href="{{ route('admin.user.reports') }}">
+                    <i class="fas fa-flag"></i>
                     <span>Reports</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}" href="{{ url('/admin/settings') }}">
+                <a class="nav-link {{ request()->is('admin/monetization*') ? 'active' : '' }}" href="{{ route('admin.monetization.index') }}">
+                    <i class="fas fa-coins"></i>
+                    <span>Monetization</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/advertising*') ? 'active' : '' }}" href="{{ route('admin.advertising.index') }}">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Advertising</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/verifications*') ? 'active' : '' }}" href="{{ route('admin.verifications.index') }}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('account.settings') }}">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>

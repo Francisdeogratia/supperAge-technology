@@ -69,6 +69,28 @@ public function index(Request $request)
 
 
 
+    public function myReferrals()
+    {
+        $userId = Session::get('id');
+        $user   = $userId ? UserRecord::find($userId) : null;
+
+        if (!$user) {
+            return redirect('/login')->with('error', 'Please log in to view your referrals.');
+        }
+
+        // People this user invited
+        $invitedUsers = UserRecord::where('invited_by', $userId)
+            ->select('id', 'name', 'username', 'profileimg', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $perUserBonus = 100; // NGN per invite
+        $totalInvited = $invitedUsers->count();
+        $totalEarned  = $totalInvited * $perUserBonus;
+
+        return view('my-referrals', compact('user', 'invitedUsers', 'perUserBonus', 'totalInvited', 'totalEarned'));
+    }
+
     public function trackInstall(Request $request)
     {
         $referrerId = $request->input('ref');

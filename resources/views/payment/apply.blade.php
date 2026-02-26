@@ -240,12 +240,12 @@
                         <div class="alert alert-warning">
                             <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Withdrawal Policy</h6>
                             <ul class="mb-0">
-                                <li>You can withdraw up to <strong>70% of your wallet balance</strong></li>
-                                <li>You will receive <strong>70% of the requested amount</strong></li>
-                                <li><strong>30% goes to SupperAge</strong> as platform fee</li>
+                                <li>You can withdraw up to <strong>50% of your wallet balance</strong></li>
+                                <li>You will receive <strong>50% of the requested amount</strong></li>
+                                <li><strong>50% goes to SupperAge</strong> as platform fee</li>
                             </ul>
                             <hr>
-                            <small class="text-muted">Example: If you request NGN 10,000, you'll receive NGN 7,000</small>
+                            <small class="text-muted">Example: If you request NGN 10,000, you'll receive NGN 5,000</small>
                         </div>
 
                         <!-- Wallet Balance -->
@@ -254,8 +254,8 @@
                                 <h5 class="card-title">Your Wallet Balance</h5>
                                 @forelse($balances as $balance)
                                     @php
-                                        $maxWithdrawable = $balance->total * 0.70;
-                                        $youWillReceive = $maxWithdrawable * 0.70;
+                                        $maxWithdrawable = $balance->total * 0.50;
+                                        $youWillReceive = $maxWithdrawable * 0.50;
                                     @endphp
                                     <div class="mb-3 p-3 bg-white rounded">
                                         <div class="row">
@@ -264,9 +264,9 @@
                                                 <span class="text-success h5">{{ number_format($balance->total, 2) }}</span>
                                             </div>
                                             <div class="col-md-6">
-                                                <small class="text-muted">Max Withdrawable (70%):</small><br>
+                                                <small class="text-muted">Max Withdrawable (50%):</small><br>
                                                 <strong class="text-primary">{{ number_format($maxWithdrawable, 2) }} {{ $balance->currency }}</strong><br>
-                                                <small class="text-muted">You'll receive (70% of withdrawal):</small><br>
+                                                <small class="text-muted">You'll receive (50% of withdrawal):</small><br>
                                                 <strong class="text-success">{{ number_format($youWillReceive, 2) }} {{ $balance->currency }}</strong>
                                             </div>
                                         </div>
@@ -497,5 +497,6 @@ function cancelApplication(id) {
 }
 </script>
 
+@include('partials.global-calls')
 </body>
 </html>

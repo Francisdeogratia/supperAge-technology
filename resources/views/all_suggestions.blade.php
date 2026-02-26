@@ -363,7 +363,9 @@
                         <i class="fa fa-user"></i>
                     </div>
                 @endif
-                @if($person->badge_status)
+                @if($person->badge_expired)
+                    <i class="fas fa-clock" title="Badge Expired – Please Renew" style="color:#e74c3c;font-size:15px;"></i>
+                @elseif($person->badge_status)
                     <img src="{{ asset($person->badge_status) }}" alt="Verified" title="Verified User" class="badge-icon">
                 @endif
             </a>
@@ -481,5 +483,6 @@ function followUser(btn) {
 <script src="{{ asset('myjs/allpost.js') }}"></script>
 <script src="{{ asset('myjs/tales.js') }}"></script>
 
+@include('partials.global-calls')
 </body>
 </html>

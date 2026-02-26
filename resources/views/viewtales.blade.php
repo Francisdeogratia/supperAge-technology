@@ -489,5 +489,7 @@ $(document).on('click', '.shareToBtn', function () {
     $(document).ready(() => showSlide(0));
     $(document).click(() => $('.dropdown-menu').hide());
 </script>
+
+@include('partials.global-calls')
 </body>
 </html>

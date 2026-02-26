@@ -15,7 +15,7 @@ class UserRecord extends Model implements Authenticatable
     use HasFactory, AuthenticatableTrait; // <-- 3. Use the trait here
     protected $table = 'users_record';
 
-    
+
 
     // public $timestamps = false;
      // ✅ ADD THIS LINE if it's not there
@@ -129,7 +129,7 @@ class UserRecord extends Model implements Authenticatable
     {
         $session = $this->activeLoginSession;
         if (!$session) return false;
-        
+
         // User is online if updated_at is within last 5 minutes and not logged out
         return $session->updated_at && Carbon::parse($session->updated_at)->gt(now()->subMinutes(5));
     }
@@ -141,14 +141,14 @@ class UserRecord extends Model implements Authenticatable
         if (!$session) {
             return 'Never';
         }
-        
+
         // Use logout_at if logged out, otherwise use updated_at
         $lastActivity = $session->logout_at ?? $session->updated_at;
-        
+
         if (!$lastActivity) {
             return 'Never';
         }
-        
+
         return Carbon::parse($lastActivity)->diffForHumans();
     }
 
@@ -188,12 +188,41 @@ public function postPerformance()
     return $this->hasMany(PostPerformanceTracking::class, 'user_id');
 }
 
+    /**
+     * Return null when badge has expired so asset(null) is never requested.
+     * Use badge_expired to check the expired state.
+     */
+    public function getBadgeStatusAttribute($value)
+    {
+        if ($value && $value !== 'expired') {
+            $expiresAt = $this->attributes['badge_expires_at'] ?? null;
+            if ($expiresAt && Carbon::now()->gte(Carbon::parse($expiresAt))) {
+                return null;
+            }
+        }
+        if ($value === 'expired') {
+            return null;
+        }
+        return $value;
+    }
 
-
-
-
-
-
-
+    /**
+     * Returns true if the badge has expired, for showing the clock icon in views.
+     */
+    public function getBadgeExpiredAttribute()
+    {
+        $status = $this->attributes['badge_status'] ?? null;
+        if (!$status || $status === 'expired') {
+            $expiresAt = $this->attributes['badge_expires_at'] ?? null;
+            if ($status === 'expired') return true;
+        }
+        if ($status && $status !== 'expired') {
+            $expiresAt = $this->attributes['badge_expires_at'] ?? null;
+            if ($expiresAt && Carbon::now()->gte(Carbon::parse($expiresAt))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

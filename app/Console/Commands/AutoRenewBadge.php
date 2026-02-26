@@ -17,7 +17,7 @@ class AutoRenewBadge extends Command
 
     public function handle()
     {
-        $baseFeeNgn = 7500;
+        $baseFeeNgn = 8000;
 
         $users = UserRecord::whereNotNull('badge_expires_at')
             ->where('badge_expires_at', '<=', Carbon::now())
@@ -78,8 +78,10 @@ class AutoRenewBadge extends Command
                 }
             }
 
-            // ✅ If no wallet had enough balance, send failure notification
+            // ✅ If no wallet had enough balance, mark badge as expired and send failure notification
             if (!$renewed) {
+                $user->badge_status = 'expired';
+                $user->save();
                 $user->notify(new BadgeRenewalNotification('failed', 'NGN', $baseFeeNgn));
                 $this->warn("Auto-renew failed for {$user->name} (insufficient balance).");
             }

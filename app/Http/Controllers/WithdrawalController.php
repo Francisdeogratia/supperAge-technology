@@ -153,12 +153,12 @@ class WithdrawalController extends Controller
 
             $currentBalance = $balances[$currency];
 
-            // Apply 60% rule - user can only withdraw 60% of balance
-            $netAvailable = $currentBalance * 0.60;
+            // Apply 50% rule - user can only withdraw 50% of balance
+            $netAvailable = $currentBalance * 0.50;
 
             if ($amountRequestedInCurrency > $netAvailable) {
                 return back()->withErrors([
-                    'error' => "Insufficient balance. You can withdraw up to 60% of your {$currency} balance (Available: {$netAvailable} {$currency})"
+                    'error' => "Insufficient balance. You can withdraw up to 50% of your {$currency} balance (Available: {$netAvailable} {$currency})"
                 ]);
             }
 
@@ -169,8 +169,8 @@ class WithdrawalController extends Controller
             }
 
             // Calculate amounts
-            $payoutAmount = $amountRequestedInCurrency * 0.60; // 60% to user
-            $trashedAmount = $amountRequestedInCurrency * 0.40; // 40% system charge
+            $payoutAmount = $amountRequestedInCurrency * 0.50; // 50% to user
+            $trashedAmount = $amountRequestedInCurrency * 0.50; // 50% system charge
 
             // Convert to NGN for wallet deduction
             $rate = $exchangeRates[$currency];

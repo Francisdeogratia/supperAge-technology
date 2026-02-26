@@ -478,7 +478,14 @@
                     }
                 }, 60000);
             } else {
-                this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                // Auto-accept if coming from global call overlay
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('auto_accept') === '1') {
+                    window.history.replaceState({}, '', window.location.pathname);
+                    this.acceptCall();
+                } else {
+                    this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                }
             }
         },
 
@@ -1266,7 +1273,13 @@
                     }, 60000);
                 }
             } else {
-                this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                const _urlP = new URLSearchParams(window.location.search);
+                if (_urlP.get('auto_accept') === '1') {
+                    window.history.replaceState({}, '', window.location.pathname);
+                    this.acceptCall();
+                } else {
+                    this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                }
             }
         },
 
@@ -2124,7 +2137,13 @@
                     }, 60000);
                 }
             } else {
-                this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                const _urlP = new URLSearchParams(window.location.search);
+                if (_urlP.get('auto_accept') === '1') {
+                    window.history.replaceState({}, '', window.location.pathname);
+                    this.acceptCall();
+                } else {
+                    this.updateStatusBadge('Incoming Call...', 'ringing', 'fa-phone-volume');
+                }
             }
         },
 

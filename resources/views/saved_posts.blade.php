@@ -56,6 +56,64 @@
         .sp-btn-view:hover { background: #166fe5; }
         .sp-btn-unsave { background: #f0f0f0; color: #dc3545; }
         .sp-btn-unsave:hover { background: #e4e4e4; }
+
+        /* Modern pagination */
+        .sp-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 28px 0 16px;
+        }
+        .sp-pagination a,
+        .sp-pagination span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .sp-pagination a {
+            background: #fff;
+            color: #1877f2;
+            border: 1.5px solid #d8dadf;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .sp-pagination a:hover {
+            background: #1877f2;
+            color: #fff;
+            border-color: #1877f2;
+            box-shadow: 0 4px 12px rgba(24,119,242,0.3);
+            transform: translateY(-1px);
+        }
+        .sp-pagination span.sp-pg-current {
+            background: linear-gradient(135deg, #1877f2, #42a5f5);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 14px rgba(24,119,242,0.38);
+        }
+        .sp-pagination span.sp-pg-disabled {
+            background: #f0f2f5;
+            color: #b0b3b8;
+            border: 1.5px solid #e4e6eb;
+            cursor: not-allowed;
+        }
+        .sp-pagination span.sp-pg-dots {
+            background: none;
+            border: none;
+            color: #8a8d91;
+            box-shadow: none;
+            font-size: 17px;
+            min-width: 24px;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -130,6 +188,36 @@
                 </div>
             </div>
         @endforeach
+
+        {{-- Modern Pagination --}}
+        @if($savedPosts->hasPages())
+        <nav class="sp-pagination">
+            {{-- Prev --}}
+            @if($savedPosts->onFirstPage())
+                <span class="sp-pg-disabled"><i class="fas fa-chevron-left"></i></span>
+            @else
+                <a href="{{ $savedPosts->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
+            @endif
+
+            {{-- Page numbers --}}
+            @foreach($savedPosts->getUrlRange(1, $savedPosts->lastPage()) as $page => $url)
+                @if($page == $savedPosts->currentPage())
+                    <span class="sp-pg-current">{{ $page }}</span>
+                @elseif($page == 1 || $page == $savedPosts->lastPage() || abs($page - $savedPosts->currentPage()) <= 2)
+                    <a href="{{ $url }}">{{ $page }}</a>
+                @elseif(abs($page - $savedPosts->currentPage()) == 3)
+                    <span class="sp-pg-dots">···</span>
+                @endif
+            @endforeach
+
+            {{-- Next --}}
+            @if($savedPosts->hasMorePages())
+                <a href="{{ $savedPosts->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
+            @else
+                <span class="sp-pg-disabled"><i class="fas fa-chevron-right"></i></span>
+            @endif
+        </nav>
+        @endif
     @endif
 </div>
 
@@ -157,5 +245,7 @@ function unsavePost(postId, btn) {
     .catch(err => console.error('Unsave failed:', err));
 }
 </script>
+
+@include('partials.global-calls')
 </body>
 </html>

@@ -44,14 +44,14 @@
     <!-- Filters -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form id="filterForm" method="GET" action="{{ route('admin.transactions.filter') }}">
+            <form id="filterForm" method="GET" action="{{ route('admin.transactions.index') }}">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label small">User</label>
                         <select name="user_id" class="form-select">
                             <option value="">All Users</option>
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} ({{ '@' . $user->username }})</option>
+                                <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ '@' . $user->username }})</option>
                             @endforeach
                         </select>
                     </div>
@@ -60,7 +60,7 @@
                         <select name="currency" class="form-select">
                             <option value="">All</option>
                             @foreach($currencies as $code => $name)
-                                <option value="{{ $code }}">{{ $code }}</option>
+                                <option value="{{ $code }}" {{ request('currency') == $code ? 'selected' : '' }}>{{ $code }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -68,18 +68,18 @@
                         <label class="form-label small">Type</label>
                         <select name="type" class="form-select">
                             <option value="">All Types</option>
-                            <option value="task_reward">Task Reward</option>
-                            <option value="debit">Debit</option>
-                            <option value="general">General</option>
+                            <option value="task_reward" {{ request('type') == 'task_reward' ? 'selected' : '' }}>Task Reward</option>
+                            <option value="debit" {{ request('type') == 'debit' ? 'selected' : '' }}>Debit</option>
+                            <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small">From Date</label>
-                        <input type="date" name="date_from" class="form-control">
+                        <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small">To Date</label>
-                        <input type="date" name="date_to" class="form-control">
+                        <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
@@ -89,9 +89,14 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <input type="text" name="search" class="form-control" placeholder="Search by transaction ID, reference, or description...">
+                        <input type="text" name="search" class="form-control" placeholder="Search by transaction ID, reference, or description..." value="{{ request('search') }}">
                     </div>
                     <div class="col-md-6 text-end">
+                        @if(request()->hasAny(['user_id', 'currency', 'type', 'date_from', 'date_to', 'search']))
+                            <a href="{{ route('admin.transactions.index') }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times me-1"></i> Clear Filters
+                            </a>
+                        @endif
                         <button type="button" class="btn btn-success" onclick="exportTransactions()">
                             <i class="fas fa-download me-1"></i> Export CSV
                         </button>
@@ -103,8 +108,9 @@
 
     <!-- User Summaries Table -->
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">User Balance Summaries</h5>
+            <small class="text-muted" id="summaryPageInfo"></small>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive" id="userSummaryTable">
@@ -117,58 +123,42 @@
                             <th class="text-center">Transactions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($userSummaries as $userId => $currencies)
-                            @php
-                                $user = $users[$userId] ?? null;
-                                $rowspan = count($currencies);
-                                $firstRow = true;
-                            @endphp
-                            @foreach($currencies as $currencyData)
-                                <tr>
-                                    @if($firstRow)
-                                        <td rowspan="{{ $rowspan }}" class="align-middle">
-                                            <div class="d-flex align-items-center">
-                                                @if($user && $user->profilepix)
-                                                    <img src="{{ asset($user->profilepix) }}" 
-                                                         alt="{{ $user->name }}" 
-                                                         class="rounded-circle me-2" 
-                                                         width="40" 
-                                                         height="40"
-                                                         style="object-fit: cover;">
-                                                @else
-                                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
-                                                         style="width: 40px; height: 40px; font-size: 18px;">
-                                                        {{ $user ? strtoupper(substr($user->name, 0, 1)) : '?' }}
-                                                    </div>
-                                                @endif
-                                                <div>
-                                                    <div class="fw-bold">{{ $user->name ?? 'Unknown' }}</div>
-                                                    <small class="text-muted">{{ '@' . ($user->username ?? 'N/A') }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        @php $firstRow = false; @endphp
-                                    @endif
-                                    <td>
-                                        <span class="badge bg-secondary">{{ $currencyData->currency }}</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <strong class="{{ $currencyData->total_amount >= 0 ? 'text-success' : 'text-danger' }}">
-                                            {{ number_format($currencyData->total_amount, 2) }} {{ $currencyData->currency }}
-                                        </strong>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info">{{ $currencyData->transaction_count }}</span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endforeach
-                    </tbody>
+                    <tbody id="summaryTbody"></tbody>
                 </table>
             </div>
         </div>
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+            <button class="btn btn-sm btn-outline-primary" id="summaryPrev" onclick="changeSummaryPage(-1)">
+                <i class="fas fa-chevron-left me-1"></i> Prev
+            </button>
+            <span id="summaryPageLabel" class="text-muted small"></span>
+            <button class="btn btn-sm btn-outline-primary" id="summaryNext" onclick="changeSummaryPage(1)">
+                Next <i class="fas fa-chevron-right ms-1"></i>
+            </button>
+        </div>
     </div>
+
+    @php
+        // Build a flat array of user summary groups for JS
+        $summaryData = [];
+        foreach ($userSummaries as $userId => $currencyGroup) {
+            $user = $users[$userId] ?? null;
+            $rows = [];
+            foreach ($currencyGroup as $cd) {
+                $rows[] = [
+                    'currency' => $cd->currency,
+                    'total_amount' => $cd->total_amount,
+                    'transaction_count' => $cd->transaction_count,
+                ];
+            }
+            $summaryData[] = [
+                'user_name' => $user->name ?? 'Unknown',
+                'user_username' => $user->username ?? 'N/A',
+                'user_avatar' => $user && $user->profilepix ? asset($user->profilepix) : null,
+                'rows' => $rows,
+            ];
+        }
+    @endphp
 
     <!-- All Transactions Table -->
     <div class="card shadow-sm">
@@ -350,5 +340,67 @@ document.querySelectorAll('#filterForm select').forEach(select => {
         document.getElementById('filterForm').submit();
     });
 });
+
+// Submit search on Enter key
+document.querySelector('#filterForm input[name="search"]').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('filterForm').submit();
+    }
+});
+
+// ---- User Balance Summaries Pagination ----
+var summaryAllData = @json($summaryData);
+var summaryPerPage = 25;
+var summaryCurrentPage = 1;
+var summaryTotalPages = Math.ceil(summaryAllData.length / summaryPerPage);
+
+function renderSummaryPage() {
+    var start = (summaryCurrentPage - 1) * summaryPerPage;
+    var end = start + summaryPerPage;
+    var pageData = summaryAllData.slice(start, end);
+    var tbody = document.getElementById('summaryTbody');
+    var html = '';
+
+    if (pageData.length === 0) {
+        html = '<tr><td colspan="4" class="text-center text-muted py-4">No user summaries found.</td></tr>';
+    } else {
+        pageData.forEach(function(item) {
+            var rowspan = item.rows.length;
+            var avatarHtml = item.user_avatar
+                ? '<img src="' + item.user_avatar + '" alt="' + item.user_name + '" class="rounded-circle me-2" width="40" height="40" style="object-fit:cover;">'
+                : '<div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width:40px;height:40px;font-size:18px;">' + item.user_name.charAt(0).toUpperCase() + '</div>';
+
+            item.rows.forEach(function(row, idx) {
+                html += '<tr>';
+                if (idx === 0) {
+                    html += '<td rowspan="' + rowspan + '" class="align-middle"><div class="d-flex align-items-center">' + avatarHtml + '<div><div class="fw-bold">' + item.user_name + '</div><small class="text-muted">@' + item.user_username + '</small></div></div></td>';
+                }
+                html += '<td><span class="badge bg-secondary">' + row.currency + '</span></td>';
+                var amountClass = row.total_amount >= 0 ? 'text-success' : 'text-danger';
+                html += '<td class="text-end"><strong class="' + amountClass + '">' + Number(row.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ' + row.currency + '</strong></td>';
+                html += '<td class="text-center"><span class="badge bg-info">' + row.transaction_count + '</span></td>';
+                html += '</tr>';
+            });
+        });
+    }
+
+    tbody.innerHTML = html;
+
+    document.getElementById('summaryPrev').disabled = (summaryCurrentPage <= 1);
+    document.getElementById('summaryNext').disabled = (summaryCurrentPage >= summaryTotalPages);
+    document.getElementById('summaryPageLabel').textContent = 'Page ' + summaryCurrentPage + ' of ' + (summaryTotalPages || 1);
+    document.getElementById('summaryPageInfo').textContent = summaryAllData.length + ' users total';
+}
+
+function changeSummaryPage(dir) {
+    var newPage = summaryCurrentPage + dir;
+    if (newPage < 1 || newPage > summaryTotalPages) return;
+    summaryCurrentPage = newPage;
+    renderSummaryPage();
+}
+
+// Render first page on load
+renderSummaryPage();
 </script>
 @endsection

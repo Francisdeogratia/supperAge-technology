@@ -168,17 +168,28 @@
         flex: 1;
         min-width: 0;
     }
+    .mutual-name-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
     .mutual-name {
         font-size: 14px;
         font-weight: 600;
         color: #050505;
         text-decoration: none;
-        display: block;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .mutual-name:hover { color: #1877f2; text-decoration: none; }
+    .mutual-badge {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        vertical-align: middle;
+    }
     .mutual-status {
         font-size: 12px;
         color: #65676b;
@@ -311,7 +322,12 @@
                     <div class="{{ $isOnline ? 'mutual-online-dot' : 'mutual-offline-dot' }}"></div>
                 </div>
                 <div class="mutual-info">
-                    <a href="{{ url('/profile/' . $follower->id) }}" class="mutual-name">{{ $follower->name }}</a>
+                    <div class="mutual-name-row">
+                        <a href="{{ url('/profile/' . $follower->id) }}" class="mutual-name">{{ $follower->name }}</a>
+                        @if($follower->badge_status)
+                            <img src="{{ asset($follower->badge_status) }}" class="mutual-badge" alt="Verified" title="Verified">
+                        @endif
+                    </div>
                     <div class="mutual-status {{ $isOnline ? 'online' : '' }}">
                         {{ $isOnline ? 'Online now' : ($lastSeen && $lastSeen !== 'Never' ? 'Last seen ' . $lastSeen : 'Offline') }}
                     </div>
@@ -419,5 +435,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
+@include('partials.global-calls')
 </body>
 </html>

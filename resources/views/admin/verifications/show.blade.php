@@ -23,9 +23,9 @@
                 <th>Government ID</th>
                 <td>
                     @if($verification->gov_id_path)
-                        <a href="{{ asset('storage/'.$verification->gov_id_path) }}" target="_blank">
-                            <img src="{{ asset('storage/'.$verification->gov_id_path) }}" 
-                                 alt="Government ID" 
+                        <a href="{{ Storage::disk('public')->url($verification->gov_id_path) }}" target="_blank">
+                            <img src="{{ Storage::disk('public')->url($verification->gov_id_path) }}"
+                                 alt="Government ID"
                                  class="gov-id-img">
                         </a>
                     @else
@@ -37,8 +37,8 @@
                 <th>Profile Picture</th>
                 <td>
                     @if($verification->profile_pic_path)
-                        <img src="{{ asset('storage/'.$verification->profile_pic_path) }}" 
-                             alt="Profile Picture" 
+                        <img src="{{ Storage::disk('public')->url($verification->profile_pic_path) }}"
+                             alt="Profile Picture"
                              class="profile-img">
                     @else
                         <span class="no-file">No file uploaded</span>

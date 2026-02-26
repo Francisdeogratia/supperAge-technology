@@ -445,24 +445,67 @@
 }
 
 /* Pagination */
-.pagination {
-    margin-top: 24px;
+.friends-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+    padding-bottom: 8px;
 }
-
-.page-link {
-    border-radius: 8px !important;
-    margin: 0 3px;
-    color: #667eea;
-    border: 1px solid #e4e6eb;
+.friends-pagination a,
+.friends-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 600;
-    padding: 8px 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
 }
-
-.page-link:hover {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
+.friends-pagination a {
+    background: #fff;
+    color: #667eea;
+    border: 1.5px solid #d8dadf;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
+.friends-pagination a:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.35);
+    transform: translateY(-1px);
+}
+.friends-pagination span.pg-current {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+}
+.friends-pagination span.pg-disabled {
+    background: #f0f2f5;
+    color: #b0b3b8;
+    border: 1.5px solid #e4e6eb;
+    cursor: not-allowed;
+}
+.friends-pagination span.pg-dots {
+    background: none;
+    border: none;
+    color: #8a8d91;
+    box-shadow: none;
+    font-size: 17px;
+    min-width: 24px;
+    padding: 0;
+}
+body.dark-mode .friends-pagination a { background: #3A3B3C; color: #a78bfa; border-color: #4E4F50; }
+body.dark-mode .friends-pagination a:hover { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; border-color:transparent; }
+body.dark-mode .friends-pagination span.pg-disabled { background:#2d2e2f; color:#555; border-color:#3e4042; }
 
 .page-item.active .page-link {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -852,9 +895,34 @@ button:active {
             </div>
             
             {{-- Pagination --}}
-            <div class="d-flex justify-content-center mt-4">
-                {{ $allUsers->links() }}
-            </div>
+            @if($allUsers->hasPages())
+            <nav class="friends-pagination">
+                {{-- Prev --}}
+                @if($allUsers->onFirstPage())
+                    <span class="pg-disabled"><i class="fas fa-chevron-left"></i></span>
+                @else
+                    <a href="{{ $allUsers->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
+                @endif
+
+                {{-- Page numbers --}}
+                @foreach($allUsers->getUrlRange(1, $allUsers->lastPage()) as $page => $url)
+                    @if($page == $allUsers->currentPage())
+                        <span class="pg-current">{{ $page }}</span>
+                    @elseif($page == 1 || $page == $allUsers->lastPage() || abs($page - $allUsers->currentPage()) <= 2)
+                        <a href="{{ $url }}">{{ $page }}</a>
+                    @elseif(abs($page - $allUsers->currentPage()) == 3)
+                        <span class="pg-dots">···</span>
+                    @endif
+                @endforeach
+
+                {{-- Next --}}
+                @if($allUsers->hasMorePages())
+                    <a href="{{ $allUsers->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
+                @else
+                    <span class="pg-disabled"><i class="fas fa-chevron-right"></i></span>
+                @endif
+            </nav>
+            @endif
         </div>
     </div>
 </div>

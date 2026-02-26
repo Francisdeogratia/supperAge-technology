@@ -146,5 +146,7 @@
         <!-- <a href="{{ url('/subscribe-premium') }}" class="upgrade-btn">Upgrade Now 🚀</a> -->
     </div>
 </div>
+
+@include('partials.global-calls')
 </body>
 </html>

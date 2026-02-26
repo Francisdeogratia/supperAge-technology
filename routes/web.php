@@ -249,6 +249,7 @@ Route::post('/submit-post', [PostController::class, 'store'])->name('submit.post
 
 Route::get('/updateprofile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/updateprofile', [ProfileController::class, 'update'])->name('profile.update');
+Route::post('/profile/upload-cover', [ProfileController::class, 'uploadCover'])->name('profile.uploadCover');
 
 // for premuinm
 Route::get('/premium', [PremiumController::class, 'premiumPage'])->name('premium');
@@ -368,6 +369,7 @@ Route::post('/register', [RegisterController::class, 'registertwo'])->name('regi
 
 
 Route::get('/invite', [ReferralController::class, 'index'])->name('invite');
+Route::get('/my-referrals', [ReferralController::class, 'myReferrals'])->name('referral.my');
 
 
 Route::post('/track-install', [ReferralController::class, 'trackInstall']);
@@ -483,11 +485,15 @@ Route::post('/friends/send-request/{userId}', [FriendController::class, 'sendReq
 Route::post('/friends/accept/{requestId}', [FriendController::class, 'acceptRequest'])->name('friends.accept');
 Route::post('/friends/reject/{requestId}', [FriendController::class, 'rejectRequest'])->name('friends.reject');
 Route::post('/friends/cancel/{requestId}', [FriendController::class, 'cancelRequest'])->name('friends.cancel');
+Route::post('/friends/unfriend/{userId}', [FriendController::class, 'unfriend'])->name('friends.unfriend');
 
 
 
 
 Route::post('/notifications/{id}/mark-read', [PostController::class, 'markNotificationRead'])->name('notifications.markRead');
+Route::post('/notifications/read-all', [PostController::class, 'markAllNotificationsRead'])->name('notifications.readAll');
+Route::delete('/notifications/{id}', [PostController::class, 'deleteNotification'])->name('notifications.delete');
+Route::delete('/notifications', [PostController::class, 'deleteAllNotifications'])->name('notifications.deleteAll');
 
 Route::post('/posts/toggle-save', [PostController::class, 'toggleSave'])->name('posts.toggleSave');
 Route::get('/saved-posts', [PostController::class, 'savedPosts'])->name('posts.saved');

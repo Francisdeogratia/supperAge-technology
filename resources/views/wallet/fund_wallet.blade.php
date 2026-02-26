@@ -232,6 +232,6 @@ $.ajaxSetup({
 <script src="{{ asset('myjs/allpost.js') }}"></script>
 <script src="{{ asset('myjs/tales.js') }}"></script>
 
-
+@include('partials.global-calls')
 </body>
 </html>

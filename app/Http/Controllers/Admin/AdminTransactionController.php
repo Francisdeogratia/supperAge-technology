@@ -23,11 +23,49 @@ class AdminTransactionController extends Controller
 
     public function index(Request $request)
     {
-        // Get all transactions with user details
-        $transactions = WalletTransaction::with(['walletOwner', 'payer'])
-            ->where('status', 'successful')
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
+        // Build filtered query
+        $query = WalletTransaction::with(['walletOwner', 'payer'])
+            ->where('status', 'successful');
+
+        // Filter by user
+        if ($request->filled('user_id')) {
+            $query->where(function($q) use ($request) {
+                $q->where('wallet_owner_id', $request->user_id)
+                  ->orWhere('payer_id', $request->user_id);
+            });
+        }
+
+        // Filter by currency
+        if ($request->filled('currency')) {
+            $query->where('currency', $request->currency);
+        }
+
+        // Filter by transaction type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('transaction_id', 'like', "%{$search}%")
+                  ->orWhere('tx_ref', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')
+            ->paginate(50)
+            ->appends($request->query());
 
         // Get user summaries (total per user per currency)
         $userSummaries = WalletTransaction::with('walletOwner')

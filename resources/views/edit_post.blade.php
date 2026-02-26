@@ -646,5 +646,6 @@ function submitUpdate(allMediaUrls) {
 }
 </script>
 
+@include('partials.global-calls')
 </body>
 </html>

@@ -900,5 +900,7 @@
             loadTransactions(nextPage, true);
         });
     </script>
+
+@include('partials.global-calls')
 </body>
 </html>

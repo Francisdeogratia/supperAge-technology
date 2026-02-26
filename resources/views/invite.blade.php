@@ -73,6 +73,9 @@
 @section('content')
 <div class="container text-center">
     <h3>Share SupperAge</h3>
+    <a href="{{ route('referral.my') }}" class="btn btn-outline-primary btn-sm mb-3">
+        <i class="fas fa-users"></i> View My Referrals & Earnings
+    </a>
 
     @php
         $taskType = request()->get('task'); // 'invite' or 'app'

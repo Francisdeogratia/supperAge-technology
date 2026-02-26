@@ -149,39 +149,36 @@ public function initiateCall(Request $request)
             'joined_at' => $member->user_id == $userId ? now() : null
         ]);
 
-
-        // After creating call and participants...
-
-            // ✅ CREATE CALL MESSAGE IN CHAT
-            GroupMessage::create([
-                'group_id' => $groupId,
-                'sender_id' => $userId,
-                'message' => "{$username} started a {$callType} call",
-                'message_type' => 'call',
-                'call_type' => $callType,
-                'call_id' => $call->id,
-                'status' => 'sent',
-            ]);
-
         // Send notification to all members except initiator
-            if ($member->user_id != $userId) {
-                Notification::create([
-                    'user_id' => $userId,
-                    'message' => "{$username} started a {$request->call_type} call in {$group->name}",
-                    'link' => route('group-calls.show', $call->id),
-                    'notification_reciever_id' => $member->user_id,
-                    'read_notification' => 'no',
-                    'type' => 'group_call',
-                    'notifiable_type' => GroupCall::class,
-                    'notifiable_id' => $call->id,
-                    'data' => json_encode([
-                        'call_id' => $call->id,
-                        'group_id' => $groupId,
-                        'call_type' => $request->call_type
-                    ])
-                ]);
-            }
+        if ($member->user_id != $userId) {
+            Notification::create([
+                'user_id' => $userId,
+                'message' => "{$username} started a {$callType} call in {$group->name}",
+                'link' => route('group-calls.show', $call->id),
+                'notification_reciever_id' => $member->user_id,
+                'read_notification' => 'no',
+                'type' => 'group_call',
+                'notifiable_type' => GroupCall::class,
+                'notifiable_id' => $call->id,
+                'data' => json_encode([
+                    'call_id' => $call->id,
+                    'group_id' => $groupId,
+                    'call_type' => $callType
+                ])
+            ]);
+        }
     }
+
+    // Create ONE call message in chat (outside the loop)
+    GroupMessage::create([
+        'group_id' => $groupId,
+        'sender_id' => $userId,
+        'message' => "{$username} started a {$callType} call",
+        'message_type' => 'call',
+        'call_type' => $callType,
+        'call_id' => $call->id,
+        'status' => 'sent',
+    ]);
     
     // Broadcast to all group members
     broadcast(new GroupCallInitiated(

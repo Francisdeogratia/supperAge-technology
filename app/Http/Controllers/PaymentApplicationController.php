@@ -95,24 +95,24 @@ class PaymentApplicationController extends Controller
         ->where('currency', $request->currency)
         ->sum('amount');
 
-    // Calculate maximum withdrawable (70% of balance)
-    $maxWithdrawable = $balance * 0.70;
-    
+    // Calculate maximum withdrawable (50% of balance)
+    $maxWithdrawable = $balance * 0.50;
+
     if ($request->amount_requested > $maxWithdrawable) {
         return back()->withErrors([
-            'error' => "You can only withdraw up to 70% of your balance. Maximum: " . 
+            'error' => "You can only withdraw up to 50% of your balance. Maximum: " .
                       number_format($maxWithdrawable, 2) . " " . $request->currency
         ]);
     }
-    
+
     if ($balance < $request->amount_requested) {
         return back()->withErrors(['error' => 'Insufficient wallet balance']);
     }
 
     // Calculate amounts
     $requestedAmount = $request->amount_requested;
-    $userReceives = $requestedAmount * 0.70;
-    $platformFee = $requestedAmount * 0.30;
+    $userReceives = $requestedAmount * 0.50;
+    $platformFee = $requestedAmount * 0.50;
 
     // ✅ Fix: Convert "null" strings to actual NULL
     DB::table('payment_applications')->insert([
@@ -132,10 +132,10 @@ class PaymentApplicationController extends Controller
         'updated_at' => now()
     ]);
 
-    return redirect()->route('payment.apply')->with('success', 
-        "Payment application submitted successfully! You will receive " . 
-        number_format($userReceives, 2) . " " . $request->currency . 
-        " (70% of requested amount). Platform fee: " . 
+    return redirect()->route('payment.apply')->with('success',
+        "Payment application submitted successfully! You will receive " .
+        number_format($userReceives, 2) . " " . $request->currency .
+        " (50% of requested amount). Platform fee: " .
         number_format($platformFee, 2) . " " . $request->currency);
 }
 

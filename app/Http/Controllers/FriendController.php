@@ -191,18 +191,41 @@ class FriendController extends Controller
     public function cancelRequest($requestId)
     {
         $userId = Session::get('id');
-        
+
         $request = FriendRequest::findOrFail($requestId);
-        
+
         if ($request->sender_id != $userId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         $request->delete();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Friend request cancelled'
         ]);
+    }
+
+    public function unfriend($userId)
+    {
+        $currentUserId = Session::get('id');
+
+        if (!$currentUserId) {
+            return response()->json(['success' => false, 'error' => 'Not logged in'], 401);
+        }
+
+        $deleted = FriendRequest::where('status', 'accepted')
+            ->where(function ($query) use ($currentUserId, $userId) {
+                $query->where('sender_id', $currentUserId)->where('receiver_id', $userId);
+            })->orWhere(function ($query) use ($currentUserId, $userId) {
+                $query->where('sender_id', $userId)->where('receiver_id', $currentUserId)
+                      ->where('status', 'accepted');
+            })->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => 'Unfriended successfully']);
+        }
+
+        return response()->json(['success' => false, 'error' => 'Friendship not found'], 404);
     }
 }

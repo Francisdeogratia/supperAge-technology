@@ -68,6 +68,7 @@ class RegisterController extends Controller
             'phone_status'      => $phonestatus,
             'unsetacct'         => $unsetacct,
             'registration_type' => $registrationType,
+            'invited_by'        => $refId ?: null,
         ]);
 
         // Handle referral reward

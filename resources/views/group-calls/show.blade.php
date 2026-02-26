@@ -18,7 +18,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #0a0a0a;
+            background: #0B141A;
             overflow: hidden;
             height: 100vh;
         }
@@ -29,14 +29,14 @@
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, #00a884 0%, #008069 100%);
+            background: #008069;
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             z-index: 9999;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
             animation: slideDown 0.3s ease;
         }
 
@@ -52,76 +52,75 @@
         .sound-permission-content {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .sound-permission-icon {
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .sound-enable-btn {
             background: white;
-            color: #00a884;
+            color: #008069;
             border: none;
-            padding: 10px 25px;
+            padding: 8px 20px;
             border-radius: 20px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 14px;
         }
 
         .sound-enable-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+            opacity: 0.9;
         }
 
-        /* Call Container */
+        /* Call Container — WhatsApp dark style */
         .call-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
             position: relative;
-            padding-top: 0;
+            background: linear-gradient(180deg, #0B3D35 0%, #0B141A 40%);
         }
 
         .call-header {
-            background: rgba(0,0,0,0.8);
+            background: transparent;
             color: white;
-            padding: 15px 20px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            backdrop-filter: blur(10px);
             z-index: 100;
         }
 
         .call-header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .call-header h2 {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 17px;
+            font-weight: 500;
             margin: 0;
+            color: #E9EDEF;
         }
 
         .call-duration {
             font-size: 13px;
-            color: #aaa;
-            font-family: 'Courier New', monospace;
+            color: #8696A0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .call-header-right {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header-btn {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             border: none;
-            color: white;
+            color: #AEBAC1;
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -129,24 +128,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
 
         .header-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
         }
 
-        /* Participants Grid */
+        /* Participants Grid — WhatsApp Style */
         .participants-grid {
             flex: 1;
             display: grid;
-            gap: 8px;
-            padding: 8px;
+            gap: 4px;
+            padding: 4px;
             overflow-y: auto;
-            background: #1a1a1a;
+            background: transparent;
+            align-content: center;
         }
 
-        /* Dynamic grid based on participant count */
         .participants-grid[data-count="1"] {
             grid-template-columns: 1fr;
         }
@@ -167,8 +166,8 @@
 
         .participant-video {
             position: relative;
-            background: #2a2a2a;
-            border-radius: 12px;
+            background: #1B2B32;
+            border-radius: 16px;
             overflow: hidden;
             min-height: 200px;
             display: flex;
@@ -188,76 +187,73 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #E9EDEF;
         }
 
         .participant-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00a884 0%, #008069 100%);
+            background: #00A884;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            border: 3px solid rgba(255,255,255,0.2);
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: white;
         }
 
         .participant-name {
             position: absolute;
-            bottom: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.75);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(11,20,26,0.7);
+            color: #E9EDEF;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 13px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
+            font-weight: 400;
         }
 
         .participant-status {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
+            top: 10px;
+            right: 10px;
+            padding: 3px 8px;
+            border-radius: 6px;
             font-size: 11px;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
+            font-weight: 500;
         }
 
         .status-ringing {
-            background: rgba(255, 193, 7, 0.9);
+            background: rgba(255, 193, 7, 0.85);
             color: #000;
         }
 
         .status-joined {
-            background: rgba(0, 168, 132, 0.9);
+            background: rgba(0, 168, 132, 0.85);
             color: white;
         }
 
         .status-declined {
-            background: rgba(220, 53, 69, 0.9);
+            background: rgba(234, 67, 53, 0.85);
             color: white;
         }
 
-        /* Call Controls */
+        /* Call Controls — WhatsApp Bottom Bar */
         .call-controls {
-            background: rgba(0,0,0,0.9);
-            padding: 20px;
+            background: rgba(11,20,26,0.95);
+            padding: 20px 0 34px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
-            backdrop-filter: blur(20px);
+            gap: 20px;
         }
 
         .call-btn {
-            width: 56px;
-            height: 56px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -265,102 +261,53 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.2s;
             position: relative;
         }
 
         .call-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.93);
         }
 
         .btn-mute,
-        .btn-video,
-        .btn-screen-share {
-            background: rgba(60,60,60,1);
-            color: white;
+        .btn-video {
+            background: rgba(255,255,255,0.1);
+            color: #E9EDEF;
         }
 
         .btn-mute:hover,
-        .btn-video:hover,
-        .btn-screen-share:hover {
-            background: rgba(80,80,80,1);
+        .btn-video:hover {
+            background: rgba(255,255,255,0.18);
         }
 
         .btn-mute.active,
         .btn-video.active {
-            background: #dc3545;
-        }
-
-        .btn-screen-share.active {
-            background: #00a884;
+            background: #EA4335;
+            color: white;
         }
 
         .btn-end-call {
-            background: #dc3545;
+            background: #EA4335;
             color: white;
-            width: 64px;
-            height: 64px;
-            font-size: 24px;
+            width: 60px;
+            height: 60px;
+            font-size: 22px;
         }
 
         .btn-end-call:hover {
-            background: #c82333;
-        }
-
-        /* Screen Share Overlay */
-        .screen-share-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #000;
-            z-index: 1000;
-            display: none;
-        }
-
-        .screen-share-overlay.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .screen-share-video {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .screen-share-header {
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .stop-share-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
+            background: #D93025;
         }
 
         /* Mobile Styles */
         @media (max-width: 768px) {
             .call-header h2 {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             .participants-grid {
                 grid-template-columns: 1fr !important;
-                gap: 6px;
-                padding: 6px;
+                gap: 4px;
+                padding: 4px;
             }
 
             .participant-video {
@@ -368,78 +315,28 @@
             }
 
             .participant-avatar {
-                width: 60px;
-                height: 60px;
-                font-size: 24px;
+                width: 64px;
+                height: 64px;
+                font-size: 26px;
             }
 
             .call-btn {
-                width: 52px;
-                height: 52px;
+                width: 50px;
+                height: 50px;
                 font-size: 18px;
             }
 
             .btn-end-call {
-                width: 60px;
-                height: 60px;
-                font-size: 22px;
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
             }
 
             .call-controls {
-                padding: 15px 10px;
-                gap: 12px;
+                padding: 16px 0 28px;
+                gap: 16px;
             }
         }
-
-        /* Minimized Participant View */
-        .minimized-participants {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 999;
-        }
-
-        .minimized-participants.active {
-            display: flex;
-        }
-
-        .mini-participant {
-            width: 120px;
-            height: 160px;
-            background: #2a2a2a;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-        }
-
-        .mini-participant video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Make sure call button is visible above other elements */
-.active-call-btn {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: linear-gradient(135deg, #00a884 0%, #008069 100%);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 30px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    z-index: 10000; /* ✅ Increased z-index */
-    box-shadow: 0 4px 20px rgba(0, 168, 132, 0.4);
-    animation: callBtnBounce 2s infinite;
-    transition: all 0.3s;
-}
     </style>
 </head>
 <body>
@@ -455,24 +352,6 @@
         <button class="sound-enable-btn" onclick="enableSound()">
             <i class="fa fa-check"></i> Enable Sound
         </button>
-    </div>
-
-    <!-- Screen Share Overlay -->
-    <div class="screen-share-overlay" id="screenShareOverlay">
-        <div class="screen-share-header">
-            <div>
-                <strong id="sharerName">Someone</strong> is sharing screen
-            </div>
-            <button class="stop-share-btn" onclick="stopScreenShare()">
-                <i class="fa fa-stop"></i> Stop Sharing
-            </button>
-        </div>
-        <video id="screenShareVideo" class="screen-share-video" autoplay playsinline></video>
-    </div>
-
-    <!-- Minimized Participants (when screen sharing) -->
-    <div class="minimized-participants" id="miniParticipants">
-        <!-- Will be populated dynamically -->
     </div>
 
     <div class="call-container">
@@ -541,6 +420,7 @@
         let soundEnabled = false;
         let callStartTime = new Date('{{ $call->started_at }}');
         let remoteUsers = {};
+        let _joiningAgora = false;
 
         // Sound functions
         function enableSound() {
@@ -570,6 +450,11 @@
 
         // Initialize call with Agora
         async function initializeCall() {
+            if (_joiningAgora) {
+                console.log('⚠️ Already joining Agora channel, skipping duplicate call');
+                return;
+            }
+            _joiningAgora = true;
             try {
                 // Join the call on the server
                 await fetch(`/group-calls/${callId}/join`, {
@@ -621,6 +506,49 @@
                     playLeaveSound();
                 });
 
+                // Auto-renew token before it expires
+                agoraClient.on('token-privilege-will-expire', async () => {
+                    console.log('🔄 Token expiring soon, renewing...');
+                    try {
+                        const renewResponse = await fetch('/agora/token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ channel: agoraChannel })
+                        });
+                        const renewData = await renewResponse.json();
+                        if (renewData.success && renewData.token) {
+                            await agoraClient.renewToken(renewData.token);
+                            console.log('✅ Token renewed successfully');
+                        }
+                    } catch (err) {
+                        console.error('❌ Token renewal failed:', err);
+                    }
+                });
+
+                agoraClient.on('token-privilege-did-expire', async () => {
+                    console.log('⚠️ Token expired, attempting to renew...');
+                    try {
+                        const renewResponse = await fetch('/agora/token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ channel: agoraChannel })
+                        });
+                        const renewData = await renewResponse.json();
+                        if (renewData.success && renewData.token) {
+                            await agoraClient.renewToken(renewData.token);
+                            console.log('✅ Token renewed after expiry');
+                        }
+                    } catch (err) {
+                        console.error('❌ Token renewal after expiry failed:', err);
+                    }
+                });
+
                 // Join channel
                 await agoraClient.join(tokenData.app_id, agoraChannel, tokenData.token, tokenData.uid);
                 console.log('Joined Agora channel:', agoraChannel);
@@ -647,6 +575,7 @@
 
             } catch (error) {
                 console.error('Error initializing call:', error);
+                _joiningAgora = false;
                 alert('Failed to access camera/microphone. Please check permissions.');
             }
         }
@@ -790,35 +719,35 @@
         });
     </script>
 
-    <!-- Participants List Modal -->
-<div class="participants-modal" id="participantsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 15px; padding: 20px; max-width: 400px; width: 90%; max-height: 70vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="margin: 0; color: #333;">Participants ({{ $call->participants->count() }})</h3>
-            <button onclick="closeParticipantsList()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #999;">&times;</button>
+    <!-- Participants List Modal — WhatsApp Style -->
+<div class="participants-modal" id="participantsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: #111B21; border-radius: 12px; padding: 0; max-width: 380px; width: 90%; max-height: 70vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #233138;">
+            <h3 style="margin: 0; color: #E9EDEF; font-size: 16px; font-weight: 500;">Participants ({{ $call->participants->count() }})</h3>
+            <button onclick="closeParticipantsList()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #AEBAC1;">&times;</button>
         </div>
-        
+
         @foreach($call->participants as $participant)
-        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f0f0f0;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00a884 0%, #008069 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #233138;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #00A884; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500; font-size: 16px;">
                 {{ strtoupper(substr($participant->user->name, 0, 1)) }}
             </div>
             <div style="flex: 1;">
-                <div style="font-weight: 600; color: #333;">
+                <div style="font-weight: 500; color: #E9EDEF; font-size: 14.5px;">
                     {{ $participant->user->name }}
                     @if($participant->user_id == $user->id)
-                    <span style="color: #00a884; font-size: 12px;">(You)</span>
+                    <span style="color: #00A884; font-size: 12px;">(You)</span>
                     @endif
                 </div>
-                <div style="font-size: 12px; color: #666;">
+                <div style="font-size: 12px; color: #8696A0;">
                     @if($participant->status === 'joined')
-                        <span style="color: #00a884;">● In call</span>
+                        <span style="color: #00A884;">In call</span>
                     @elseif($participant->status === 'ringing')
-                        <span style="color: #ffc107;">● Ringing...</span>
+                        <span style="color: #FFC107;">Ringing...</span>
                     @elseif($participant->status === 'declined')
-                        <span style="color: #dc3545;">● Declined</span>
+                        <span style="color: #EA4335;">Declined</span>
                     @else
-                        <span style="color: #999;">● Left</span>
+                        <span>Left</span>
                     @endif
                 </div>
             </div>
