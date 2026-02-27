@@ -702,6 +702,14 @@ Route::delete('/events/{id}', [EventController::class, 'destroy'])->name('events
 // use App\Http\Controllers\LiveStreamController;
 
 // Live Streaming Routes
+
+// Must be BEFORE the {streamId} wildcard — Agora SDK sets poster="noposter" on video elements
+// which the browser fetches as a URL relative to the current page.
+Route::get('/live/stream/noposter', function () {
+    $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+    return response($png, 200)->header('Content-Type', 'image/png')->header('Cache-Control', 'public, max-age=86400');
+});
+
 Route::middleware(['user.session'])->group(function () {
     Route::get('/live', [LiveStreamController::class, 'index'])->name('live.index');
     Route::post('/live/start', [LiveStreamController::class, 'start'])->name('live.start');
