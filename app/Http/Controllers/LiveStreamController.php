@@ -13,6 +13,7 @@ use App\Models\Notification;
 use Illuminate\Support\Str;
 use App\Models\LiveStreamLike;
 use App\Models\LiveStreamComment;
+use App\Helpers\AgoraTokenBuilder;
 use Pusher\Pusher;
 
 class LiveStreamController extends Controller
@@ -312,11 +313,45 @@ private function recordView($streamId, $userId)
     /**
      * Get comments for stream
      */
-    public function getComments($streamId)
+    public function getLiveToken($streamId)
     {
-        $comments = LiveStreamComment::with('user')
-            ->where('stream_id', $streamId)
-            ->orderBy('created_at', 'desc')
+        $userId = Session::get('id');
+        if (!$userId) {
+            return response()->json(['error' => 'Not logged in'], 401);
+        }
+
+        $stream = LiveStream::findOrFail($streamId);
+        $isCreator = $stream->creator_id == $userId;
+        $role = $isCreator ? AgoraTokenBuilder::ROLE_PUBLISHER : AgoraTokenBuilder::ROLE_SUBSCRIBER;
+        $channel = 'live-' . $streamId;
+        $expire  = time() + 7200; // 2 hours
+
+        $token = AgoraTokenBuilder::buildTokenWithUid(
+            env('AGORA_APP_ID'),
+            env('AGORA_APP_CERTIFICATE'),
+            $channel,
+            (int) $userId,
+            $role,
+            $expire
+        );
+
+        return response()->json([
+            'token'   => $token,
+            'uid'     => (int) $userId,
+            'appId'   => env('AGORA_APP_ID'),
+            'channel' => $channel,
+        ]);
+    }
+
+    public function getComments(Request $request, $streamId)
+    {
+        $after = (int) $request->query('after', 0);
+        $query = LiveStreamComment::with('user')
+            ->where('stream_id', $streamId);
+        if ($after > 0) {
+            $query->where('id', '>', $after);
+        }
+        $comments = $query->orderBy('created_at', 'desc')
             ->limit(50)
             ->get()
             ->map(function($comment) {

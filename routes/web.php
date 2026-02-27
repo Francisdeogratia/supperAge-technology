@@ -714,6 +714,7 @@ Route::middleware(['user.session'])->group(function () {
     Route::post('/live/stream/{streamId}/like', [LiveStreamController::class, 'likeStream'])->name('live.like');
     Route::post('/live/stream/{streamId}/comment', [LiveStreamController::class, 'addComment'])->name('live.comment');
     Route::get('/live/stream/{streamId}/comments', [LiveStreamController::class, 'getComments']);
+    Route::get('/live/stream/{streamId}/token', [LiveStreamController::class, 'getLiveToken']);
 });
 
 
