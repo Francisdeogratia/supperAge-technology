@@ -163,25 +163,27 @@
         /* ── Bottom controls ── */
         #bottomBar {
             position: absolute; bottom: 0; left: 0; right: 0;
-            z-index: 20; padding: 12px 14px 24px;
-            display: flex; align-items: center; gap: 10px;
+            z-index: 20;
+            padding: 10px 10px calc(16px + env(safe-area-inset-bottom, 0px));
+            display: flex; align-items: center; gap: 8px;
         }
         #commentInputWrap {
-            flex: 1; display: flex; align-items: center;
+            flex: 1; min-width: 0; display: flex; align-items: center;
             background: rgba(255,255,255,.15); border-radius: 24px;
-            padding: 8px 14px; gap: 8px;
+            padding: 8px 10px; gap: 6px;
             backdrop-filter: blur(4px);
+            overflow: hidden;
         }
         #commentInputWrap input {
-            flex: 1; background: none; border: none; outline: none;
+            flex: 1; min-width: 0; background: none; border: none; outline: none;
             color: #fff; font-size: 14px;
         }
         #commentInputWrap input::placeholder { color: rgba(255,255,255,.6); }
         #sendCommentBtn {
             background: #e91e8c; border: none; color: #fff;
-            width: 32px; height: 32px; border-radius: 50%;
+            width: 30px; height: 30px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 14px; flex-shrink: 0;
+            cursor: pointer; font-size: 13px; flex-shrink: 0;
         }
 
         .ctrl-btn {
@@ -260,8 +262,10 @@
 
         /* ── Mobile ── */
         @media (max-width: 480px) {
-            #commentsFloat { right: 70px; }
-            .ctrl-btn { width: 40px; height: 40px; font-size: 15px; }
+            #commentsFloat { right: 60px; bottom: 90px; }
+            .ctrl-btn { width: 38px; height: 38px; font-size: 14px; }
+            #endBtn { padding: 7px 10px; font-size: 12px; }
+            #commentInputWrap input { font-size: 13px; }
         }
     </style>
 </head>
@@ -275,11 +279,15 @@
     </div>
 
     <!-- Video area -->
-    <div id="videoContainer">
-        <div id="noVideoMsg" style="display:none;">
-            <img src="{{ $stream->creator->profileimg ?? asset('images/best3.png') }}" class="avatar-big" alt="">
-            <p>{{ $stream->creator->name ?? 'Host' }} is preparing the stream…</p>
-        </div>
+    <div id="videoContainer"></div>
+
+    <!-- No video placeholder (outside videoContainer so Agora doesn't delete it) -->
+    <div id="noVideoMsg" style="display:none; position:absolute; inset:0; z-index:5;
+         flex-direction:column; align-items:center; justify-content:center; background:#111;">
+        <img src="{{ $stream->creator->profileimg ?? asset('images/best3.png') }}" class="avatar-big" alt="">
+        <p style="color:#aaa; font-size:15px; margin-top:10px;">
+            {{ $stream->creator->name ?? 'Host' }} is preparing the stream…
+        </p>
     </div>
 
     <!-- Gradients -->
@@ -452,15 +460,12 @@ async function startBroadcast() {
             { encoderConfig: 'high_quality' },
             { encoderConfig: '720p_2', facingMode }
         );
-        const videoEl = document.createElement('div');
-        videoEl.id = 'localVideoDiv';
-        videoEl.style.cssText = 'width:100%;height:100%;';
-        document.getElementById('videoContainer').innerHTML = '';
-        document.getElementById('videoContainer').appendChild(videoEl);
+        ensureVideoDiv('localVideoDiv');
         localVideoTrack.play('localVideoDiv');
 
         await agoraClient.publish([localAudioTrack, localVideoTrack]);
         hideLoading();
+        hideNoVideo();
         showStatus('You are LIVE! 🔴', 2000);
     } catch(e) {
         console.error(e);
@@ -473,12 +478,7 @@ async function handleUserPublished(user, mediaType) {
     await agoraClient.subscribe(user, mediaType);
 
     if (mediaType === 'video') {
-        const videoEl = document.createElement('div');
-        videoEl.id = 'remoteVideoDiv';
-        videoEl.style.cssText = 'width:100%;height:100%;';
-        const container = document.getElementById('videoContainer');
-        container.innerHTML = '';
-        container.appendChild(videoEl);
+        ensureVideoDiv('remoteVideoDiv');
         user.videoTrack.play('remoteVideoDiv');
         hideLoading();
         hideNoVideo();
@@ -727,13 +727,23 @@ function showStatus(msg, autohide = 0) {
 function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
 }
+function ensureVideoDiv(id) {
+    let el = document.getElementById(id);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = id;
+        el.style.cssText = 'width:100%;height:100%;';
+        document.getElementById('videoContainer').appendChild(el);
+    }
+    return el;
+}
 function showNoVideo() {
-    document.getElementById('noVideoMsg').style.display = 'flex';
-    document.getElementById('noVideoMsg').style.flexDirection = 'column';
-    document.getElementById('noVideoMsg').style.alignItems = 'center';
+    const el = document.getElementById('noVideoMsg');
+    if (el) el.style.display = 'flex';
 }
 function hideNoVideo() {
-    document.getElementById('noVideoMsg').style.display = 'none';
+    const el = document.getElementById('noVideoMsg');
+    if (el) el.style.display = 'none';
 }
 function showEnded(msg) {
     hideLoading();
