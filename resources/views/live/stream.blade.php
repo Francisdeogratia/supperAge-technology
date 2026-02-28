@@ -401,6 +401,7 @@ const CREATOR_ID  = {{ $stream->creator_id }};
 let agoraClient   = null;
 let localAudioTrack = null;
 let localVideoTrack = null;
+let remoteAudioTrack = null;
 let micMuted      = false;
 let camOff        = false;
 let facingMode    = 'user';
@@ -519,8 +520,36 @@ async function handleUserPublished(user, mediaType) {
         hideNoVideo();
     }
     if (mediaType === 'audio') {
-        user.audioTrack.play();
+        remoteAudioTrack = user.audioTrack;
+        try {
+            await user.audioTrack.play();
+            hideUnmuteBtn();
+        } catch(e) {
+            // Browser blocked autoplay — show tap-to-hear button
+            console.warn('Audio autoplay blocked:', e);
+            showUnmuteBtn();
+        }
     }
+}
+
+function showUnmuteBtn() {
+    let btn = document.getElementById('unmuteBtn');
+    if (btn) { btn.style.display = 'flex'; return; }
+    btn = document.createElement('button');
+    btn.id = 'unmuteBtn';
+    btn.innerHTML = '<i class="fas fa-volume-mute" style="font-size:22px;"></i><span style="font-size:13px;font-weight:700;">Tap to hear audio</span>';
+    btn.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:35;background:rgba(233,30,140,.92);color:#fff;border:none;border-radius:30px;padding:14px 28px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.5);';
+    btn.onclick = function() {
+        if (remoteAudioTrack) {
+            remoteAudioTrack.play();
+        }
+        hideUnmuteBtn();
+    };
+    document.getElementById('liveWrap').appendChild(btn);
+}
+function hideUnmuteBtn() {
+    const btn = document.getElementById('unmuteBtn');
+    if (btn) btn.style.display = 'none';
 }
 
 function handleUserUnpublished(user, mediaType) {
