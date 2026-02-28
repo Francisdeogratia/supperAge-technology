@@ -419,8 +419,11 @@ async function initStream() {
     showStatus('Fetching stream credentials…');
     try {
         const res  = await fetch(`/live/stream/${STREAM_ID}/token`);
+        if (!res.ok) { showEnded('Could not connect to the stream. (HTTP ' + res.status + ')'); return; }
         const data = await res.json();
-        if (data.error) { showEnded('Stream not available.'); return; }
+        if (data.error) { showEnded('Stream not available: ' + data.error); return; }
+        if (!data.appId || !data.token) { showEnded('Stream configuration missing. Check AGORA_APP_ID in server .env'); return; }
+        document.getElementById('statusPill').style.display = 'none';
         await joinAgora(data);
     } catch(e) {
         console.error(e);
@@ -446,6 +449,7 @@ async function joinAgora({ token, uid, appId, channel }) {
     } else {
         hideLoading();
         showNoVideo();
+        showStatus('Waiting for host to start video…', 3000);
     }
 
     startTimers();
@@ -538,7 +542,7 @@ function sendComment() {
     })
     .then(r => r.json())
     .then(d => {
-        if (d.success) addFloatingComment(d.user_name, d.user_avatar, text, d.id);
+        if (d.success) addFloatingComment(d.comment.user_name, d.comment.user_avatar, text, d.comment.id);
     })
     .catch(console.error);
 }
