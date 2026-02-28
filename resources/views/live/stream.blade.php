@@ -434,14 +434,18 @@ async function initStream() {
 async function joinAgora({ token, uid, appId, channel }) {
     AgoraRTC.setLogLevel(4); // errors only
 
-    agoraClient = AgoraRTC.createClient({ mode: 'live', codec: 'h264' });
+    agoraClient = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
 
     // Viewer count via subscription events
     agoraClient.on('user-published', handleUserPublished);
     agoraClient.on('user-unpublished', handleUserUnpublished);
 
-    const role = IS_CREATOR ? 'host' : 'audience';
-    await agoraClient.setClientRole(role);
+    if (IS_CREATOR) {
+        await agoraClient.setClientRole('host');
+    } else {
+        // level 1 = low latency audience
+        await agoraClient.setClientRole('audience', { level: 1 });
+    }
     await agoraClient.join(appId, channel, token, uid);
 
     if (IS_CREATOR) {
@@ -459,10 +463,12 @@ async function joinAgora({ token, uid, appId, channel }) {
 // ── Creator: start broadcast ───────────────────────────────────────────────────
 async function startBroadcast() {
     showStatus('Starting camera & microphone…');
+    hideRetryBtn();
     try {
+        // Use simple config for best mobile compatibility
         [localAudioTrack, localVideoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
-            { encoderConfig: 'high_quality' },
-            { encoderConfig: '720p_2', facingMode }
+            {},
+            { facingMode }
         );
         ensureVideoDiv('localVideoDiv');
         localVideoTrack.play('localVideoDiv');
@@ -472,9 +478,34 @@ async function startBroadcast() {
         hideNoVideo();
         showStatus('You are LIVE! 🔴', 2000);
     } catch(e) {
-        console.error(e);
-        showStatus('Camera/mic error: ' + e.message);
+        console.error('startBroadcast error:', e);
+        hideLoading();
+        let msg = 'Camera/mic error.';
+        if (e.code === 'PERMISSION_DENIED' || (e.message && e.message.includes('Permission'))) {
+            msg = 'Camera/mic permission denied. Please allow access and retry.';
+        } else if (e.message) {
+            msg = 'Error: ' + e.message;
+        }
+        showStatus(msg);
+        showRetryBtn();
     }
+}
+
+function showRetryBtn() {
+    let btn = document.getElementById('retryBroadcastBtn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'retryBroadcastBtn';
+        btn.textContent = '🔄 Retry Camera';
+        btn.style.cssText = 'position:absolute;bottom:120px;left:50%;transform:translateX(-50%);z-index:40;background:#e91e8c;color:#fff;border:none;border-radius:24px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;';
+        btn.onclick = startBroadcast;
+        document.getElementById('liveWrap').appendChild(btn);
+    }
+    btn.style.display = 'block';
+}
+function hideRetryBtn() {
+    const btn = document.getElementById('retryBroadcastBtn');
+    if (btn) btn.style.display = 'none';
 }
 
 // ── Viewer: receive stream ─────────────────────────────────────────────────────
