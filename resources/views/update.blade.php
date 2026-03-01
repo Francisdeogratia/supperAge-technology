@@ -7369,6 +7369,13 @@ document.addEventListener('DOMContentLoaded', function () {
               setTimeout(() => successMsg.style.display = 'none', 3000);
               form.reset();
 
+              // ✅ Close the comments collapse after posting
+              const collapseEl = document.getElementById(`comments-${postId}`);
+              if (collapseEl) {
+                const bsCollapse = bootstrap.Collapse.getInstance(collapseEl);
+                if (bsCollapse) bsCollapse.hide();
+              }
+
               // ✅ Refresh comment list
               fetch(`/posts/${postId}/comments`)
                 .then(res => res.text())
