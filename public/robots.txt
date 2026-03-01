@@ -13,4 +13,4 @@ Disallow: /my-posts
 Disallow: /notifications
 Disallow: /logout
 
-Sitemap: https://supperage.com/sitemap.xml
+Sitemap: https://www.supperage.com/sitemap.xml
