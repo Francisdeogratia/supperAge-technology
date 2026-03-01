@@ -649,6 +649,7 @@ Route::post('/groups/messages/{id}/react', [GroupController::class, 'reactToMess
 // Group Members Routes
 Route::post('/groups/{id}/members', [GroupController::class, 'addMembers'])->name('groups.addMembers');
 Route::delete('/groups/{id}/members/{memberId}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
+Route::post('/groups/{id}/members/{memberId}/make-admin', [GroupController::class, 'makeAdmin'])->name('groups.makeAdmin');
 
 // Group Call Routes
 Route::post('/group-calls/initiate', [GroupCallController::class, 'initiateCall'])->name('group-calls.initiate');

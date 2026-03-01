@@ -1974,20 +1974,32 @@
         {{-- Members --}}
         <div class="gi-members-header">Members ({{ $group->member_count }})</div>
         @foreach($group->members as $member)
-        <div class="gi-member">
+        <div class="gi-member" id="gi-member-{{ $member->user_id }}">
             <img src="{{ $member->user->profileimg ?? asset('images/best3.png') }}"
                  onerror="this.src='{{ asset('images/best3.png') }}'"
                  alt="{{ $member->user->name }}">
-            <div class="flex-1">
+            <div style="flex:1;">
                 <div class="gi-member-name">{{ $member->user->name }}</div>
-                <div class="gi-member-role">
+                <div class="gi-member-role" id="gi-role-{{ $member->user_id }}">
                     @if($member->user_id == $group->created_by)
-                        <span style="color:#0EA5E9;">Group Creator</span>
+                        <span style="color:#0EA5E9;font-weight:600;">Creator</span>
+                    @elseif($member->role === 'admin')
+                        <span style="color:#28a745;font-weight:600;">Admin</span>
                     @else
-                        {{ ucfirst($member->role) }}
+                        Member
                     @endif
                 </div>
             </div>
+            @if($isCreator && $member->user_id != $group->created_by)
+            <button
+                id="gi-adminbtn-{{ $member->user_id }}"
+                onclick="toggleAdmin({{ $member->user_id }}, this)"
+                style="border:none;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;
+                       background:{{ $member->role === 'admin' ? '#f8d7da' : '#d1ecf1' }};
+                       color:{{ $member->role === 'admin' ? '#842029' : '#0c5460' }};">
+                {{ $member->role === 'admin' ? 'Remove Admin' : 'Make Admin' }}
+            </button>
+            @endif
         </div>
         @endforeach
 
@@ -3987,6 +3999,38 @@ function showGroupInfo() {
 function closeGroupInfo() {
     document.getElementById('groupInfoDrawer').classList.remove('open');
     document.getElementById('groupInfoOverlay').classList.remove('open');
+}
+
+async function toggleAdmin(memberId, btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        const res  = await fetch(`/groups/${groupId}/members/${memberId}/make-admin`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            const roleEl = document.getElementById(`gi-role-${memberId}`);
+            if (data.role === 'admin') {
+                roleEl.innerHTML = '<span style="color:#28a745;font-weight:600;">Admin</span>';
+                btn.textContent  = 'Remove Admin';
+                btn.style.background = '#f8d7da';
+                btn.style.color      = '#842029';
+            } else {
+                roleEl.textContent   = 'Member';
+                btn.textContent      = 'Make Admin';
+                btn.style.background = '#d1ecf1';
+                btn.style.color      = '#0c5460';
+            }
+        } else {
+            alert(data.error || 'Failed to update role');
+            btn.textContent = btn.style.background === 'rgb(248, 215, 218)' ? 'Remove Admin' : 'Make Admin';
+        }
+    } catch(e) {
+        alert('Something went wrong.');
+    }
+    btn.disabled = false;
 }
 
 function showMembersModal() {

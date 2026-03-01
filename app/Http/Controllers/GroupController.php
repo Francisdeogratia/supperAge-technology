@@ -762,6 +762,40 @@ class GroupController extends Controller
         ]);
     }
 
+    public function makeAdmin($groupId, $memberId)
+    {
+        $userId = Session::get('id');
+        $group  = Group::findOrFail($groupId);
+
+        // Only the creator can promote members
+        if ($group->created_by != $userId) {
+            return response()->json(['error' => 'Only the group creator can make admins'], 403);
+        }
+
+        $member = GroupMember::where('group_id', $groupId)
+            ->where('user_id', $memberId)
+            ->first();
+
+        if (!$member) {
+            return response()->json(['error' => 'Member not found in this group'], 404);
+        }
+
+        if ($memberId == $group->created_by) {
+            return response()->json(['error' => 'Creator is already the owner'], 400);
+        }
+
+        $newRole = $member->role === 'admin' ? 'member' : 'admin';
+        $member->update(['role' => $newRole]);
+
+        return response()->json([
+            'success' => true,
+            'role'    => $newRole,
+            'message' => $newRole === 'admin'
+                ? 'Member promoted to admin!'
+                : 'Admin role removed.'
+        ]);
+    }
+
     public function removeMember($groupId, $memberId)
     {
         $userId = Session::get('id');
