@@ -728,6 +728,78 @@
     display: block;
 }
 
+/* ── Group Info Drawer ── */
+.group-info-drawer {
+    position: fixed;
+    top: 0; right: -100%; bottom: 0;
+    width: 100%; max-width: 420px;
+    background: #f0f2f5;
+    z-index: 3000;
+    transition: right .28s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.group-info-drawer.open { right: 0; }
+.group-info-drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 2999;
+    display: none;
+}
+.group-info-drawer-overlay.open { display: block; }
+.gi-header {
+    background: #0EA5E9; color: #fff;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+}
+.gi-header button { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+.gi-header span { font-size: 17px; font-weight: 600; }
+.gi-body { flex: 1; overflow-y: auto; }
+.gi-cover {
+    background: #0EA5E9;
+    padding: 30px 16px 20px;
+    text-align: center;
+}
+.gi-cover img {
+    width: 90px; height: 90px; border-radius: 50%;
+    object-fit: cover; border: 3px solid rgba(255,255,255,.6);
+    margin-bottom: 10px;
+}
+.gi-cover h5 { color: #fff; font-size: 20px; font-weight: 700; margin: 0; }
+.gi-cover small { color: rgba(255,255,255,.8); font-size: 13px; }
+.gi-section {
+    background: #fff; margin: 8px 0;
+    padding: 14px 20px;
+}
+.gi-section-label {
+    font-size: 12px; color: #0EA5E9; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 6px;
+}
+.gi-section p { margin: 0; color: #333; font-size: 14px; line-height: 1.5; }
+.gi-member {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 20px; background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+.gi-member img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.gi-member-name { font-weight: 600; font-size: 14px; color: #111; }
+.gi-member-role { font-size: 12px; color: #888; }
+.gi-members-header {
+    padding: 12px 20px 6px;
+    font-size: 12px; color: #0EA5E9; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    background: #fff; border-top: 8px solid #f0f2f5;
+}
+.gi-actions { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.gi-btn {
+    padding: 13px; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.gi-btn-leave { background: #fff3cd; color: #856404; }
+.gi-btn-delete { background: #f8d7da; color: #842029; }
+
 /* Members Modal */
 .members-modal {
     position: fixed;
@@ -1302,6 +1374,10 @@
         {{-- Chat Menu --}}
         {{-- Chat Menu --}}
 <div class="chat-menu" id="chatMenu">
+    <div class="menu-item" onclick="showGroupInfo()">
+        <i class="fa fa-info-circle text-info"></i>
+        <span>Group Info</span>
+    </div>
     <div class="menu-item" onclick="showMembersModal()">
         <i class="fa fa-users text-primary"></i>
         <span>View Members</span>
@@ -1852,6 +1928,81 @@
         <div style="display: flex; gap: 10px; justify-content: flex-end;">
             <button onclick="closeReportModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer;">Cancel</button>
             <button onclick="submitReport()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #dc3545; color: white; cursor: pointer;">Submit Report</button>
+        </div>
+    </div>
+</div>
+
+{{-- Group Info Drawer --}}
+<div class="group-info-drawer-overlay" id="groupInfoOverlay" onclick="closeGroupInfo()"></div>
+<div class="group-info-drawer" id="groupInfoDrawer">
+    <div class="gi-header">
+        <button onclick="closeGroupInfo()"><i class="fa fa-arrow-left"></i></button>
+        <span>Group Info</span>
+    </div>
+    <div class="gi-body">
+        {{-- Cover / Avatar --}}
+        <div class="gi-cover">
+            <img src="{{ $group->image ?? asset('images/best3.png') }}"
+                 onerror="this.src='{{ asset('images/best3.png') }}'" alt="{{ $group->name }}">
+            <h5>{{ $group->name }}</h5>
+            <small>{{ $group->member_count }} members</small>
+        </div>
+
+        {{-- Description --}}
+        <div class="gi-section">
+            <div class="gi-section-label">Description</div>
+            <p>{{ $group->description ?? 'No description added.' }}</p>
+        </div>
+
+        {{-- Info --}}
+        <div class="gi-section">
+            <div class="gi-section-label">Details</div>
+            <p style="margin-bottom:8px;">
+                <i class="fa fa-calendar-alt" style="color:#0EA5E9;width:18px;"></i>
+                Created {{ $group->created_at->format('d M Y') }}
+            </p>
+            <p style="margin-bottom:8px;">
+                <i class="fa fa-user-shield" style="color:#0EA5E9;width:18px;"></i>
+                Created by <strong>{{ $group->creator->name ?? 'Unknown' }}</strong>
+            </p>
+            <p>
+                <i class="fa fa-users" style="color:#0EA5E9;width:18px;"></i>
+                {{ $group->member_count }} {{ Str::plural('member', $group->member_count) }}
+            </p>
+        </div>
+
+        {{-- Members --}}
+        <div class="gi-members-header">Members ({{ $group->member_count }})</div>
+        @foreach($group->members as $member)
+        <div class="gi-member">
+            <img src="{{ $member->user->profileimg ?? asset('images/best3.png') }}"
+                 onerror="this.src='{{ asset('images/best3.png') }}'"
+                 alt="{{ $member->user->name }}">
+            <div class="flex-1">
+                <div class="gi-member-name">{{ $member->user->name }}</div>
+                <div class="gi-member-role">
+                    @if($member->user_id == $group->created_by)
+                        <span style="color:#0EA5E9;">Group Creator</span>
+                    @else
+                        {{ ucfirst($member->role) }}
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endforeach
+
+        {{-- Actions --}}
+        <div class="gi-actions">
+            @if(!$isCreator)
+            <button class="gi-btn gi-btn-leave" onclick="closeGroupInfo(); leaveGroup();">
+                <i class="fa fa-sign-out-alt"></i> Leave Group
+            </button>
+            @endif
+            @if($isCreator)
+            <button class="gi-btn gi-btn-delete" onclick="closeGroupInfo(); deleteGroup();">
+                <i class="fa fa-trash"></i> Delete Group
+            </button>
+            @endif
         </div>
     </div>
 </div>
@@ -3828,7 +3979,14 @@ function formatCallDuration(seconds) {
 // ========================================
 
 function showGroupInfo() {
-    window.location.href = '{{ route("groups.show", $group->id) }}';
+    document.getElementById('groupInfoDrawer').classList.add('open');
+    document.getElementById('groupInfoOverlay').classList.add('open');
+    document.getElementById('chatMenu').classList.remove('show');
+}
+
+function closeGroupInfo() {
+    document.getElementById('groupInfoDrawer').classList.remove('open');
+    document.getElementById('groupInfoOverlay').classList.remove('open');
 }
 
 function showMembersModal() {
