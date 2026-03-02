@@ -30,6 +30,53 @@ class ApiTaskController extends Controller
         ]);
     }
 
+    public function leaderboard(Request $request)
+    {
+        $user   = $request->user();
+        $period = $request->get('period', 'all');
+
+        $query = function ($q) use ($period) {
+            $q->where('status', 'successful')->where('type', 'task_reward');
+            if ($period === 'today') $q->whereDate('created_at', today());
+            elseif ($period === 'week') $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        };
+
+        $leaders = \App\Models\UserRecord::withSum(['walletTransactions as total_task_rewards' => $query], 'amount')
+            ->orderByDesc('total_task_rewards')
+            ->take(10)
+            ->get()
+            ->map(fn($u) => [
+                'id'                 => $u->id,
+                'name'               => $u->name,
+                'username'           => $u->username,
+                'profileimg'         => $u->profileimg ? (filter_var($u->profileimg, FILTER_VALIDATE_URL) ? $u->profileimg : url($u->profileimg)) : null,
+                'badge_status'       => $u->badge_status,
+                'total_task_rewards' => (float) ($u->total_task_rewards ?? 0),
+            ]);
+
+        $myPoints = $user->walletTransactions()
+            ->where('status', 'successful')->where('type', 'task_reward')
+            ->when($period === 'today', fn($q) => $q->whereDate('created_at', today()))
+            ->when($period === 'week', fn($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
+            ->sum('amount');
+
+        $myRank = \App\Models\UserRecord::withSum(['walletTransactions as total_task_rewards' => $query], 'amount')
+            ->having('total_task_rewards', '>', $myPoints)
+            ->count() + 1;
+
+        $todayEarnings = $user->walletTransactions()
+            ->where('type', 'task_reward')->where('status', 'successful')
+            ->whereDate('created_at', today())->sum('amount');
+
+        return response()->json([
+            'leaders'        => $leaders,
+            'my_rank'        => $myRank,
+            'my_points'      => (float) $myPoints,
+            'today_earnings' => (float) $todayEarnings,
+            'daily_goal'     => 100,
+        ]);
+    }
+
     public function complete(Request $request, $id)
     {
         $user = $request->user();

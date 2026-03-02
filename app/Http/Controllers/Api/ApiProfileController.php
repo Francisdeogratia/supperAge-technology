@@ -33,6 +33,14 @@ class ApiProfileController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        $taskPoints = ($authUserId === (int) $id)
+            ? DB::table('wallet_transactions')
+                ->where('wallet_owner_id', $id)
+                ->where('type', 'task_reward')
+                ->where('status', 'successful')
+                ->sum('amount')
+            : 0;
+
         return response()->json([
             'user'            => $this->formatUser($user),
             'followers_count' => $followersCount,
@@ -40,6 +48,7 @@ class ApiProfileController extends Controller
             'posts_count'     => $postsCount,
             'is_following'    => $isFollowing,
             'is_own_profile'  => $authUserId === (int) $id,
+            'task_points'     => (float) $taskPoints,
             'posts'           => $posts->map(fn($p) => $this->formatPost($p, $authUserId)),
         ]);
     }

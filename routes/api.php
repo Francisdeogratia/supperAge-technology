@@ -172,6 +172,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Tasks
     Route::get('tasks',                    [ApiTaskController::class, 'index']);
     Route::post('tasks/{id}/complete',     [ApiTaskController::class, 'complete']);
+    Route::get('tasks/leaderboard',        [ApiTaskController::class, 'leaderboard']);
 
     // Referral
     Route::get('referral',                 [ApiReferralController::class, 'index']);
