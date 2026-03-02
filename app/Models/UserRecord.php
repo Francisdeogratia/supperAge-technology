@@ -8,11 +8,12 @@ use App\Models\LoginDetail;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable; // <-- 1. Import the Interface
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait; // Trait to handle implementation
+use Laravel\Sanctum\HasApiTokens;
 
 // 2. Class MUST implement the interface and use the trait
 class UserRecord extends Model implements Authenticatable
 {
-    use HasFactory, AuthenticatableTrait; // <-- 3. Use the trait here
+    use HasApiTokens, HasFactory, AuthenticatableTrait; // <-- 3. Use the trait here
     protected $table = 'users_record';
 
 
