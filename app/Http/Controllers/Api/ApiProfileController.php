@@ -86,7 +86,7 @@ class ApiProfileController extends Controller
 
     public function followers(Request $request)
     {
-        $userId = $request->user()->id;
+        $userId = $request->get('user_id', $request->user()->id);
 
         $followers = Follow::with('sender')
             ->where('receiver_id', $userId)
@@ -103,7 +103,7 @@ class ApiProfileController extends Controller
 
     public function following(Request $request)
     {
-        $userId = $request->user()->id;
+        $userId = $request->get('user_id', $request->user()->id);
 
         $following = Follow::with('receiver')
             ->where('sender_id', $userId)

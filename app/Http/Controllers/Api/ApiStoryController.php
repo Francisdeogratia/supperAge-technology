@@ -169,6 +169,34 @@ class ApiStoryController extends Controller
         return response()->json(['message' => 'View recorded']);
     }
 
+    public function addComment(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user  = $request->user();
+        $story = TalesExten::find($id);
+
+        if (!$story) {
+            return response()->json(['message' => 'Story not found'], 404);
+        }
+
+        DB::table('tale_comments')->insert([
+            'tale_id'    => $id,
+            'user_id'    => $user->id,
+            'comment'    => $request->content,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'Comment added']);
+    }
+
     private function formatStory(TalesExten $story, bool $viewed): array
     {
         return [

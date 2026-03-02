@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\ApiLiveController;
 use App\Http\Controllers\Api\ApiWalletController;
 use App\Http\Controllers\Api\ApiNotificationController;
 use App\Http\Controllers\Api\ApiProfileController;
+use App\Http\Controllers\Api\ApiEventsController;
+use App\Http\Controllers\Api\ApiMarketplaceController;
+use App\Http\Controllers\Api\ApiAgeAIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +116,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('followers',            [ApiProfileController::class, 'followers']);
     Route::get('following',            [ApiProfileController::class, 'following']);
     Route::get('search/users',         [ApiProfileController::class, 'searchUsers']);
+
+    // Events
+    Route::prefix('events')->group(function () {
+        Route::get('/',                [ApiEventsController::class, 'index']);
+        Route::get('{id}',             [ApiEventsController::class, 'show']);
+        Route::post('{id}/attend',     [ApiEventsController::class, 'attend']);
+        Route::post('{id}/unattend',   [ApiEventsController::class, 'unattend']);
+    });
+
+    // Marketplace
+    Route::get('marketplace',          [ApiMarketplaceController::class, 'index']);
+
+    // AgeAI
+    Route::post('age-ai/chat',         [ApiAgeAIController::class, 'chat']);
+
+    // Story comments
+    Route::post('stories/{id}/comment', [ApiStoryController::class, 'addComment']);
 
     // Link preview helper
     Route::post('link-preview',        function (Request $request) {

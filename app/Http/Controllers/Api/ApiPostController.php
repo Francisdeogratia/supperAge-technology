@@ -319,7 +319,7 @@ class ApiPostController extends Controller
     {
         return [
             'id'         => $comment->id,
-            'content'    => $comment->content,
+            'content'    => $comment->comment,
             'parent_id'  => $comment->parent_id,
             'created_at' => $comment->created_at,
             'user'       => $comment->user ? [

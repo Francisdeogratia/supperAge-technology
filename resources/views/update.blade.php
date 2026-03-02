@@ -2975,7 +2975,7 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
 {{-- ✅ ADD THIS: Link Preview for Promoted Posts --}}
 @if($post->link_preview)
   @php
-    $linkData = json_decode($post->link_preview, true);
+    $linkData = is_array($post->link_preview) ? $post->link_preview : json_decode($post->link_preview, true);
   @endphp
   <div class="link-preview-card-display">
     @if(!empty($linkData['image']))
@@ -3372,7 +3372,7 @@ function trackAdClick(adId, targetUrl) {
           <!-- ✅ NEW: Display Link Preview -->
             @if($post->link_preview)
                 @php
-                    $linkData = json_decode($post->link_preview, true);
+                    $linkData = is_array($post->link_preview) ? $post->link_preview : json_decode($post->link_preview, true);
                 @endphp
                 <div class="link-preview-card-display">
                     @if(!empty($linkData['image']))
