@@ -14,6 +14,11 @@ use App\Http\Controllers\Api\ApiProfileController;
 use App\Http\Controllers\Api\ApiEventsController;
 use App\Http\Controllers\Api\ApiMarketplaceController;
 use App\Http\Controllers\Api\ApiAgeAIController;
+use App\Http\Controllers\Api\ApiFriendController;
+use App\Http\Controllers\Api\ApiAdvertisingController;
+use App\Http\Controllers\Api\ApiTaskController;
+use App\Http\Controllers\Api\ApiReferralController;
+use App\Http\Controllers\Api\ApiBlueBadgeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Profiles & Social
+    Route::get('profile/my-posts',     [ApiProfileController::class, 'myPosts']);
     Route::get('profile/{id}',         [ApiProfileController::class, 'show']);
     Route::post('follow/{id}',         [ApiProfileController::class, 'follow']);
     Route::post('unfollow/{id}',       [ApiProfileController::class, 'unfollow']);
@@ -120,7 +126,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Events
     Route::prefix('events')->group(function () {
         Route::get('/',                [ApiEventsController::class, 'index']);
+        Route::post('/',               [ApiEventsController::class, 'store']);
         Route::get('{id}',             [ApiEventsController::class, 'show']);
+        Route::delete('{id}',          [ApiEventsController::class, 'destroy']);
         Route::post('{id}/attend',     [ApiEventsController::class, 'attend']);
         Route::post('{id}/unattend',   [ApiEventsController::class, 'unattend']);
     });
@@ -133,6 +141,48 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Story comments
     Route::post('stories/{id}/comment', [ApiStoryController::class, 'addComment']);
+
+    // Friends
+    Route::prefix('friends')->group(function () {
+        Route::get('/',                    [ApiFriendController::class, 'index']);
+        Route::post('request/{userId}',    [ApiFriendController::class, 'sendRequest']);
+        Route::post('accept/{requestId}',  [ApiFriendController::class, 'acceptRequest']);
+        Route::post('reject/{requestId}',  [ApiFriendController::class, 'rejectRequest']);
+        Route::post('cancel/{requestId}',  [ApiFriendController::class, 'cancelRequest']);
+        Route::post('unfriend/{userId}',   [ApiFriendController::class, 'unfriend']);
+        Route::get('status/{userId}',      [ApiFriendController::class, 'status']);
+    });
+
+    // Message reactions, edit, delete, block, report
+    Route::post('messages/{id}/react',   [ApiMessageController::class, 'react']);
+    Route::put('messages/{id}',          [ApiMessageController::class, 'editMessage']);
+    Route::delete('messages/{id}',       [ApiMessageController::class, 'deleteMessage']);
+    Route::post('users/block',           [ApiMessageController::class, 'block']);
+    Route::post('users/unblock',         [ApiMessageController::class, 'unblock']);
+    Route::post('users/report',          [ApiMessageController::class, 'report']);
+
+    // Advertising
+    Route::prefix('advertising')->group(function () {
+        Route::get('/',       [ApiAdvertisingController::class, 'index']);
+        Route::post('/',      [ApiAdvertisingController::class, 'store']);
+        Route::get('{id}',    [ApiAdvertisingController::class, 'show']);
+        Route::delete('{id}', [ApiAdvertisingController::class, 'destroy']);
+    });
+
+    // Tasks
+    Route::get('tasks',                    [ApiTaskController::class, 'index']);
+    Route::post('tasks/{id}/complete',     [ApiTaskController::class, 'complete']);
+
+    // Referral
+    Route::get('referral',                 [ApiReferralController::class, 'index']);
+
+    // Blue Badge
+    Route::post('blue-badge/apply',        [ApiBlueBadgeController::class, 'store']);
+
+    // Group message reactions, edit, delete
+    Route::post('groups/messages/{id}/react',  [ApiGroupController::class, 'reactMessage']);
+    Route::post('groups/messages/{id}/edit',   [ApiGroupController::class, 'editMessage']);
+    Route::post('groups/messages/{id}/delete', [ApiGroupController::class, 'deleteMessage']);
 
     // Link preview helper
     Route::post('link-preview',        function (Request $request) {

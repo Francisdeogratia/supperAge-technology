@@ -230,4 +230,52 @@ class ApiGroupController extends Controller
             ] : null,
         ];
     }
+
+    public function reactMessage(\Illuminate\Http\Request $request, $id)
+    {
+        $user  = $request->user();
+        $emoji = $request->input('emoji');
+        $msg   = GroupMessage::find($id);
+        if (!$msg) return response()->json(['message' => 'Message not found'], 404);
+
+        $reactions = json_decode($msg->reactions ?? '{}', true) ?: [];
+        if (!isset($reactions[$emoji])) $reactions[$emoji] = [];
+        if (in_array($user->id, $reactions[$emoji])) {
+            $reactions[$emoji] = array_values(array_filter($reactions[$emoji], fn($uid) => $uid !== $user->id));
+        } else {
+            $reactions[$emoji][] = $user->id;
+        }
+        if (empty($reactions[$emoji])) unset($reactions[$emoji]);
+
+        $msg->reactions = json_encode($reactions);
+        $msg->save();
+
+        return response()->json(['reactions' => $reactions]);
+    }
+
+    public function editMessage(\Illuminate\Http\Request $request, $id)
+    {
+        $user = $request->user();
+        $msg  = GroupMessage::find($id);
+        if (!$msg) return response()->json(['message' => 'Message not found'], 404);
+        if ($msg->sender_id !== $user->id) return response()->json(['message' => 'Forbidden'], 403);
+
+        $msg->message   = $request->input('message');
+        $msg->is_edited = true;
+        $msg->save();
+
+        return response()->json(['message' => 'Message updated', 'data' => $this->formatGroupMessage($msg)]);
+    }
+
+    public function deleteMessage(\Illuminate\Http\Request $request, $id)
+    {
+        $user = $request->user();
+        $msg  = GroupMessage::find($id);
+        if (!$msg) return response()->json(['message' => 'Message not found'], 404);
+        if ($msg->sender_id !== $user->id) return response()->json(['message' => 'Forbidden'], 403);
+
+        $msg->delete();
+
+        return response()->json(['message' => 'Message deleted']);
+    }
 }

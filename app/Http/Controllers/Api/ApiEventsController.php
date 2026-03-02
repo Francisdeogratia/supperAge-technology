@@ -53,6 +53,52 @@ class ApiEventsController extends Controller
         return response()->json(['event' => $this->formatEvent($event, $isAttending ? [$id] : [])]);
     }
 
+    public function store(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string|max:5000',
+            'location'    => 'nullable|string|max:255',
+            'event_date'  => 'nullable|date',
+            'image'       => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $userId = $request->user()->id;
+
+        $id = DB::table('events')->insertGetId([
+            'user_id'         => $userId,
+            'title'           => $request->title,
+            'description'     => $request->description,
+            'location'        => $request->location,
+            'event_date'      => $request->event_date,
+            'image'           => $request->image,
+            'attendees_count' => 0,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        $event = DB::table('events')->where('id', $id)->first();
+
+        return response()->json(['event' => $this->formatEvent($event, []), 'message' => 'Event created'], 201);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $userId = $request->user()->id;
+        $event  = DB::table('events')->where('id', $id)->first();
+
+        if (!$event) return response()->json(['message' => 'Event not found'], 404);
+        if ($event->user_id !== $userId) return response()->json(['message' => 'Unauthorized'], 403);
+
+        DB::table('events')->where('id', $id)->delete();
+
+        return response()->json(['message' => 'Event deleted']);
+    }
+
     public function attend(Request $request, $id)
     {
         $userId = $request->user()->id;

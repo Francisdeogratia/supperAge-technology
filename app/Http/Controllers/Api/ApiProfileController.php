@@ -118,6 +118,24 @@ class ApiProfileController extends Controller
         ]);
     }
 
+    public function myPosts(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $posts = SamplePost::where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json([
+            'posts'        => $posts->map(fn($p) => array_merge($this->formatPost($p, $userId), [
+                'comments_count' => DB::table('post_comments')->where('post_id', $p->id)->count(),
+            ])),
+            'current_page' => $posts->currentPage(),
+            'last_page'    => $posts->lastPage(),
+        ]);
+    }
+
     public function searchUsers(Request $request)
     {
         $query  = $request->get('q', '');

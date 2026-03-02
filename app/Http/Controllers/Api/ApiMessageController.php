@@ -123,6 +123,112 @@ class ApiMessageController extends Controller
         return response()->json(['message' => 'Marked as read']);
     }
 
+    public function editMessage(Request $request, $id)
+    {
+        $user    = $request->user();
+        $message = Message::find($id);
+
+        if (!$message) return response()->json(['message' => 'Not found'], 404);
+        if ($message->sender_id !== $user->id) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $request->validate(['message' => 'required|string|max:5000']);
+
+        $message->update([
+            'content'   => $request->message,
+            'is_edited' => 1,
+        ]);
+
+        return response()->json(['message' => $this->formatMessage($message->fresh())]);
+    }
+
+    public function deleteMessage(Request $request, $id)
+    {
+        $user    = $request->user();
+        $message = Message::find($id);
+
+        if (!$message) return response()->json(['message' => 'Not found'], 404);
+        if ($message->sender_id !== $user->id) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $message->delete();
+
+        return response()->json(['message' => 'Message deleted']);
+    }
+
+    public function react(Request $request, $id)
+    {
+        $user    = $request->user();
+        $request->validate(['emoji' => 'required|string|max:10']);
+
+        $message = Message::find($id);
+        if (!$message) return response()->json(['message' => 'Not found'], 404);
+
+        $reactions = json_decode($message->reactions ?? '{}', true) ?? [];
+        $emoji     = $request->emoji;
+        $userId    = (string) $user->id;
+
+        // Toggle: if user already reacted with this emoji, remove it
+        if (isset($reactions[$emoji]) && in_array($userId, $reactions[$emoji])) {
+            $reactions[$emoji] = array_values(array_filter($reactions[$emoji], fn($id) => $id !== $userId));
+            if (empty($reactions[$emoji])) unset($reactions[$emoji]);
+        } else {
+            // Remove any other emoji from this user first
+            foreach ($reactions as $e => $users) {
+                $reactions[$e] = array_values(array_filter($users, fn($id) => $id !== $userId));
+                if (empty($reactions[$e])) unset($reactions[$e]);
+            }
+            $reactions[$emoji][] = $userId;
+        }
+
+        $message->update(['reactions' => json_encode($reactions)]);
+
+        return response()->json(['reactions' => $reactions]);
+    }
+
+    public function block(Request $request)
+    {
+        $request->validate(['user_id' => 'required|integer']);
+        $authId = $request->user()->id;
+        $targetId = $request->user_id;
+
+        DB::table('blocked_users')->updateOrInsert(
+            ['blocker_id' => $authId, 'blocked_id' => $targetId],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
+
+        return response()->json(['message' => 'User blocked']);
+    }
+
+    public function unblock(Request $request)
+    {
+        $request->validate(['user_id' => 'required|integer']);
+        $authId = $request->user()->id;
+
+        DB::table('blocked_users')
+            ->where('blocker_id', $authId)
+            ->where('blocked_id', $request->user_id)
+            ->delete();
+
+        return response()->json(['message' => 'User unblocked']);
+    }
+
+    public function report(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer',
+            'reason'  => 'required|string|max:500',
+        ]);
+
+        DB::table('user_reports')->insert([
+            'reporter_id' => $request->user()->id,
+            'reported_id' => $request->user_id,
+            'reason'      => $request->reason,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        return response()->json(['message' => 'Report submitted']);
+    }
+
     private function formatMessage(Message $msg): array
     {
         return [
