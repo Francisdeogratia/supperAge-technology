@@ -58,28 +58,40 @@ class ApiStoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'tales_content'    => 'nullable|string|max:2000',
-            'files_talesexten' => 'nullable|string',
-            'text_color'       => 'nullable|string',
-            'bgnd_color'       => 'nullable|string',
-            'type'             => 'nullable|string',
+            'tales_content' => 'nullable|string|max:2000',
+            'story_file'    => 'nullable|file|max:20480|mimes:jpg,jpeg,png,gif,webp,mp4,mov',
+            'text_color'    => 'nullable|string',
+            'bgnd_color'    => 'nullable|string',
+            'type'          => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        if (!$request->tales_content && !$request->hasFile('story_file')) {
+            return response()->json(['message' => 'Please add text or an image.'], 422);
+        }
+
         $user = $request->user();
+
+        // Handle file upload
+        $fileUrl = null;
+        if ($request->hasFile('story_file')) {
+            $file    = $request->file('story_file');
+            $path    = $file->store('stories', 'public');
+            $fileUrl = asset('storage/' . $path);
+        }
 
         $story = TalesExten::create([
             'specialcode'      => $user->specialcode,
             'tales_content'    => $request->tales_content,
-            'files_talesexten' => $request->files_talesexten,
+            'files_talesexten' => $fileUrl,
             'tales_datetime'   => now(),
             'username'         => $user->username,
             'text_color'       => $request->text_color ?? '#ffffff',
             'bgnd_color'       => $request->bgnd_color ?? '#000000',
-            'type'             => $request->type ?? 'text',
+            'type'             => $fileUrl ? ($request->type ?? 'image') : 'text',
         ]);
 
         return response()->json(['story' => $this->formatStory($story, false)], 201);
@@ -199,10 +211,17 @@ class ApiStoryController extends Controller
 
     private function formatStory(TalesExten $story, bool $viewed): array
     {
+        // Build a proper absolute URL for the file
+        $file = $story->files_talesexten;
+        if ($file && !filter_var($file, FILTER_VALIDATE_URL)) {
+            // It's a relative path — make it absolute
+            $file = url($file);
+        }
+
         return [
             'id'         => $story->tales_id,
             'content'    => $story->tales_content,
-            'file'       => $story->files_talesexten,
+            'file'       => $file,
             'type'       => $story->type,
             'text_color' => $story->text_color,
             'bgnd_color' => $story->bgnd_color,
