@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Services\NotificationService;
 use App\Models\SamplePost;
 use App\Models\PostLike;
 use App\Models\PostComment;
 use App\Models\PostRepost;
 use App\Models\SavedPost;
-use App\Models\Notification;
 use App\Models\UserRecord;
 use Carbon\Carbon;
 
@@ -20,28 +20,81 @@ class ApiPostController extends Controller
     public function feed(Request $request)
     {
         $userId = $request->user()->id;
-        $page   = $request->get('page', 1);
-        $limit  = $request->get('limit', 20);
+        $page   = max(1, (int) $request->get('page', 1));
+        $limit  = 20;
 
-        $followingIds = DB::table('follow_tbl')
+        $followingIds   = DB::table('follow_tbl')
             ->where('sender_id', $userId)
             ->pluck('receiver_id')
             ->toArray();
-
         $followingIds[] = $userId;
 
-        $posts = SamplePost::with(['user'])
+        // ── Fetch original posts ──────────────────────────────────────────────
+        $originalPosts = SamplePost::with('user')
             ->whereIn('user_id', $followingIds)
             ->where('status', 'published')
             ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate($limit, ['*'], 'page', $page);
+            ->latest()
+            ->limit(80)
+            ->get();
+
+        // ── Fetch reposts (keyed by post_id, sorted by repost time) ──────────
+        $repostRows = DB::table('post_reposts as pr')
+            ->join('users_record as u', 'u.id', '=', 'pr.user_id')
+            ->whereIn('pr.user_id', $followingIds)
+            ->select('pr.post_id', 'pr.created_at as repost_time',
+                     'u.name as reposter_name', 'u.username as reposter_username')
+            ->latest('pr.created_at')
+            ->limit(80)
+            ->get()
+            ->keyBy('post_id');
+
+        $repostedPosts = SamplePost::with('user')
+            ->whereIn('id', $repostRows->keys()->toArray())
+            ->where('status', 'published')
+            ->whereNull('deleted_at')
+            ->get();
+
+        // ── Batch per-user queries (avoid N+1) ────────────────────────────────
+        $allIds = $originalPosts->merge($repostedPosts)->unique('id')->pluck('id')->toArray();
+
+        $likedSet    = array_flip(PostLike::whereIn('post_id', $allIds)->where('user_id', $userId)->pluck('post_id')->toArray());
+        $savedSet    = array_flip(SavedPost::whereIn('post_id', $allIds)->where('user_id', $userId)->pluck('post_id')->toArray());
+        $repostedSet = array_flip(PostRepost::whereIn('post_id', $allIds)->where('user_id', $userId)->pluck('post_id')->toArray());
+        $commentCounts = PostComment::whereIn('post_id', $allIds)->whereNull('parent_id')
+            ->groupBy('post_id')->selectRaw('post_id, count(*) as cnt')
+            ->pluck('cnt', 'post_id');
+
+        // ── Build feed items ──────────────────────────────────────────────────
+        $feedItems = collect();
+
+        foreach ($originalPosts as $p) {
+            $item              = $this->formatPostFeed($p, $likedSet, $savedSet, $repostedSet, $commentCounts);
+            $item['sort_time'] = $p->created_at->timestamp;
+            $item['feed_key']  = 'post-' . $p->id;
+            $feedItems->push($item);
+        }
+
+        foreach ($repostedPosts as $p) {
+            if (!$repostRows->has($p->id)) continue;
+            $row               = $repostRows->get($p->id);
+            $item              = $this->formatPostFeed($p, $likedSet, $savedSet, $repostedSet, $commentCounts);
+            $item['repost_info'] = ['name' => $row->reposter_name, 'username' => $row->reposter_username];
+            $item['sort_time'] = strtotime($row->repost_time);
+            $item['feed_key']  = 'repost-' . $p->id;
+            $feedItems->push($item);
+        }
+
+        // ── Sort by time desc, paginate ───────────────────────────────────────
+        $sorted = $feedItems->sortByDesc('sort_time')->values();
+        $total  = $sorted->count();
+        $items  = $sorted->forPage($page, $limit)->values();
 
         return response()->json([
-            'posts'       => $posts->items() ? array_map(fn($p) => $this->formatPost($p, $userId), $posts->items()) : [],
-            'total'       => $posts->total(),
-            'current_page'=> $posts->currentPage(),
-            'last_page'   => $posts->lastPage(),
+            'posts'        => $items,
+            'total'        => $total,
+            'current_page' => $page,
+            'last_page'    => max(1, (int) ceil($total / $limit)),
         ]);
     }
 
@@ -62,7 +115,7 @@ class ApiPostController extends Controller
         $user = $request->user();
 
         $post = SamplePost::create([
-            'post_content' => $request->post_content,
+            'post_content' => $request->post_content ?? '',
             'file_path'    => $request->file_path,
             'specialcode'  => $user->specialcode,
             'username'     => $user->username,
@@ -75,6 +128,11 @@ class ApiPostController extends Controller
 
         $post->load('user');
 
+        // Notify followers (fire-and-forget — never fail the post creation)
+        try {
+            NotificationService::notifyFollowers($user, 'post', $post->id);
+        } catch (\Throwable $e) {}
+
         return response()->json(['post' => $this->formatPost($post, $user->id)], 201);
     }
 
@@ -85,6 +143,22 @@ class ApiPostController extends Controller
 
         if (!$post) {
             return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        // Only count one view per user
+        $alreadyViewed = DB::table('post_views')
+            ->where('post_id', $id)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if (!$alreadyViewed) {
+            DB::table('post_views')->insert([
+                'post_id'    => $id,
+                'user_id'    => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $post->increment('views');
         }
 
         return response()->json(['post' => $this->formatPost($post, $userId)]);
@@ -99,11 +173,15 @@ class ApiPostController extends Controller
             return response()->json(['message' => 'Post not found'], 404);
         }
 
-        if ($post->user_id !== $user->id) {
+        if ((int)$post->user_id !== (int)$user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $post->update($request->only(['post_content', 'text_color', 'bgnd_color']));
+        $data = $request->only(['post_content', 'text_color', 'bgnd_color']);
+        if ($request->has('file_path')) {
+            $data['file_path'] = $request->file_path; // null clears media
+        }
+        $post->update($data);
         $post->load('user');
 
         return response()->json(['post' => $this->formatPost($post, $user->id)]);
@@ -118,7 +196,7 @@ class ApiPostController extends Controller
             return response()->json(['message' => 'Post not found'], 404);
         }
 
-        if ($post->user_id !== $user->id) {
+        if ((int)$post->user_id !== (int)$user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -148,14 +226,19 @@ class ApiPostController extends Controller
         $post->increment('likes');
 
         if ($post->user_id !== $userId) {
-            Notification::create([
-                'user_id'    => $post->user_id,
-                'from_id'    => $userId,
-                'type'       => 'like',
-                'message'    => $request->user()->name . ' liked your post',
-                'reference_id' => $id,
-                'is_read'    => 0,
-            ]);
+            try {
+                DB::table('notifications')->insert([
+                    'id'                       => \Illuminate\Support\Str::uuid()->toString(),
+                    'notification_reciever_id' => (string) $post->user_id,
+                    'actor_id'                 => $userId,
+                    'post_id'                  => $id,
+                    'type'                     => 'like',
+                    'message'                  => $request->user()->name . ' liked your post',
+                    'read_notification'        => 'no',
+                    'created_at'               => now(),
+                    'updated_at'               => now(),
+                ]);
+            } catch (\Exception $e) { /* notification failure must not break the response */ }
         }
 
         return response()->json(['liked' => true, 'likes' => $post->fresh()->likes]);
@@ -211,14 +294,19 @@ class ApiPostController extends Controller
         $comment->load('user');
 
         if ($post->user_id !== $user->id) {
-            Notification::create([
-                'user_id'      => $post->user_id,
-                'from_id'      => $user->id,
-                'type'         => 'comment',
-                'message'      => $user->name . ' commented on your post',
-                'reference_id' => $id,
-                'is_read'      => 0,
-            ]);
+            try {
+                DB::table('notifications')->insert([
+                    'id'                       => \Illuminate\Support\Str::uuid()->toString(),
+                    'notification_reciever_id' => (string) $post->user_id,
+                    'actor_id'                 => $user->id,
+                    'post_id'                  => $id,
+                    'type'                     => 'comment',
+                    'message'                  => $user->name . ' commented on your post',
+                    'read_notification'        => 'no',
+                    'created_at'               => now(),
+                    'updated_at'               => now(),
+                ]);
+            } catch (\Exception $e) { /* notification failure must not break the response */ }
         }
 
         return response()->json(['comment' => $this->formatComment($comment)], 201);
@@ -237,10 +325,12 @@ class ApiPostController extends Controller
 
         if ($existing) {
             $existing->delete();
+            $post->decrement('shares');
             return response()->json(['reposted' => false]);
         }
 
         PostRepost::create(['post_id' => $id, 'user_id' => $userId]);
+        $post->increment('shares');
 
         return response()->json(['reposted' => true]);
     }
@@ -286,31 +376,206 @@ class ApiPostController extends Controller
         ]);
     }
 
-    private function formatPost(SamplePost $post, int $userId): array
+    public function fileStats(Request $request, $id)
+    {
+        $userId    = $request->user()->id;
+        $post      = SamplePost::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        $filePaths = json_decode($post->file_path, true) ?? [];
+        $count     = count($filePaths);
+
+        if ($count === 0) {
+            return response()->json(['stats' => []]);
+        }
+
+        $viewCounts = DB::table('post_file_views')
+            ->where('post_id', $id)
+            ->select('file_index', DB::raw('count(*) as cnt'))
+            ->groupBy('file_index')
+            ->pluck('cnt', 'file_index');
+
+        $likeCounts = DB::table('post_file_likes')
+            ->where('post_id', $id)
+            ->select('file_index', DB::raw('count(*) as cnt'))
+            ->groupBy('file_index')
+            ->pluck('cnt', 'file_index');
+
+        $userLiked = DB::table('post_file_likes')
+            ->where('post_id', $id)
+            ->where('user_id', $userId)
+            ->pluck('file_index')
+            ->flip()
+            ->all();
+
+        $stats = [];
+        for ($i = 0; $i < $count; $i++) {
+            $stats[] = [
+                'index'    => $i,
+                'views'    => (int) ($viewCounts[$i] ?? 0),
+                'likes'    => (int) ($likeCounts[$i] ?? 0),
+                'is_liked' => isset($userLiked[$i]),
+            ];
+        }
+
+        return response()->json(['stats' => $stats]);
+    }
+
+    public function fileView(Request $request, $id, $index)
+    {
+        $userId = $request->user()->id;
+        $post   = SamplePost::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        $filePaths = json_decode($post->file_path, true) ?? [];
+        $index     = (int) $index;
+
+        if ($index < 0 || $index >= count($filePaths)) {
+            return response()->json(['message' => 'Invalid file index'], 422);
+        }
+
+        $exists = DB::table('post_file_views')
+            ->where('post_id', $id)
+            ->where('file_index', $index)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if (!$exists) {
+            DB::table('post_file_views')->insert([
+                'post_id'    => $id,
+                'file_index' => $index,
+                'user_id'    => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $views = DB::table('post_file_views')
+            ->where('post_id', $id)
+            ->where('file_index', $index)
+            ->count();
+
+        return response()->json(['views' => $views]);
+    }
+
+    public function fileLike(Request $request, $id, $index)
+    {
+        $userId = $request->user()->id;
+        $post   = SamplePost::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        $filePaths = json_decode($post->file_path, true) ?? [];
+        $index     = (int) $index;
+
+        if ($index < 0 || $index >= count($filePaths)) {
+            return response()->json(['message' => 'Invalid file index'], 422);
+        }
+
+        $existing = DB::table('post_file_likes')
+            ->where('post_id', $id)
+            ->where('file_index', $index)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($existing) {
+            DB::table('post_file_likes')
+                ->where('post_id', $id)
+                ->where('file_index', $index)
+                ->where('user_id', $userId)
+                ->delete();
+            $liked = false;
+        } else {
+            DB::table('post_file_likes')->insert([
+                'post_id'    => $id,
+                'file_index' => $index,
+                'user_id'    => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $liked = true;
+        }
+
+        $likes = DB::table('post_file_likes')
+            ->where('post_id', $id)
+            ->where('file_index', $index)
+            ->count();
+
+        return response()->json(['liked' => $liked, 'likes' => $likes]);
+    }
+
+    private function formatPostFeed(SamplePost $post, array $likedSet, array $savedSet, array $repostedSet, $commentCounts): array
     {
         $filePaths = json_decode($post->file_path, true);
-
         return [
-            'id'           => $post->id,
-            'content'      => $post->post_content,
-            'file_path'    => $filePaths,
-            'text_color'   => $post->text_color,
-            'bgnd_color'   => $post->bgnd_color,
-            'link_preview' => $post->link_preview,
-            'likes'        => (int) ($post->likes ?? 0),
-            'views'        => (int) ($post->views ?? 0),
-            'shares'       => (int) ($post->shares ?? 0),
-            'created_at'   => $post->created_at,
-            'user'         => $post->user ? [
-                'id'         => $post->user->id,
-                'name'       => $post->user->name,
-                'username'   => $post->user->username,
-                'profileimg' => $post->user->profileimg ? (filter_var($post->user->profileimg, FILTER_VALIDATE_URL) ? $post->user->profileimg : url($post->user->profileimg)) : null,
+            'id'             => $post->id,
+            'content'        => $post->post_content,
+            'file_path'      => $filePaths,
+            'text_color'     => $post->text_color,
+            'bgnd_color'     => $post->bgnd_color,
+            'link_preview'   => $post->link_preview,
+            'likes'          => (int) ($post->likes   ?? 0),
+            'views'          => (int) ($post->views   ?? 0),
+            'shares'         => (int) ($post->shares  ?? 0),
+            'created_at'     => $post->created_at,
+            'repost_info'    => null,
+            'user'           => $post->user ? [
+                'id'           => $post->user->id,
+                'name'         => $post->user->name,
+                'username'     => $post->user->username,
+                'profileimg'   => $post->user->profileimg
+                    ? (filter_var($post->user->profileimg, FILTER_VALIDATE_URL)
+                        ? $post->user->profileimg
+                        : url($post->user->profileimg))
+                    : null,
                 'badge_status' => $post->user->badge_status,
             ] : null,
-            'is_liked'     => PostLike::where('post_id', $post->id)->where('user_id', $userId)->exists(),
-            'is_saved'     => SavedPost::where('post_id', $post->id)->where('user_id', $userId)->exists(),
-            'is_reposted'  => PostRepost::where('post_id', $post->id)->where('user_id', $userId)->exists(),
+            'is_liked'       => isset($likedSet[$post->id]),
+            'is_saved'       => isset($savedSet[$post->id]),
+            'is_reposted'    => isset($repostedSet[$post->id]),
+            'comments_count' => (int) ($commentCounts[$post->id] ?? 0),
+        ];
+    }
+
+    private function formatPost(SamplePost $post, int $userId, $repostMap = null): array
+    {
+        $filePaths  = json_decode($post->file_path, true);
+        $repostInfo = null;
+        if ($repostMap && $repostMap->has($post->id)) {
+            $r = $repostMap->get($post->id);
+            $repostInfo = ['name' => $r->reposter_name, 'username' => $r->reposter_username];
+        }
+
+        return [
+            'id'             => $post->id,
+            'content'        => $post->post_content,
+            'file_path'      => $filePaths,
+            'text_color'     => $post->text_color,
+            'bgnd_color'     => $post->bgnd_color,
+            'link_preview'   => $post->link_preview,
+            'likes'          => (int) ($post->likes ?? 0),
+            'views'          => (int) ($post->views ?? 0),
+            'shares'         => (int) ($post->shares ?? 0),
+            'created_at'     => $post->created_at,
+            'repost_info'    => $repostInfo,
+            'user'           => $post->user ? [
+                'id'           => $post->user->id,
+                'name'         => $post->user->name,
+                'username'     => $post->user->username,
+                'profileimg'   => $post->user->profileimg ? (filter_var($post->user->profileimg, FILTER_VALIDATE_URL) ? $post->user->profileimg : url($post->user->profileimg)) : null,
+                'badge_status' => $post->user->badge_status,
+            ] : null,
+            'is_liked'       => PostLike::where('post_id', $post->id)->where('user_id', $userId)->exists(),
+            'is_saved'       => SavedPost::where('post_id', $post->id)->where('user_id', $userId)->exists(),
+            'is_reposted'    => PostRepost::where('post_id', $post->id)->where('user_id', $userId)->exists(),
             'comments_count' => PostComment::where('post_id', $post->id)->whereNull('parent_id')->count(),
         ];
     }

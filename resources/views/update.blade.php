@@ -2073,10 +2073,6 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
 <body>
     <!-- Your main navbar content  -->
  @include('layouts.navbar')
-  @extends('layouts.app')
-@section('seo_title', 'Feed - SupperAge | Posts, Updates & Trending')
-@section('seo_description', 'Explore the latest posts, updates, and trending content on SupperAge. Share stories, discover what\'s happening, and earn while you engage.')
-@section('content')
 
 
 <!-- ------------------------------------container biguns --------------------------------------------------->
@@ -2975,7 +2971,8 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
 {{-- ✅ ADD THIS: Link Preview for Promoted Posts --}}
 @if($post->link_preview)
   @php
-    $linkData = is_array($post->link_preview) ? $post->link_preview : json_decode($post->link_preview, true);
+    $raw      = $post->link_preview;
+    $linkData = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
   @endphp
   <div class="link-preview-card-display">
     @if(!empty($linkData['image']))
@@ -2986,14 +2983,14 @@ body.dark-mode .link-preview-loading { background: #3A3B3C; }
     <div class="link-preview-content">
       <div class="link-preview-site">
         @if(!empty($linkData['favicon']))<img src="{{ $linkData['favicon'] }}" class="link-preview-favicon">@endif
-        <span>{{ $linkData['site_name'] }}</span>
+        <span>{{ $linkData['site_name'] ?? '' }}</span>
       </div>
-      <h4 class="link-preview-title">{{ $linkData['title'] }}</h4>
+      <h4 class="link-preview-title">{{ $linkData['title'] ?? '' }}</h4>
       @if(!empty($linkData['description']))
         <p class="link-preview-description">{{ $linkData['description'] }}</p>
       @endif
-      <a href="{{ $linkData['url'] }}" class="link-preview-url" target="_blank" rel="noopener">
-        <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'], 50) }}
+      <a href="{{ $linkData['url'] ?? '#' }}" class="link-preview-url" target="_blank" rel="noopener">
+        <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'] ?? '', 50) }}
       </a>
     </div>
   </div>
@@ -3372,7 +3369,8 @@ function trackAdClick(adId, targetUrl) {
           <!-- ✅ NEW: Display Link Preview -->
             @if($post->link_preview)
                 @php
-                    $linkData = is_array($post->link_preview) ? $post->link_preview : json_decode($post->link_preview, true);
+                    $raw      = $post->link_preview;
+    $linkData = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
                 @endphp
                 <div class="link-preview-card-display">
                     @if(!empty($linkData['image']))
@@ -3383,14 +3381,14 @@ function trackAdClick(adId, targetUrl) {
                     <div class="link-preview-content">
                         <div class="link-preview-site">
                             @if(!empty($linkData['favicon']))<img src="{{ $linkData['favicon'] }}" class="link-preview-favicon">@endif
-                            <span>{{ $linkData['site_name'] }}</span>
+                            <span>{{ $linkData['site_name'] ?? '' }}</span>
                         </div>
-                        <h4 class="link-preview-title">{{ $linkData['title'] }}</h4>
+                        <h4 class="link-preview-title">{{ $linkData['title'] ?? '' }}</h4>
                         @if(!empty($linkData['description']))
                             <p class="link-preview-description">{{ $linkData['description'] }}</p>
                         @endif
-                        <a href="{{ $linkData['url'] }}" class="link-preview-url" target="_blank" rel="noopener">
-                            <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'], 50) }}
+                        <a href="{{ $linkData['url'] ?? '#' }}" class="link-preview-url" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'] ?? '', 50) }}
                         </a>
                     </div>
                 </div>
@@ -4168,17 +4166,10 @@ function copyPostLink(event, url, postId) {
   </div>
 </div>
 
-  
-      </div>
-    @endforeach
   </div>
+    @endforeach
+  </div>{{-- end list-group --}}
 
-
-
-
-
-
-  
   <script>
   function toggleOtherContent(event, postId) {
     event.preventDefault();

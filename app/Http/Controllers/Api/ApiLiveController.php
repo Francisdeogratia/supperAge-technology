@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\AgoraTokenBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -82,8 +83,17 @@ class ApiLiveController extends Controller
             $stream->increment('viewer_count');
         }
 
+        $token = '';
+        if ($appId && $appCert) {
+            $expireTs = time() + 3600;
+            $agoraRole = $role === 1 ? AgoraTokenBuilder::ROLE_PUBLISHER : AgoraTokenBuilder::ROLE_SUBSCRIBER;
+            $token = AgoraTokenBuilder::buildTokenWithUid(
+                $appId, $appCert, $channel, $userId, $agoraRole, $expireTs
+            );
+        }
+
         return response()->json([
-            'token'      => '', // Generate via Agora token server in production
+            'token'      => $token,
             'app_id'     => $appId,
             'channel'    => $channel,
             'uid'        => $userId,

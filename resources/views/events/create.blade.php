@@ -453,12 +453,12 @@
         function uploadImage(file) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'francis');
+    formData.append('upload_preset', 'supperAge');
 
     $('.image-upload-area').html('<i class="fas fa-spinner fa-spin fa-2x"></i><p>Uploading...</p>');
 
     // ✅ FIX: Remove jQuery ajax and use fetch to avoid Laravel Echo headers
-    fetch('https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload', {
+    fetch('https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload', {
         method: 'POST',
         body: formData
         // Don't include any headers

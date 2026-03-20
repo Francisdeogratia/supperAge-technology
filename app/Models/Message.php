@@ -16,6 +16,7 @@ class Message extends Model
         'link_preview',      // ✅ ADDED
         'reply_to_id',
         'reactions',
+        'seen',
         'status',
         'is_deleted_by_sender',
         'is_deleted_by_receiver',

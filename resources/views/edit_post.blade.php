@@ -569,11 +569,11 @@ $('#editPostForm').on('submit', function(e) {
         (function(f) {
             var cloudData = new FormData();
             cloudData.append('file', f);
-            cloudData.append('upload_preset', 'francis');
+            cloudData.append('upload_preset', 'supperAge');
 
             var endpoint = f.type.startsWith('video')
-                ? 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload'
-                : 'https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload';
+                ? 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload'
+                : 'https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload';
 
             $.ajax({
                 url: endpoint,

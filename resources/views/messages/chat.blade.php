@@ -1653,7 +1653,7 @@
                         </div>
                     @endif
                     
-                    {{ \Str::limit($initialPinnedMessage->message, 80) ?: ($initialFileCount ? 'Attachment' : 'Message') }}
+                    {{ \Str::limit($initialPinnedMessage->message ?? '', 80) ?: ($initialFileCount ? 'Attachment' : 'Message') }}
                 @endif
             </span>
         </div>
@@ -1728,19 +1728,19 @@
         @php $lastDateShown = null; @endphp
         @forelse($messages as $message)
             @php
-                $messageDate = $message->created_at->format('Y-m-d');
+                $messageDate = $message->created_at ? $message->created_at->format('Y-m-d') : '1970-01-01';
                 $showDateSep = ($lastDateShown !== $messageDate);
                 $lastDateShown = $messageDate;
             @endphp
             @if($showDateSep)
                 <div class="date-separator">
                     <span class="date-separator-chip">
-                        @if($message->created_at->isToday())
+                        @if($message->created_at && $message->created_at->isToday())
                             TODAY
-                        @elseif($message->created_at->isYesterday())
+                        @elseif($message->created_at && $message->created_at->isYesterday())
                             YESTERDAY
                         @else
-                            {{ $message->created_at->format('M d, Y') }}
+                            {{ $message->created_at ? $message->created_at->format('M d, Y') : '' }}
                         @endif
                     </span>
                 </div>
@@ -1768,7 +1768,7 @@
         $repliedToMessage = $message->replyTo;
         $repliedToFiles = $repliedToMessage->file_path ? json_decode($repliedToMessage->file_path, true) : null;
         $fileCount = $repliedToFiles ? count($repliedToFiles) : 0;
-        $displayText = \Str::limit($repliedToMessage->message, 30);
+        $displayText = \Str::limit($repliedToMessage->message ?? '', 30);
     @endphp
 
     {{-- 🎯 ADD onclick HANDLER HERE --}}
@@ -1828,26 +1828,27 @@
 {{-- ✅ NEW: Link Preview Display --}}
 @if($message->link_preview)
     @php
-        $linkData = json_decode($message->link_preview, true);
+        $linkData = is_string($message->link_preview) ? json_decode($message->link_preview, true) : null;
+        $linkData = is_array($linkData) ? $linkData : [];
     @endphp
     <div class="message-link-preview">
         <div class="link-preview-card">
             @if(!empty($linkData['image']))
                 <div class="link-preview-image">
-                    <img src="{{ $linkData['image'] }}" alt="{{ $linkData['title'] }}">
+                    <img src="{{ $linkData['image'] }}" alt="{{ $linkData['title'] ?? '' }}">
                 </div>
             @endif
             <div class="link-preview-content">
                 <div class="link-preview-site">
-                    <img src="{{ $linkData['favicon'] }}" class="link-preview-favicon">
-                    <span>{{ $linkData['site_name'] }}</span>
+                    @if(!empty($linkData['favicon']))<img src="{{ $linkData['favicon'] }}" class="link-preview-favicon">@endif
+                    <span>{{ $linkData['site_name'] ?? '' }}</span>
                 </div>
-                <h4 class="link-preview-title">{{ $linkData['title'] }}</h4>
+                <h4 class="link-preview-title">{{ $linkData['title'] ?? '' }}</h4>
                 @if(!empty($linkData['description']))
                     <p class="link-preview-description">{{ $linkData['description'] }}</p>
                 @endif
-                <a href="{{ $linkData['url'] }}" class="link-preview-url" target="_blank" rel="noopener">
-                    <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'], 50) }}
+                <a href="{{ $linkData['url'] ?? '#' }}" class="link-preview-url" target="_blank" rel="noopener">
+                    <i class="fas fa-external-link-alt"></i> {{ Str::limit($linkData['url'] ?? '', 50) }}
                 </a>
             </div>
         </div>
@@ -1862,17 +1863,14 @@
     @php
         // Decode the files and get the total count
         $files = json_decode($message->file_path, true);
-        $fileCount = count($files);
-        
-        // Safety check for valid data
-        if (!is_array($files) || $fileCount === 0) {
+        if (!is_array($files)) {
             $files = [];
-            $fileCount = 0;
         }
+        $fileCount = count($files);
 
         // Create a basic caption based on message content and sender
         $caption = trim($message->message) ?: 'Sent attachment';
-        $senderName = $message->sender_id == $user->id ? 'You' : $message->sender->username;
+        $senderName = $message->sender_id == $user->id ? 'You' : ($message->sender->username ?? 'Unknown');
         $fullCaption = "{$caption} (From: {$senderName})";
         
         // Determine the number of files to hide
@@ -2037,7 +2035,7 @@
 @endif
                     
                     <div class="message-time">
-                        {{ $message->created_at->format('g:i A') }}
+                        {{ $message->created_at ? $message->created_at->format('g:i A') : '' }}
                         @if($message->sender_id == $user->id)
                             <span class="message-status">
                                 @if($message->status == 'read')
@@ -2056,10 +2054,10 @@
                         @php
                             $reactions = json_decode($message->reactions, true);
                         @endphp
-                        @if(!empty($reactions))
+                        @if(!empty($reactions) && is_array($reactions))
                         <div class="message-reactions">
                             @foreach($reactions as $emoji => $userIds)
-                                @if(count($userIds) > 0)
+                                @if(is_array($userIds) && count($userIds) > 0)
                                 <span class="reaction-item" onclick="reactToMessage('{{ $emoji }}', {{ $message->id }})">
                                     {{ $emoji }} {{ count($userIds) }}
                                 </span>
@@ -2578,10 +2576,10 @@ async function sendVoiceNote() {
     try {
         const formData = new FormData();
         formData.append('file', audioBlob, 'voice-note.webm');
-        formData.append('upload_preset', 'francis');
+        formData.append('upload_preset', 'supperAge');
         formData.append('resource_type', 'video');
         
-        const response = await fetch('https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload', {
+        const response = await fetch('https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload', {
             method: 'POST',
             body: formData
         });
@@ -2933,9 +2931,9 @@ async function capturePhoto() {
         try {
             const formData = new FormData();
             formData.append('file', blob, 'camera-photo.jpg');
-            formData.append('upload_preset', 'francis');
+            formData.append('upload_preset', 'supperAge');
             
-            const response = await fetch('https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload', {
+            const response = await fetch('https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload', {
                 method: 'POST',
                 body: formData
             });
@@ -3066,7 +3064,7 @@ async function uploadVideo(videoBlob) {
     try {
         const formData = new FormData();
         formData.append('file', videoBlob, 'camera-video.webm');
-        formData.append('upload_preset', 'francis');
+        formData.append('upload_preset', 'supperAge');
         formData.append('resource_type', 'video');
         
         // Upload with progress tracking
@@ -3123,7 +3121,7 @@ async function uploadVideo(videoBlob) {
             throw new Error('Network error');
         };
         
-        xhr.open('POST', 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload');
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload');
         xhr.send(formData);
         
     } catch (error) {
@@ -3901,11 +3899,11 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
         selectedFiles.forEach((file, fileIndex) => {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('upload_preset', 'francis');
+            formData.append('upload_preset', 'supperAge');
             
             const endpoint = file.type.startsWith('video/')
-                ? 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload'
-                : 'https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload';
+                ? 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload'
+                : 'https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload';
             
             const promise = new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();

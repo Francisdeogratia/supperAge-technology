@@ -61,37 +61,40 @@
 <body>
 
  @include('layouts.navbar')
-{{-- resources/views/users/blocked.blade.php --}}
 
-@extends('layouts.app')
-
-@section('content')
-<div class="container">
-    <h3 class="mb-4 text-danger">🚫 Blocked Users ({{ count($blockedPeople) }})</h3>
-    <p class="text-muted">These users cannot send you messages or view your activity. Click 'Unblock' to restore communication.</p>
+<div class="container" style="margin-top:30px; max-width:700px;">
+    <div class="d-flex align-items-center mb-3">
+        <a href="javascript:history.back()" class="btn btn-sm btn-light mr-3">
+            <i class="fa fa-arrow-left"></i>
+        </a>
+        <h4 class="mb-0 text-danger">
+            🚫 Blocked Users
+            <span class="badge badge-danger ml-2">{{ $blockedPeople->count() }}</span>
+        </h4>
+    </div>
+    <p class="text-muted">These users cannot send you messages or view your activity.</p>
 
     @if($blockedPeople->isEmpty())
-        <div class="alert alert-info">
-            You haven't blocked any users yet.
-        </div>
+        <div class="alert alert-info">You haven't blocked any users yet.</div>
     @else
-        <div class="list-group">
+        <div class="list-group" id="blocked-list">
             @foreach($blockedPeople as $person)
-                <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="list-group-item d-flex justify-content-between align-items-center" id="blocked-row-{{ $person->id }}">
                     <div class="d-flex align-items-center">
-                        <img src="{{ $person->profileimg ?? asset('images/best3.png') }}" 
-                             class="rounded-circle me-3" 
-                             style="width:45px;height:45px;object-fit:cover;">
+                        <img src="{{ $person->profileimg ? (filter_var($person->profileimg, FILTER_VALIDATE_URL) ? $person->profileimg : asset($person->profileimg)) : asset('images/best3.png') }}"
+                             class="rounded-circle mr-3"
+                             style="width:46px;height:46px;object-fit:cover;"
+                             onerror="this.src='{{ asset('images/best3.png') }}'">
                         <div>
                             <h6 class="mb-0">{{ $person->name }}</h6>
-                            <small class="text-muted">{{ '@' . $person->username }}</small>
-                            <small class="d-block text-secondary">Blocked since: {{ \Carbon\Carbon::parse($person->blocked_at)->format('M d, Y') }}</small>
+                            <small class="text-muted">@{{ $person->username }}</small>
+                            <small class="d-block text-secondary">
+                                Blocked since: {{ \Carbon\Carbon::parse($person->blocked_at)->format('M d, Y') }}
+                            </small>
                         </div>
                     </div>
-                    
-                    <button class="btn btn-sm btn-outline-danger unblock-btn" 
-                            data-blocked-id="{{ $person->id }}"
-                            onclick="unblockUserFromList({{ $person->id }})">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            onclick="unblockUser({{ $person->id }}, this)">
                         Unblock
                     </button>
                 </div>
@@ -100,37 +103,44 @@
     @endif
 </div>
 
-{{-- You need a script section for the unblock functionality --}}
 <script>
-    // Assuming you have defined the CSRF token globally or in the layout
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
-    function unblockUserFromList(blockedId) {
-        if (confirm('Are you sure you want to unblock this user?')) {
-            fetch('/users/unblock', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN 
-                },
-                body: JSON.stringify({
-                    blocked_user_id: blockedId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('User unblocked successfully.');
-                    window.location.reload(); // Reload to update the list
-                } else {
-                    alert('Failed to unblock user.');
+
+    function unblockUser(blockedId, btn) {
+        if (!confirm('Unblock this user?')) return;
+        btn.disabled = true;
+        btn.textContent = 'Unblocking…';
+        fetch('/users/unblock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+            body: JSON.stringify({ blocked_user_id: blockedId })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById('blocked-row-' + blockedId);
+                if (row) row.remove();
+                // Update count badge
+                const remaining = document.querySelectorAll('[id^="blocked-row-"]').length;
+                const badge = document.querySelector('.badge-danger');
+                if (badge) badge.textContent = remaining;
+                if (remaining === 0) {
+                    document.getElementById('blocked-list').innerHTML =
+                        '<div class="alert alert-info">You haven\'t blocked any users yet.</div>';
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Unblock';
+                alert('Failed to unblock. Please try again.');
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.textContent = 'Unblock';
+            alert('Network error. Please try again.');
+        });
     }
 </script>
-@endsection
 
 <!-- Load jQuery first -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>

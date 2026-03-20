@@ -506,11 +506,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return new Promise((resolve, reject) => {
                 const cloudData = new FormData();
                 cloudData.append("file", file);
-                cloudData.append("upload_preset", "francis");
+                cloudData.append("upload_preset", "supperAge");
 
                 const endpoint = file.type.startsWith("video")
-                    ? "https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload"
-                    : "https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload";
+                    ? "https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload"
+                    : "https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload";
 
                 const xhr = new XMLHttpRequest();
                 
@@ -634,11 +634,11 @@ document.addEventListener("DOMContentLoaded", function () {
 //         const cloudinaryUpload = async (file) => {
 //             const cloudData = new FormData();
 //             cloudData.append("file", file);
-//             cloudData.append("upload_preset", "francis");
+//             cloudData.append("upload_preset", "supperAge");
 
 //             const endpoint = file.type.startsWith("video")
-//                 ? "https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload"
-//                 : "https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload";
+//                 ? "https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload"
+//                 : "https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload";
 
 //             return $.ajax({
 //                 url: endpoint,

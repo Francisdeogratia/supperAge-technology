@@ -430,6 +430,11 @@
             }
         }
 
+        /* Hide mobile navbar (shown inside app WebView) */
+        .mobile-bottom-nav, .mobile-plus-dropdown, #mobilePlusDropdown, #dropdownOverlay {
+            display: none !important;
+        }
+
         /* Loading Animation */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -523,54 +528,12 @@
                                     <th><i class="fas fa-money-bill"></i> Currency</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($allUsers as $u)
-                                @php
-                                $isOnline = $u->is_online;
-                                $lastSeen = $u->last_seen ?? 'Offline';
-                                @endphp
-                                <tr>
-                                    <td class="text-center">
-                                        <input type="checkbox" name="recipients[{{ $u->id }}][selected]" value="1">
-                                    </td>
-                                    <td>
-                                        <div class="user-info">
-                                            <img src="{{ $u->profileimg ?? asset('images/default-avatar.png') }}" 
-                                                 alt="{{ $u->name }}" 
-                                                 class="user-avatar">
-                                            <div>
-                                                <div class="user-name">
-                                                    {{ $u->name }}
-                                                    @if($u->badge_status)
-                                                        <img src="{{ asset($u->badge_status) }}" 
-                                                             alt="Verified" 
-                                                             style="width:16px;height:16px;margin-left:3px;">
-                                                    @endif
-                                                </div>
-                                                <span class="{{ $isOnline ? 'online-badge' : 'offline-badge' }}">
-                                                    {{ $isOnline ? '● Online' : $lastSeen }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="number" 
-                                               name="recipients[{{ $u->id }}][amount]"
-                                               class="form-control form-control-sm amount-field"
-                                               step="0.01" 
-                                               min="0"
-                                               placeholder="0.00">
-                                    </td>
-                                    <td>
-                                        <select name="recipients[{{ $u->id }}][currency]"
-                                                class="form-control form-control-sm currency-field">
-                                            @foreach($currencies as $code => $name)
-                                                <option value="{{ $code }}">{{ $code }}</option>
-                                            @endforeach
-                                        </select>
+                            <tbody id="desktopUserList">
+                                <tr id="desktopEmpty">
+                                    <td colspan="4" class="text-center py-4" style="color:#999;">
+                                        <i class="fas fa-search mr-2"></i> Search for a user above to add them
                                     </td>
                                 </tr>
-                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -587,51 +550,11 @@
                     </label>
                 </div>
 
-                @foreach($allUsers as $u)
-                @php
-                $isOnline = $u->is_online;
-                $lastSeen = $u->last_seen ?? 'Offline';
-                @endphp
-                <div class="user-card">
-                    <div class="user-card-header">
-                        <input type="checkbox" name="recipients[{{ $u->id }}][selected]" value="1">
-                        <img src="{{ $u->profileimg ?? asset('images/default-avatar.png') }}" 
-                             alt="{{ $u->name }}" 
-                             class="user-card-avatar">
-                        <div class="user-card-info">
-                            <div class="user-card-name">
-                                {{ $u->name }}
-                                @if($u->badge_status)
-                                    <img src="{{ asset($u->badge_status) }}" 
-                                         alt="Verified" 
-                                         style="width:18px;height:18px;margin-left:3px;">
-                                @endif
-                            </div>
-                            <span class="{{ $isOnline ? 'online-badge' : 'offline-badge' }}">
-                                {{ $isOnline ? '● Online' : $lastSeen }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-dollar-sign"></i> Amount</label>
-                        <input type="number"
-                               name="recipients[{{ $u->id }}][amount]"
-                               class="form-control amount-field"
-                               step="0.01" 
-                               min="0"
-                               placeholder="Enter amount">
-                    </div>
-                    <div>
-                        <label class="form-label"><i class="fas fa-money-bill"></i> Currency</label>
-                        <select name="recipients[{{ $u->id }}][currency]"
-                                class="form-control currency-field">
-                            @foreach($currencies as $code => $name)
-                                <option value="{{ $code }}">{{ $name }} ({{ $code }})</option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div id="mobileUserList">
+                    <p class="text-center text-muted py-4" id="mobileEmpty">
+                        <i class="fas fa-search mr-2"></i> Search for a user above to add them
+                    </p>
                 </div>
-                @endforeach
             </div>
 
             <!-- Desktop Submit Button -->
@@ -666,6 +589,21 @@
     <script src="{{ asset('myjs/mobilenavbar.js') }}"></script>
     <script src="{{ asset('myjs/searchuser.js') }}"></script> -->
 
+    <!-- Global layout sync (called after AJAX renders new inputs) -->
+    <script>
+    function syncLayoutEnabled() {
+        const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+        function toggle(container, enabled) {
+            if (!container) return;
+            container.querySelectorAll('input[name^="recipients"], select[name^="recipients"]').forEach(el => {
+                el.disabled = !enabled;
+            });
+        }
+        toggle(document.getElementById('desktopLayout'), isDesktop);
+        toggle(document.getElementById('mobileLayout'), !isDesktop);
+    }
+    </script>
+
     <!-- Desktop JS -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -676,12 +614,6 @@
         const form = document.querySelector('form');
         const desktopLayout = document.getElementById('desktopLayout');
         const mobileLayout = document.getElementById('mobileLayout');
-
-        function syncLayoutEnabled() {
-            const isDesktop = window.matchMedia('(min-width: 768px)').matches;
-            toggleContainerInputs(desktopLayout, isDesktop);
-            toggleContainerInputs(mobileLayout, !isDesktop);
-        }
 
         function toggleContainerInputs(container, enabled) {
             if (!container) return;
@@ -761,12 +693,6 @@
         const selectAllMobile = document.getElementById('selectAllMobile');
         const mobileBtn = document.getElementById('mobileSendBtn');
         const form = document.querySelector('form');
-
-        function syncLayoutEnabled() {
-            const isDesktop = window.matchMedia('(min-width: 768px)').matches;
-            toggleContainerInputs(desktopLayout, isDesktop);
-            toggleContainerInputs(mobileLayout, !isDesktop);
-        }
 
         function toggleContainerInputs(container, enabled) {
             if (!container) return;
@@ -859,48 +785,132 @@
     });
     </script>
 
-    <!-- Search JS -->
+    <!-- Search JS (AJAX) -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('userSearch');
-        const resultCount = document.getElementById('searchResultCount');
+        const searchInput   = document.getElementById('userSearch');
+        const resultCount   = document.getElementById('searchResultCount');
+        const desktopTbody  = document.getElementById('desktopUserList');
+        const desktopEmpty  = document.getElementById('desktopEmpty');
+        const mobileList    = document.getElementById('mobileUserList');
+        const mobileEmpty   = document.getElementById('mobileEmpty');
+        const currencies    = @json($currencies);
+
         if (!searchInput) return;
 
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            let visible = 0;
-            let total = 0;
+        let debounceTimer = null;
 
-            // Filter desktop rows
-            const desktopRows = document.querySelectorAll('#desktopLayout tbody tr');
-            desktopRows.forEach(row => {
-                total++;
-                const name = row.querySelector('.user-name')?.textContent?.toLowerCase() || '';
-                if (!query || name.includes(query)) {
-                    row.style.display = '';
-                    visible++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+        function currencyOptions(selectedCode) {
+            return Object.entries(currencies).map(([code, name]) =>
+                `<option value="${code}" ${code === selectedCode ? 'selected' : ''}>${name} (${code})</option>`
+            ).join('');
+        }
 
-            // Filter mobile cards
-            const mobileCards = document.querySelectorAll('#mobileLayout .user-card');
-            mobileCards.forEach(card => {
-                const name = card.querySelector('.user-card-name')?.textContent?.toLowerCase() || '';
-                if (!query || name.includes(query)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+        function buildDesktopRow(u) {
+            const avatar = u.profileimg || '/images/default-avatar.png';
+            const badge  = u.badge_status ? `<img src="${u.badge_status}" alt="Verified" style="width:16px;height:16px;margin-left:3px;">` : '';
+            const status = u.is_online
+                ? `<span class="online-badge">● Online</span>`
+                : `<span class="offline-badge">${u.last_seen || 'Offline'}</span>`;
+            return `<tr>
+                <td><input type="checkbox" name="recipients[${u.id}][selected]" value="1"></td>
+                <td>
+                    <div class="user-info">
+                        <img src="${avatar}" alt="${u.name}" class="user-avatar">
+                        <div>
+                            <div class="user-name">${u.name}${badge}</div>
+                            ${status}
+                        </div>
+                    </div>
+                </td>
+                <td><input type="number" name="recipients[${u.id}][amount]" class="form-control amount-field" step="0.01" min="0" placeholder="Amount"></td>
+                <td><select name="recipients[${u.id}][currency]" class="form-control currency-field">${currencyOptions('NGN')}</select></td>
+            </tr>`;
+        }
 
-            if (query) {
-                resultCount.style.display = 'block';
-                resultCount.textContent = visible + ' of ' + total + ' users found';
+        function buildMobileCard(u) {
+            const avatar = u.profileimg || '/images/default-avatar.png';
+            const badge  = u.badge_status ? `<img src="${u.badge_status}" alt="Verified" style="width:18px;height:18px;margin-left:3px;">` : '';
+            const status = u.is_online
+                ? `<span class="online-badge">● Online</span>`
+                : `<span class="offline-badge">${u.last_seen || 'Offline'}</span>`;
+            return `<div class="user-card">
+                <div class="user-card-header">
+                    <input type="checkbox" name="recipients[${u.id}][selected]" value="1">
+                    <img src="${avatar}" alt="${u.name}" class="user-card-avatar">
+                    <div class="user-card-info">
+                        <div class="user-card-name">${u.name}${badge}</div>
+                        ${status}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-dollar-sign"></i> Amount</label>
+                    <input type="number" name="recipients[${u.id}][amount]" class="form-control amount-field" step="0.01" min="0" placeholder="Enter amount">
+                </div>
+                <div>
+                    <label class="form-label"><i class="fas fa-money-bill"></i> Currency</label>
+                    <select name="recipients[${u.id}][currency]" class="form-control currency-field">${currencyOptions('NGN')}</select>
+                </div>
+            </div>`;
+        }
+
+        function renderResults(users) {
+            // Desktop
+            if (desktopEmpty) desktopEmpty.remove();
+            const existingRows = desktopTbody.querySelectorAll('tr:not(#desktopEmpty)');
+            existingRows.forEach(r => r.remove());
+            if (users.length === 0) {
+                desktopTbody.innerHTML = `<tr><td colspan="4" class="text-center py-4" style="color:#999;"><i class="fas fa-user-slash mr-2"></i> No users found</td></tr>`;
             } else {
-                resultCount.style.display = 'none';
+                desktopTbody.innerHTML = users.map(buildDesktopRow).join('');
             }
+
+            // Mobile
+            if (mobileEmpty) mobileEmpty.remove();
+            const existingCards = mobileList.querySelectorAll('.user-card');
+            existingCards.forEach(c => c.remove());
+            if (users.length === 0) {
+                mobileList.innerHTML = `<p class="text-center text-muted py-4"><i class="fas fa-user-slash mr-2"></i> No users found</p>`;
+            } else {
+                mobileList.innerHTML = users.map(buildMobileCard).join('');
+            }
+
+            // Update count
+            resultCount.style.display = 'block';
+            resultCount.textContent = users.length + ' user' + (users.length !== 1 ? 's' : '') + ' found';
+
+            // Disable inputs in the inactive layout (desktop vs mobile)
+            if (typeof syncLayoutEnabled === 'function') syncLayoutEnabled();
+        }
+
+        function clearResults() {
+            desktopTbody.innerHTML = `<tr id="desktopEmpty"><td colspan="4" class="text-center py-4" style="color:#999;"><i class="fas fa-search mr-2"></i> Search for a user above to add them</td></tr>`;
+            mobileList.innerHTML   = `<p class="text-center text-muted py-4" id="mobileEmpty"><i class="fas fa-search mr-2"></i> Search for a user above to add them</p>`;
+            resultCount.style.display = 'none';
+        }
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (query.length < 2) {
+                clearResults();
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                resultCount.style.display = 'block';
+                resultCount.textContent   = 'Searching…';
+
+                fetch('/wallet/search-users?q=' + encodeURIComponent(query), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(r => r.json())
+                .then(renderResults)
+                .catch(() => {
+                    resultCount.textContent = 'Search failed. Please try again.';
+                });
+            }, 350);
         });
     });
     </script>

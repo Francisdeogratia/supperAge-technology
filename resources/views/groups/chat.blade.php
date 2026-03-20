@@ -1535,13 +1535,10 @@
                         @if($message->file_path)
                             @php
                                 $files = json_decode($message->file_path, true);
+                                if (!is_array($files)) {
+                                    $files = [];
+                                }
                                 $fileCount = count($files);
-                                  
-
-                        if (!is_array($files) || $fileCount === 0) {
-                                $files = [];
-                                $fileCount = 0;
-                            }
                             
                             $caption = trim($message->message) ?: 'Sent attachment';
                             $senderName = $message->sender_id == $user->id ? 'You' : $message->sender->username;
@@ -2822,10 +2819,10 @@ async function sendVoiceNote() {
     try {
         const formData = new FormData();
         formData.append('file', audioBlob, 'voice-note.webm');
-        formData.append('upload_preset', 'francis');
+        formData.append('upload_preset', 'supperAge');
         formData.append('resource_type', 'video');
         
-        const response = await fetch('https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload', {
+        const response = await fetch('https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload', {
             method: 'POST',
             body: formData
         });
@@ -3076,9 +3073,9 @@ async function capturePhoto() {
         try {
             const formData = new FormData();
             formData.append('file', blob, 'camera-photo.jpg');
-            formData.append('upload_preset', 'francis');
+            formData.append('upload_preset', 'supperAge');
             
-            const response = await fetch('https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload', {
+            const response = await fetch('https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload', {
                 method: 'POST',
                 body: formData
             });
@@ -3197,7 +3194,7 @@ async function uploadVideo(videoBlob) {
     try {
         const formData = new FormData();
         formData.append('file', videoBlob, 'camera-video.webm');
-        formData.append('upload_preset', 'francis');
+        formData.append('upload_preset', 'supperAge');
         formData.append('resource_type', 'video');
         
         const xhr = new XMLHttpRequest();
@@ -3250,7 +3247,7 @@ async function uploadVideo(videoBlob) {
             throw new Error('Network error');
         };
         
-        xhr.open('POST', 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload');
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload');
         xhr.send(formData);
         
     } catch (error) {
@@ -3511,11 +3508,11 @@ document.getElementById('messageForm').addEventListener('submit', async function
         selectedFiles.forEach((file, fileIndex) => {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('upload_preset', 'francis');
+            formData.append('upload_preset', 'supperAge');
             
             const endpoint = file.type.startsWith('video/')
-                ? 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload'
-                : 'https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload';
+                ? 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload'
+                : 'https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload';
             
             const promise = new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();

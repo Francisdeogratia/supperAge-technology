@@ -35,6 +35,8 @@ class UserRecord extends Model implements Authenticatable
         'number_followers',
         'continent',
         'country',
+        'state',
+        'city',
         'status',
         'disabled_until',
         'email_status',

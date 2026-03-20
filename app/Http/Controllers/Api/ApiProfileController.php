@@ -73,13 +73,17 @@ class ApiProfileController extends Controller
 
         Follow::create(['sender_id' => $authUser->id, 'receiver_id' => $id]);
 
-        Notification::create([
-            'user_id'  => $id,
-            'from_id'  => $authUser->id,
-            'type'     => 'follow',
-            'message'  => $authUser->name . ' started following you',
-            'is_read'  => 0,
-        ]);
+        try {
+            Notification::create([
+                'notification_reciever_id' => $id,
+                'actor_id'                 => $authUser->id,
+                'type'                     => 'follow',
+                'message'                  => $authUser->name . ' started following you',
+                'read_notification'        => 'no',
+            ]);
+        } catch (\Exception $e) {
+            // Notification failed — follow already completed, continue
+        }
 
         return response()->json(['message' => 'Followed', 'is_following' => true]);
     }
@@ -131,18 +135,35 @@ class ApiProfileController extends Controller
     {
         $userId = $request->user()->id;
 
-        $posts = SamplePost::where('user_id', $userId)
+        // Own posts
+        $ownPosts = SamplePost::where('user_id', $userId)
             ->whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return response()->json([
-            'posts'        => $posts->map(fn($p) => array_merge($this->formatPost($p, $userId), [
+            ->get()
+            ->map(fn($p) => array_merge($this->formatPost($p, $userId), [
                 'comments_count' => DB::table('post_comments')->where('post_id', $p->id)->count(),
-            ])),
-            'current_page' => $posts->currentPage(),
-            'last_page'    => $posts->lastPage(),
-        ]);
+                'is_repost'      => false,
+            ]))->toArray();
+
+        // Reposted posts (by this user)
+        $repostedPostIds = DB::table('post_reposts')
+            ->where('user_id', $userId)
+            ->pluck('post_id')
+            ->toArray();
+
+        $repostedPosts = SamplePost::whereIn('id', $repostedPostIds)
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(fn($p) => array_merge($this->formatPost($p, $userId), [
+                'comments_count' => DB::table('post_comments')->where('post_id', $p->id)->count(),
+                'is_repost'      => true,
+            ]))->toArray();
+
+        // Merge and sort by created_at descending
+        $all = array_merge($ownPosts, $repostedPosts);
+        usort($all, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
+
+        return response()->json(['posts' => $all]);
     }
 
     public function searchUsers(Request $request)
@@ -163,8 +184,72 @@ class ApiProfileController extends Controller
         ->limit(20)
         ->get();
 
+        if ($users->isEmpty()) {
+            return response()->json(['users' => []]);
+        }
+
+        $userIds = $users->pluck('id');
+
+        // IDs the current user follows (among results)
+        $followingIds = Follow::where('sender_id', $userId)
+            ->whereIn('receiver_id', $userIds)
+            ->pluck('receiver_id')
+            ->toArray();
+
+        // IDs that follow the current user back (among results) — mutual = friend
+        $followerIds = Follow::where('receiver_id', $userId)
+            ->whereIn('sender_id', $userIds)
+            ->pluck('sender_id')
+            ->toArray();
+
         return response()->json([
-            'users' => $users->map(fn($u) => $this->formatUser($u)),
+            'users' => $users->map(function ($u) use ($followingIds, $followerIds) {
+                $isFollowing = in_array($u->id, $followingIds);
+                $isFriend    = $isFollowing && in_array($u->id, $followerIds);
+                return array_merge($this->formatUser($u), [
+                    'is_following' => $isFollowing,
+                    'is_friend'    => $isFriend,
+                ]);
+            }),
+        ]);
+    }
+
+    public function suggestedUsers(Request $request)
+    {
+        $userId = $request->user()->id;
+        $limit  = max(6, (int) $request->get('limit', 20));
+
+        $users = UserRecord::where('id', '!=', $userId)
+            ->where('status', 'active')
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get();
+
+        if ($users->isEmpty()) {
+            return response()->json(['users' => []]);
+        }
+
+        $userIds = $users->pluck('id');
+
+        $followingIds = Follow::where('sender_id', $userId)
+            ->whereIn('receiver_id', $userIds)
+            ->pluck('receiver_id')
+            ->toArray();
+
+        $followerIds = Follow::where('receiver_id', $userId)
+            ->whereIn('sender_id', $userIds)
+            ->pluck('sender_id')
+            ->toArray();
+
+        return response()->json([
+            'users' => $users->map(function ($u) use ($followingIds, $followerIds) {
+                $isFollowing = in_array($u->id, $followingIds);
+                $isFriend    = $isFollowing && in_array($u->id, $followerIds);
+                return array_merge($this->formatUser($u), [
+                    'is_following' => $isFollowing,
+                    'is_friend'    => $isFriend,
+                ]);
+            }),
         ]);
     }
 
@@ -178,8 +263,10 @@ class ApiProfileController extends Controller
             'profileimg' => $user->profileimg ? (filter_var($user->profileimg, FILTER_VALIDATE_URL) ? $user->profileimg : url($user->profileimg)) : null,
             'bgimg'      => $user->bgimg ? (filter_var($user->bgimg, FILTER_VALIDATE_URL) ? $user->bgimg : url($user->bgimg)) : null,
             'country'    => $user->country,
-            'badge_status' => $user->badge_status,
+            'badge_status'     => $user->badge_status,
             'number_followers' => $user->number_followers ?? 0,
+            'is_online'        => (bool) $user->is_online,
+            'last_seen'        => $user->last_seen,
         ];
     }
 

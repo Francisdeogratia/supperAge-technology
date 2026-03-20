@@ -62,6 +62,26 @@ use App\Http\Controllers\Admin\AdminTransactionController;
 Route::post('/broadcasting/auth', [BroadcastAuthController::class, 'authenticate'])
     ->name('broadcasting.auth');
 
+// App WebView auto-login via cache token (expires in 15 min)
+Route::get('/app/autologin', function (Illuminate\Http\Request $request) {
+    $token = $request->query('token');
+    if (!$token) abort(403, 'Missing token.');
+
+    $data = \Illuminate\Support\Facades\Cache::pull('app_autologin_' . $token);
+    if (!$data) abort(403, 'This link has expired. Please go back and try again.');
+
+    $user = UserRecord::find($data['user_id']);
+    if (!$user) abort(404);
+
+    Session::put('id',       $user->id);
+    Session::put('name',     $user->name);
+    Session::put('email',    $user->email);
+    Session::put('username', $user->username);
+
+    $redirect = ltrim($data['redirect'] ?? 'wallet/withdraw', '/');
+    return redirect('/' . $redirect);
+});
+
 // Test route to confirm it's working
 Route::get('/test-broadcast-controller', function() {
     return (new BroadcastAuthController())->authenticate(new Request([
@@ -160,7 +180,12 @@ Route::post('/login', [AccountController::class, 'login']);
 
 // for psw forgot 
 Route::post('/forgot', [AccountController::class, 'forgot']);
-// for psw reset 
+// Mobile call page (HTTPS context required for getUserMedia / Agora Web SDK)
+Route::get('/mobile-call', function () {
+    return view('mobile-call');
+})->name('mobile-call');
+
+// for psw reset
 Route::view('/reset-password', 'reset-password');
 Route::post('/password-update', [AccountController::class, 'updatePassword'])->name('password.update');
 Route::view('/reset-password-success', 'reset-password-success');
@@ -330,6 +355,9 @@ Route::get('/wallet/transfer', [WalletController::class, 'showTransferPage'])
 
 Route::post('/wallet/transfer', [WalletController::class, 'processMultiTransfer'])
     ->name('wallet.transfer.process');
+
+Route::get('/wallet/search-users', [WalletController::class, 'searchUsers'])
+    ->name('wallet.search.users');
 
 // withdraw money
 Route::get('/wallet/withdraw', [WithdrawalController::class, 'showForm'])

@@ -50,7 +50,9 @@
 
     <!-- Scripts -->
     <style>
-
+        .mobile-bottom-nav, .mobile-plus-dropdown, #mobilePlusDropdown, #dropdownOverlay {
+            display: none !important;
+        }
         </style>
     
 </head>
@@ -155,9 +157,9 @@
 {{-- Badge logic --}}
 @if(!$user || !$user->badge_expires_at)
     {{-- Never applied --}}
-   <form action="{{ route('payment.start') }}" method="GET" id="badgeForm">
+   <div id="badgeForm">
     <label for="currency">Choose Currency</label>
-    <select name="currency" id="currencySelect" class="form-control mb-2">
+    <select id="currencySelect" class="form-control mb-2">
         <option value="NGN" {{ $defaultCurrency == 'NGN' ? 'selected' : '' }}>NGN - Nigerian Naira</option>
         <option value="USD" {{ $defaultCurrency == 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
         <option value="EUR" {{ $defaultCurrency == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
@@ -178,14 +180,12 @@
         <option value="RWF" {{ $defaultCurrency == 'RWF' ? 'selected' : '' }}>RWF - Rwandan Franc</option>
     </select>
 
-    <p id="feePreview" class="text-info">
-        Loading fee...
-    </p>
+    <p id="feePreview" class="text-info">Loading fee...</p>
 
-    <button type="submit" class="pay-btn mb-3 ">
-        Apply Now – Pay Online
+    <button type="button" class="pay-btn mb-3" id="payOnlineBtn" onclick="startBadgePayment()">
+        Apply Now – Pay Online with Card / Bank
     </button>
-</form>
+</div>
 
 
 
@@ -225,8 +225,8 @@
 @endif
 @elseif(now()->gte($user->badge_expires_at))
     {{-- Expired --}}
-    <form action="{{ route('payment.start') }}" method="GET" class="renew-form">
-        <select name="currency" class="form-control mb-2">
+    <div class="renew-form">
+        <select id="renewCurrencySelect" class="form-control mb-2">
             <option value="NGN">NGN - Nigerian Naira</option>
             <option value="USD">USD - US Dollar</option>
             <option value="EUR">EUR - Euro</option>
@@ -247,10 +247,10 @@
             <option value="RWF">RWF - Rwandan Franc</option>
         </select>
         <p id="renewFeePreview" class="text-info">Loading fee...</p>
-    <button type="submit" class="btn btn-warning">
-        Renew Badge – Pay Online
-    </button>
-    </form>
+        <button type="button" class="btn btn-warning" onclick="startBadgePayment('renew')">
+            Renew Badge – Pay Online with Card / Bank
+        </button>
+    </div>
 
     @if($walletBalance >= 3500)
         <form action="{{ route('badge.verify.wallet') }}" method="POST" style="display:inline;">
@@ -331,58 +331,105 @@ document.getElementById('notificationsDropdown').addEventListener('click', funct
 <script src="{{ asset('myjs/allpost.js') }}"></script>
 <script src="{{ asset('myjs/tales.js') }}"></script>
 
+<script src="https://checkout.flutterwave.com/v3.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    function updateFeePreview(currency) {
-        fetch(`/api/get-rate?currency=${currency}`)
-            .then(res => res.json())
-            .then(data => {
-                const feeEl = document.getElementById('feePreview');
-                if (!feeEl) return;
-                feeEl.innerText = data.success
-                    ? `≈ ${currency} ${data.convertedAmount}`
-                    : 'Unable to fetch rate, defaulting to NGN 1500';
-            })
-            .catch(() => {
-                const feeEl = document.getElementById('feePreview');
-                if (feeEl) feeEl.innerText = 'Error fetching rate';
-            });
-    }
+function fetchFee(currency, callback) {
+    fetch('/api/get-rate?currency=' + currency)
+        .then(r => r.json())
+        .then(d => callback(d.success ? d.convertedAmount : 5000))
+        .catch(() => callback(5000));
+}
 
-    const selectEl = document.getElementById('currencySelect');
+document.addEventListener('DOMContentLoaded', function () {
+    // New application fee preview
+    var selectEl = document.getElementById('currencySelect');
     if (selectEl) {
-        selectEl.addEventListener('change', function() {
-            updateFeePreview(this.value);
-        });
-        updateFeePreview(selectEl.value);
-    }
-
-    // --- Renew form ---
-    function updateRenewFee(currency) {
-        fetch(`/api/get-rate?currency=${currency}`)
-            .then(res => res.json())
-            .then(data => {
-                const renewEl = document.getElementById('renewFeePreview');
-                if (!renewEl) return;
-                renewEl.innerText = data.success
-                    ? `≈ ${currency} ${data.convertedAmount}`
-                    : 'Unable to fetch rate, defaulting to NGN 1500';
-            })
-            .catch(() => {
-                const renewEl = document.getElementById('renewFeePreview');
-                if (renewEl) renewEl.innerText = 'Error fetching rate';
+        selectEl.addEventListener('change', function () {
+            fetchFee(this.value, function (amt) {
+                var el = document.getElementById('feePreview');
+                if (el) el.innerText = '≈ ' + selectEl.value + ' ' + amt;
             });
+        });
+        fetchFee(selectEl.value, function (amt) {
+            var el = document.getElementById('feePreview');
+            if (el) el.innerText = '≈ ' + selectEl.value + ' ' + amt;
+        });
     }
 
-    const renewSelect = document.querySelector('form.renew-form select[name="currency"]');
+    // Renewal fee preview
+    var renewSelect = document.getElementById('renewCurrencySelect');
     if (renewSelect) {
-        renewSelect.addEventListener('change', function() {
-            updateRenewFee(this.value);
+        renewSelect.addEventListener('change', function () {
+            fetchFee(this.value, function (amt) {
+                var el = document.getElementById('renewFeePreview');
+                if (el) el.innerText = '≈ ' + renewSelect.value + ' ' + amt;
+            });
         });
-        updateRenewFee(renewSelect.value);
+        fetchFee(renewSelect.value, function (amt) {
+            var el = document.getElementById('renewFeePreview');
+            if (el) el.innerText = '≈ ' + renewSelect.value + ' ' + amt;
+        });
     }
 });
 
+function startBadgePayment(type) {
+    var isRenew   = (type === 'renew');
+    var selectEl  = isRenew
+        ? document.getElementById('renewCurrencySelect')
+        : document.getElementById('currencySelect');
+    var currency  = selectEl ? selectEl.value : 'NGN';
+    var btn       = isRenew
+        ? document.querySelector('#renewCurrencySelect ~ button')
+        : document.getElementById('payOnlineBtn');
+
+    if (btn) { btn.disabled = true; btn.innerText = 'Loading...'; }
+
+    fetchFee(currency, function (amount) {
+        FlutterwaveCheckout({
+            public_key:      '{{ env("FLW_PUBLIC_KEY") }}',
+            tx_ref:          'BADGE-' + Date.now(),
+            amount:          amount,
+            currency:        currency,
+            payment_options: 'card, banktransfer, ussd',
+            customer: {
+                email:        '{{ $user->email ?? "" }}',
+                phone_number: '{{ $user->phone ?? "" }}',
+                name:         '{{ $user->name ?? "" }}'
+            },
+            customizations: {
+                title:       'SupperAge Blue Badge',
+                description: 'Blue Badge Verification Fee'
+            },
+            callback: function (data) {
+                if (data.status === 'successful') {
+                    var successUrl = '/payment-success'
+                        + '?transaction_id=' + data.transaction_id
+                        + '&tx_ref='         + (data.tx_ref || '')
+                        + '&status=successful'
+                        + '&currency='       + currency;
+
+                    if (window.ReactNativeWebView) {
+                        // Primary: postMessage to React Native
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                            type:           'badge_payment_success',
+                            transaction_id: String(data.transaction_id),
+                            tx_ref:         data.tx_ref || '',
+                            currency:       currency
+                        }));
+                        // Secondary: also navigate so onShouldStartLoadWithRequest fires as backup
+                        setTimeout(function () { window.location.href = successUrl; }, 300);
+                    } else {
+                        // Normal browser (not app): redirect to success page
+                        window.location.href = successUrl;
+                    }
+                }
+            },
+            onclose: function () {
+                if (btn) { btn.disabled = false; btn.innerText = isRenew ? 'Renew Badge – Pay Online with Card / Bank' : 'Apply Now – Pay Online with Card / Bank'; }
+            }
+        });
+    });
+}
 </script>
 
 

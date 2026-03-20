@@ -43,6 +43,12 @@
     <link rel="stylesheet" href="{{ asset('css/mobilenavbar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/searchuser.css') }}">
     <link rel="stylesheet" href="{{ asset('css/wallet.css') }}"> <!-- NEW: Add the wallet styles -->
+    <style>
+        .mobile-bottom-nav,
+        .mobile-plus-dropdown,
+        #mobilePlusDropdown,
+        #dropdownOverlay { display: none !important; }
+    </style>
 </head>
 
 <body class="wallet-page">

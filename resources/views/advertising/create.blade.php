@@ -703,7 +703,7 @@ function updateEstimations() {
 function uploadMedia(file) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'francis');
+    formData.append('upload_preset', 'supperAge');
 
     // Update upload area to show uploading
     $('#uploadArea').html(`
@@ -713,8 +713,8 @@ function uploadMedia(file) {
     `);
 
     const uploadUrl = file.type.includes('video') 
-        ? 'https://api.cloudinary.com/v1_1/djaqqrwoi/video/upload' 
-        : 'https://api.cloudinary.com/v1_1/djaqqrwoi/image/upload';
+        ? 'https://api.cloudinary.com/v1_1/dl6vgz50t/video/upload' 
+        : 'https://api.cloudinary.com/v1_1/dl6vgz50t/image/upload';
 
     fetch(uploadUrl, {
         method: 'POST',

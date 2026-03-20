@@ -19,7 +19,7 @@ class ApiNotificationController extends Controller
             ->paginate(30, ['*'], 'page', $page);
 
         $unreadCount = Notification::where('notification_reciever_id', $userId)
-            ->where('read_notification', 0)
+            ->where('read_notification', 'no')
             ->count();
 
         return response()->json([
@@ -42,7 +42,7 @@ class ApiNotificationController extends Controller
             return response()->json(['message' => 'Not found'], 404);
         }
 
-        $notification->update(['read_notification' => 1]);
+        $notification->update(['read_notification' => 'yes']);
 
         return response()->json(['message' => 'Marked as read']);
     }
@@ -51,8 +51,8 @@ class ApiNotificationController extends Controller
     {
         $userId = $request->user()->id;
         Notification::where('notification_reciever_id', $userId)
-            ->where('read_notification', 0)
-            ->update(['read_notification' => 1]);
+            ->where('read_notification', 'no')
+            ->update(['read_notification' => 'yes']);
 
         return response()->json(['message' => 'All notifications marked as read']);
     }
@@ -65,13 +65,15 @@ class ApiNotificationController extends Controller
             'message'      => $n->message,
             'post_id'      => $n->post_id,
             'link'         => $n->link,
-            'is_read'      => (bool) $n->read_notification,
+            'data'         => $n->data,
+            'is_read'      => $n->read_notification === 'yes',
             'created_at'   => $n->created_at,
             'actor'        => $n->actor ? [
-                'id'         => $n->actor->id,
-                'name'       => $n->actor->name,
-                'username'   => $n->actor->username,
-                'profileimg' => $n->actor->profileimg ? (filter_var($n->actor->profileimg, FILTER_VALIDATE_URL) ? $n->actor->profileimg : url($n->actor->profileimg)) : null,
+                'id'           => $n->actor->id,
+                'name'         => $n->actor->name,
+                'username'     => $n->actor->username,
+                'profileimg'   => $n->actor->profileimg ? (filter_var($n->actor->profileimg, FILTER_VALIDATE_URL) ? $n->actor->profileimg : url($n->actor->profileimg)) : null,
+                'badge_status' => $n->actor->badge_status ?? null,
             ] : null,
         ];
     }

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\ApiAdvertisingController;
 use App\Http\Controllers\Api\ApiTaskController;
 use App\Http\Controllers\Api\ApiReferralController;
 use App\Http\Controllers\Api\ApiBlueBadgeController;
+use App\Http\Controllers\Api\ApiCallController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +29,9 @@ use App\Http\Controllers\Api\ApiBlueBadgeController;
 
 // ── Public Auth ──────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('login',    [ApiAuthController::class, 'login']);
-    Route::post('register', [ApiAuthController::class, 'register']);
+    Route::post('login',            [ApiAuthController::class, 'login']);
+    Route::post('register',         [ApiAuthController::class, 'register']);
+    Route::post('forgot-password',  [ApiAuthController::class, 'forgotPassword']);
 });
 
 // ── Authenticated Routes ──────────────────────────────────────────────────
@@ -39,7 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout',          [ApiAuthController::class, 'logout']);
         Route::get('me',               [ApiAuthController::class, 'me']);
-        Route::put('profile',          [ApiAuthController::class, 'updateProfile']);
+        Route::post('push-token',      [ApiAuthController::class, 'savePushToken']);
+        Route::match(['put', 'post'], 'profile', [ApiAuthController::class, 'updateProfile']);
         Route::put('password',         [ApiAuthController::class, 'updatePassword']);
     });
 
@@ -56,6 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('{id}/comments',   [ApiPostController::class, 'addComment']);
         Route::post('{id}/repost',     [ApiPostController::class, 'repost']);
         Route::post('{id}/save',       [ApiPostController::class, 'save']);
+        Route::get('{id}/files/stats',         [ApiPostController::class, 'fileStats']);
+        Route::post('{id}/files/{index}/view', [ApiPostController::class, 'fileView']);
+        Route::post('{id}/files/{index}/like', [ApiPostController::class, 'fileLike']);
     });
 
     // Stories / Tales
@@ -63,29 +69,61 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/',                [ApiStoryController::class, 'index']);
         Route::post('/',               [ApiStoryController::class, 'store']);
         Route::get('{id}',             [ApiStoryController::class, 'show']);
+        Route::put('{id}',             [ApiStoryController::class, 'update']);
         Route::delete('{id}',          [ApiStoryController::class, 'destroy']);
         Route::post('{id}/like',       [ApiStoryController::class, 'like']);
         Route::post('{id}/view',       [ApiStoryController::class, 'view']);
+        Route::get('{id}/comments',    [ApiStoryController::class, 'comments']);
+        Route::get('{id}/viewers',     [ApiStoryController::class, 'viewers']);
     });
 
     // Direct Messages
     Route::prefix('messages')->group(function () {
-        Route::get('/',                [ApiMessageController::class, 'conversations']);
-        Route::get('{friendId}',       [ApiMessageController::class, 'messages']);
-        Route::post('{friendId}',      [ApiMessageController::class, 'send']);
-        Route::post('{id}/read',       [ApiMessageController::class, 'markRead']);
+        Route::get('/',                            [ApiMessageController::class, 'conversations']);
+        Route::get('archived',                     [ApiMessageController::class, 'archivedChats']);
+        Route::post('upload-image',               [ApiMessageController::class, 'uploadImage']);
+        Route::post('upload-voice',               [ApiMessageController::class, 'uploadVoice']);
+        Route::post('upload-file',                [ApiMessageController::class, 'uploadFile']);
+        Route::post('transcribe-voice',           [ApiMessageController::class, 'transcribeVoice']);
+        Route::get('{friendId}',                   [ApiMessageController::class, 'messages']);
+        Route::post('{friendId}',                  [ApiMessageController::class, 'send']);
+        Route::post('{id}/read',                   [ApiMessageController::class, 'markRead']);
+        Route::post('{friendId}/typing',           [ApiMessageController::class, 'updateTyping']);
+        Route::get('{friendId}/typing',            [ApiMessageController::class, 'checkTyping']);
+        Route::get('{friendId}/pinned',            [ApiMessageController::class, 'getPinnedMessage']);
+        Route::post('{friendId}/pin/{messageId}',  [ApiMessageController::class, 'pinMessage']);
+        Route::delete('{friendId}/pin',            [ApiMessageController::class, 'unpinMessage']);
+        Route::post('{friendId}/archive',          [ApiMessageController::class, 'archiveChat']);
+        Route::post('{friendId}/unarchive',        [ApiMessageController::class, 'unarchiveChat']);
     });
 
     // Groups
     Route::prefix('groups')->group(function () {
         Route::get('/',                    [ApiGroupController::class, 'index']);
+        Route::get('/public',              [ApiGroupController::class, 'publicGroups']);
         Route::post('/',                   [ApiGroupController::class, 'store']);
+        Route::post('{id}/join',           [ApiGroupController::class, 'joinGroup']);
         Route::get('{id}',                 [ApiGroupController::class, 'show']);
         Route::get('{id}/messages',        [ApiGroupController::class, 'messages']);
         Route::post('{id}/messages',       [ApiGroupController::class, 'sendMessage']);
         Route::post('{id}/members',        [ApiGroupController::class, 'addMember']);
         Route::delete('{id}/members/{uid}',[ApiGroupController::class, 'removeMember']);
         Route::post('{id}/members/{uid}/make-admin', [ApiGroupController::class, 'makeAdmin']);
+        Route::put('{id}',                         [ApiGroupController::class, 'update']);
+        Route::post('{id}/read',                   [ApiGroupController::class, 'markRead']);
+        Route::post('{id}/leave',                  [ApiGroupController::class, 'leave']);
+        Route::post('{id}/report',                 [ApiGroupController::class, 'report']);
+        Route::delete('{id}',                      [ApiGroupController::class, 'destroy']);
+        // Group calls
+        Route::post('{id}/calls/initiate', [ApiGroupController::class, 'initiateGroupCall']);
+        Route::get('{id}/calls/active',    [ApiGroupController::class, 'activeGroupCall']);
+    });
+    Route::prefix('group-calls')->group(function () {
+        Route::get('poll-incoming',   [ApiGroupController::class, 'pollIncomingGroupCall']);
+        Route::post('{callId}/join',  [ApiGroupController::class, 'joinGroupCall']);
+        Route::post('{callId}/leave', [ApiGroupController::class, 'leaveGroupCall']);
+        Route::post('{callId}/end',   [ApiGroupController::class, 'endGroupCall']);
+        Route::get('{callId}/poll',   [ApiGroupController::class, 'pollGroupCall']);
     });
 
     // Live Streams
@@ -102,6 +140,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Wallet
     Route::prefix('wallet')->group(function () {
         Route::get('/',                [ApiWalletController::class, 'balance']);
+        Route::get('web-url',          [ApiWalletController::class, 'walletWebUrl']);
+        Route::get('withdraw-url',     [ApiWalletController::class, 'withdrawUrl']);
+        Route::post('initiate',        [ApiWalletController::class, 'initiate']);
+        Route::post('verify',          [ApiWalletController::class, 'verify']);
         Route::post('fund',            [ApiWalletController::class, 'fund']);
         Route::post('transfer',        [ApiWalletController::class, 'transfer']);
         Route::post('withdraw',        [ApiWalletController::class, 'withdraw']);
@@ -122,6 +164,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('followers',            [ApiProfileController::class, 'followers']);
     Route::get('following',            [ApiProfileController::class, 'following']);
     Route::get('search/users',         [ApiProfileController::class, 'searchUsers']);
+    Route::get('users/suggestions',    [ApiProfileController::class, 'suggestedUsers']);
 
     // Events
     Route::prefix('events')->group(function () {
@@ -139,7 +182,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // AgeAI
     Route::post('age-ai/chat',         [ApiAgeAIController::class, 'chat']);
 
-    // Story comments
+    // Story comments (post)
     Route::post('stories/{id}/comment', [ApiStoryController::class, 'addComment']);
 
     // Friends
@@ -153,12 +196,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('status/{userId}',      [ApiFriendController::class, 'status']);
     });
 
-    // Message reactions, edit, delete, block, report
+    // Message reactions, edit, delete, forward, block, report
     Route::post('messages/{id}/react',   [ApiMessageController::class, 'react']);
+    Route::post('messages/{id}/forward', [ApiMessageController::class, 'forwardMessage']);
     Route::put('messages/{id}',          [ApiMessageController::class, 'editMessage']);
     Route::delete('messages/{id}',       [ApiMessageController::class, 'deleteMessage']);
     Route::post('users/block',           [ApiMessageController::class, 'block']);
     Route::post('users/unblock',         [ApiMessageController::class, 'unblock']);
+    Route::get('users/blocked',          [ApiMessageController::class, 'blockedUsers']);
     Route::post('users/report',          [ApiMessageController::class, 'report']);
 
     // Advertising
@@ -178,20 +223,35 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('referral',                 [ApiReferralController::class, 'index']);
 
     // Blue Badge
-    Route::post('blue-badge/apply',        [ApiBlueBadgeController::class, 'store']);
+    Route::get('blue-badge/info',              [ApiBlueBadgeController::class, 'getInfo']);
+    Route::get('blue-badge/rate',              [ApiBlueBadgeController::class, 'getRate']);
+    Route::post('blue-badge/pay-wallet',       [ApiBlueBadgeController::class, 'payFromWallet']);
+    Route::post('blue-badge/initiate-payment', [ApiBlueBadgeController::class, 'initiatePayment']);
+    Route::post('blue-badge/verify-payment',   [ApiBlueBadgeController::class, 'verifyPayment']);
+    Route::post('blue-badge/apply',            [ApiBlueBadgeController::class, 'store']);
 
-    // Group message reactions, edit, delete
-    Route::post('groups/messages/{id}/react',  [ApiGroupController::class, 'reactMessage']);
-    Route::post('groups/messages/{id}/edit',   [ApiGroupController::class, 'editMessage']);
-    Route::post('groups/messages/{id}/delete', [ApiGroupController::class, 'deleteMessage']);
+    // Group message reactions, edit, delete, forward
+    Route::post('groups/messages/{id}/react',   [ApiGroupController::class, 'reactMessage']);
+    Route::post('groups/messages/{id}/edit',    [ApiGroupController::class, 'editMessage']);
+    Route::post('groups/messages/{id}/delete',  [ApiGroupController::class, 'deleteMessage']);
+    Route::post('groups/messages/{id}/forward', [ApiGroupController::class, 'forwardMessage']);
+    // Group pinned message
+    Route::get('groups/{id}/pinned',                  [ApiGroupController::class, 'getPinnedMessage']);
+    Route::post('groups/{id}/messages/{msgId}/pin',   [ApiGroupController::class, 'pinMessage']);
+    Route::delete('groups/{id}/messages/pin',         [ApiGroupController::class, 'unpinMessage']);
 
-    // Link preview helper
-    Route::post('link-preview',        function (Request $request) {
-        $url = $request->input('url');
-        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
-            return response()->json(['error' => 'Invalid URL'], 422);
-        }
-        // Basic response; full implementation reads OG tags
-        return response()->json(['url' => $url, 'title' => '', 'description' => '', 'image' => '']);
+    // Link preview
+    Route::post('link-preview', [ApiMessageController::class, 'fetchLinkPreview']);
+
+    // Calls (Agora audio/video)
+    Route::prefix('calls')->group(function () {
+        Route::get('poll',               [ApiCallController::class, 'poll']);
+        Route::post('initiate',          [ApiCallController::class, 'initiate']);
+        Route::post('token',             [ApiCallController::class, 'generateToken']);
+        Route::get('{callId}/status',    [ApiCallController::class, 'status']);
+        Route::post('{callId}/accept',   [ApiCallController::class, 'accept']);
+        Route::post('{callId}/decline',  [ApiCallController::class, 'decline']);
+        Route::post('{callId}/end',      [ApiCallController::class, 'end']);
+        Route::post('{callId}/timeout',  [ApiCallController::class, 'timeout']);
     });
 });

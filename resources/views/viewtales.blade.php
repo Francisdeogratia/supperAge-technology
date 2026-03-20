@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-site-verification" content="IWdPOFToacXu8eoMwOYWPxqja5IAyAd_cQSBAILNfWo" />
+
+    {{-- Open Graph / Link Preview meta tags --}}
+    @php
+        $ogTitle       = '@' . $tale->username . "'s Story on SupperAge";
+        $ogDescription = $tale->tales_content ? $tale->tales_content : 'View this story on SupperAge';
+        $ogUrl         = url('/viewtales/' . $tale->tales_id);
+        $isVideo       = $tale->type === 'video' || ($tale->files_talesexten && preg_match('/\.(mp4|mov|webm)$/i', $tale->files_talesexten));
+
+        // For videos: generate a Cloudinary thumbnail (static image) for OG preview
+        if ($isVideo && $tale->files_talesexten && str_contains($tale->files_talesexten, 'res.cloudinary.com')) {
+            $ogImage = preg_replace('/\/video\/upload\//', '/video/upload/so_0,w_600,h_600,c_fill/', $tale->files_talesexten);
+            $ogImage = preg_replace('/\.(mp4|mov|webm)(\?.*)?$/i', '.jpg', $ogImage);
+        } elseif ($tale->files_talesexten && !$isVideo) {
+            $ogImage = filter_var($tale->files_talesexten, FILTER_VALIDATE_URL) ? $tale->files_talesexten : url($tale->files_talesexten);
+        } else {
+            $ogImage = url('images/og-default.png');
+        }
+    @endphp
+    <meta property="og:type"               content="{{ $isVideo ? 'video.other' : 'article' }}" />
+    <meta property="og:title"              content="{{ $ogTitle }}" />
+    <meta property="og:description"        content="{{ $ogDescription }}" />
+    <meta property="og:image"              content="{{ $ogImage }}" />
+    <meta property="og:image:width"        content="600" />
+    <meta property="og:image:height"       content="600" />
+    <meta property="og:url"                content="{{ $ogUrl }}" />
+    <meta property="og:site_name"          content="SupperAge" />
+    @if($isVideo)
+    <meta property="og:video"              content="{{ $tale->files_talesexten }}" />
+    <meta property="og:video:type"         content="video/mp4" />
+    @endif
+    <meta name="twitter:card"              content="{{ $isVideo ? 'player' : 'summary_large_image' }}" />
+    <meta name="twitter:title"             content="{{ $ogTitle }}" />
+    <meta name="twitter:description"       content="{{ $ogDescription }}" />
+    <meta name="twitter:image"             content="{{ $ogImage }}" />
+    <meta name="twitter:site"              content="@supperage" />
+    <link rel="canonical"                  href="{{ $ogUrl }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
@@ -144,7 +180,7 @@
     </div>
 
     @foreach($userTales as $index => $tale)
-    <div class="card tale-slide" data-id="{{ $tale->tales_id }}">
+    <div class="card tale-slide" data-id="{{ $tale->tales_id }}" style="background-color: {{ $tale->bgnd_color ?? '#000000' }}">
         
         <div class="header">
             <a href="{{ url('update') }}" style="color: #fff; margin-right: 15px;"><i class="fa fa-arrow-left"></i></a>
@@ -188,17 +224,24 @@
 
         <div class="media-container" onclick="moveToNextSlide()">
             <div class="play-pause-overlay"><i class="fa fa-play"></i></div>
-            @if(Str::endsWith($tale->files_talesexten, ['.mp4', '.webm', '.ogg']))
+            @if($tale->files_talesexten && ($tale->type === 'video' || Str::endsWith($tale->files_talesexten, ['.mp4', '.webm', '.ogg', '.mov'])))
                 <video class="main-media tale-video" playsinline id="vid-{{ $tale->tales_id }}">
                     <source src="{{ $tale->files_talesexten }}" type="video/mp4">
                 </video>
-            @else
+            @elseif($tale->files_talesexten && $tale->type !== 'text')
                 <img src="{{ $tale->files_talesexten }}" class="main-media">
+            @else
+                {{-- Text-only story: show text centred on the coloured background --}}
+                <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; padding:24px; box-sizing:border-box;">
+                    <p style="color:{{ $tale->text_color ?? '#ffffff' }}; font-size:1.5rem; font-weight:700; text-align:center; margin:0; line-height:1.4;">
+                        {{ $tale->tales_content }}
+                    </p>
+                </div>
             @endif
         </div>
 
         <div class="overlay">
-            <div class="message">{{ $tale->tales_content }}</div>
+            <div class="message" style="color:{{ $tale->text_color ?? '#ffffff' }}">{{ $tale->tales_content }}</div>
             
     @if($tale->link_preview)
     @php $linkData = json_decode($tale->link_preview, true); @endphp

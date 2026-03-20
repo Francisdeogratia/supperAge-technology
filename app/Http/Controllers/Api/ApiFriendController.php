@@ -186,8 +186,16 @@ class ApiFriendController extends Controller
 
         if (!$req) return response()->json(['status' => 'none']);
 
+        if ($req->status === 'accepted') {
+            $status = 'friends';
+        } elseif ($req->status === 'pending') {
+            $status = $req->sender_id === $authId ? 'pending_sent' : 'pending_received';
+        } else {
+            $status = 'none';
+        }
+
         return response()->json([
-            'status'     => $req->status,
+            'status'     => $status,
             'request_id' => $req->id,
             'is_sender'  => $req->sender_id === $authId,
         ]);

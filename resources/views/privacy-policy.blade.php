@@ -20,7 +20,7 @@
     <meta http-equiv="X-UA-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>SupperAge all post and updates</title>
+    <title>Privacy Policy - SupperAge</title>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
@@ -542,121 +542,165 @@
 
     <div class="policy-content">
         <!-- Privacy Policy -->
-        <div class="policy-section active" id="privacy">
+        <div class=”policy-section active” id=”privacy”>
             <h2>SupperAge Privacy Policy</h2>
-            <p class="last-updated">Last Updated: January 1, 2026</p>
-            
-            <p>SupperAge ("we", "our", "us") operates a social-financial platform that allows users to chat, share content, complete tasks, earn rewards, fund wallets, send and receive payments, create stores, and buy or sell products and services.</p>
-            
-            <p>This Privacy Policy explains how we collect, use, share, and protect your information.</p>
+            <p class=”last-updated”>Last Updated: March 11, 2026</p>
+
+            <p>SupperAge (“we”, “our”, “us”) operates the SupperAge website at <strong>www.supperage.com</strong> and the <strong>SupperAge mobile application</strong> (available on Android and iOS). Together these are referred to as the “Platform”.</p>
+
+            <p>SupperAge is a social-financial platform that allows users to chat, share content, post updates, watch and create stories, go live, complete tasks, earn rewards, fund digital wallets, send and receive payments, shop in the marketplace, and create stores.</p>
+
+            <p>This Privacy Policy explains what data we collect, why we collect it, how we use and protect it, and your rights as a user. By using SupperAge — on the website or the mobile app — you agree to this policy.</p>
 
             <h3>1. Information We Collect</h3>
-            
-            <h4>1.1 Personal Information</h4>
-            <p>We may collect the following personal data:</p>
+
+            <h4>1.1 Account & Profile Information</h4>
+            <p>When you register or update your profile, we collect:</p>
             <ul>
                 <li>Full name</li>
                 <li>Username</li>
                 <li>Email address</li>
-                <li>Phone number</li>
-                <li>Profile photo</li>
+                <li>Phone number (optional)</li>
+                <li>Profile photo and cover image</li>
                 <li>Date of birth (optional)</li>
+                <li>Gender (optional)</li>
+                <li>Country, state, city (optional)</li>
+                <li>Short bio (optional)</li>
             </ul>
 
-            <h4>1.2 Communication Data</h4>
+            <h4>1.2 Content You Create</h4>
+            <p>We store any content you voluntarily submit, including:</p>
             <ul>
-                <li>Chat messages</li>
-                <li>Posts, comments, likes, shares</li>
+                <li>Posts, comments, likes, shares, and reposts</li>
                 <li>Stories, photos, and videos</li>
-                <li>Live-stream interactions</li>
+                <li>Direct messages and group chat messages</li>
+                <li>Voice notes sent in chats</li>
+                <li>Live-stream videos and live chat comments</li>
+                <li>Marketplace store listings and product images</li>
+                <li>Event listings</li>
             </ul>
 
             <h4>1.3 Financial Information</h4>
+            <p>When you use wallet features, we collect:</p>
             <ul>
-                <li>Wallet balance</li>
-                <li>Payment transactions</li>
-                <li>Bank details (for withdrawals)</li>
-                <li>Currency used</li>
-                <li>Funding or transfer history</li>
+                <li>Wallet balance and transaction history</li>
+                <li>Payment amounts, references, and currencies</li>
+                <li>Bank account details (only when you request a withdrawal)</li>
+                <li>Flutterwave payment records (our payment processor)</li>
             </ul>
+            <p>Wallet top-up, transfers, and withdrawals are processed on the SupperAge website. The mobile app opens these pages via an in-app browser (WebView) — we do not collect card details directly inside the app.</p>
 
-            <h4>1.4 Device Information</h4>
+            <h4>1.4 Device & Technical Information</h4>
+            <p>When you use the mobile app or website, we automatically collect:</p>
             <ul>
                 <li>IP address</li>
-                <li>Device model</li>
-                <li>Operating system</li>
-                <li>Browser</li>
-                <li>App usage data</li>
-                <li>Location (optional)</li>
+                <li>Device model and manufacturer</li>
+                <li>Operating system and version (Android or iOS)</li>
+                <li>App version</li>
+                <li>Browser type (website users)</li>
+                <li>App usage data and session logs</li>
+                <li>Crash reports</li>
             </ul>
 
+            <h4>1.5 Mobile App Permissions</h4>
+            <p>The SupperAge mobile app may request the following device permissions. Each permission is only used for its stated purpose:</p>
+            <ul>
+                <li><strong>Camera</strong> — To take photos or record videos for posts, stories, profile photos, and marketplace listings. Only activated when you tap a camera button.</li>
+                <li><strong>Microphone</strong> — To record voice notes in chats. Only activated when you record a voice message.</li>
+                <li><strong>Photo Library / Storage</strong> — To let you pick images or videos from your device for uploading.</li>
+                <li><strong>Push Notifications</strong> — To send you alerts about messages, friend requests, likes, comments, task rewards, and wallet activity. You can disable this in your device settings at any time.</li>
+                <li><strong>Internet Access</strong> — Required to connect to SupperAge servers.</li>
+            </ul>
+            <p>We do not access your contacts, SMS, call logs, calendar, or any other data not listed above.</p>
+
+            <h4>1.6 Location Data</h4>
+            <p>We do not actively track your GPS location. You may optionally set your country, state, and city in your profile. This is voluntary and never collected in the background.</p>
+
             <h3>2. How We Use Your Information</h3>
-            <p>We use your information to:</p>
+            <p>We use the information we collect to:</p>
             <ul>
                 <li>Create and manage your SupperAge account</li>
-                <li>Provide chatting, posting, live-streaming, and story features</li>
-                <li>Process wallet funding, withdrawals, and transfers</li>
-                <li>Verify payments and prevent fraud</li>
-                <li>Personalize your experience</li>
-                <li>Improve app performance and user experience</li>
-                <li>Provide customer support</li>
-                <li>Send important notifications</li>
+                <li>Enable all social features: posting, chatting, live-streaming, stories</li>
+                <li>Process wallet funding, transfers, and withdrawals</li>
+                <li>Detect and prevent fraud and unauthorized transactions</li>
+                <li>Personalize your feed and content recommendations</li>
+                <li>Send push notifications, emails, and in-app alerts</li>
+                <li>Verify identity when required (e.g. Blue Badge applications)</li>
+                <li>Respond to support requests</li>
+                <li>Improve app performance and fix bugs</li>
+                <li>Comply with legal obligations</li>
             </ul>
 
             <h3>3. How We Share Your Information</h3>
-            <p><strong>We do not sell your data.</strong></p>
-            <p>We may share information only with:</p>
+            <p><strong>We do not sell your personal data to anyone.</strong></p>
+            <p>We may share limited information only with:</p>
             <ul>
-                <li>Payment processors</li>
-                <li>Banks</li>
-                <li>Third-party service providers</li>
-                <li>Law enforcement (if required by law)</li>
+                <li><strong>Flutterwave</strong> — Our payment processor. They handle payment verification and receive transaction details when you fund your wallet. Flutterwave has its own Privacy Policy.</li>
+                <li><strong>Hosting & Infrastructure Providers</strong> — Our servers and cloud services that store your data securely.</li>
+                <li><strong>Google Analytics</strong> — We use analytics on the website to understand traffic patterns. No personally identifiable information is shared.</li>
+                <li><strong>Google AdSense</strong> — Used for website advertising. May use cookies. See Google's Privacy Policy.</li>
+                <li><strong>Law Enforcement</strong> — We may disclose information if required by law, court order, or to protect the safety of users or the public.</li>
             </ul>
-            <p>All partners follow strict privacy rules.</p>
+            <p>All third-party partners are required to handle data securely and only for the purposes we specify.</p>
 
-            <h3>4. Cookies & Tracking Technologies</h3>
-            <p>We use cookies to:</p>
+            <h3>4. Authentication Token (Mobile App)</h3>
+            <p>When you log in on the mobile app, we generate a secure authentication token (via Laravel Sanctum) that is stored on your device using encrypted secure storage. This token identifies your session without storing your password on the device. Logging out permanently deletes this token.</p>
+
+            <h3>5. Cookies & Tracking (Website)</h3>
+            <p>The SupperAge website uses cookies to:</p>
             <ul>
-                <li>Keep you logged in</li>
-                <li>Measure website traffic</li>
-                <li>Save your preferences</li>
-                <li>Improve performance</li>
+                <li>Keep you logged in during your session</li>
+                <li>Remember your preferences (e.g. dark mode)</li>
+                <li>Measure website traffic via Google Analytics</li>
+                <li>Serve relevant ads via Google AdSense</li>
             </ul>
+            <p>The mobile app does not use browser cookies. Authentication is handled via secure device storage.</p>
 
-            <h3>5. User Content</h3>
-            <p>Anything you post—including photos, stories, videos, comments—may be visible to other users depending on your privacy settings.</p>
-
-            <h3>6. Your Rights</h3>
-            <p>You can:</p>
+            <h3>6. Data Retention</h3>
             <ul>
-                <li>Edit your profile information</li>
-                <li>Delete posts</li>
-                <li>Request account deletion</li>
-                <li>Request your data</li>
-                <li>Control notifications</li>
-                <li>Change privacy settings</li>
+                <li>Your account and data are kept for as long as your account is active.</li>
+                <li>If you delete a post or story, it is removed from public view immediately and permanently deleted from our servers within 30 days.</li>
+                <li>Transaction records are retained for a minimum of 5 years for financial compliance purposes.</li>
+                <li>After account deletion, your personal data is removed within 30 days, except where we are legally required to retain it.</li>
             </ul>
 
-            <h3>7. Data Security</h3>
-            <p>We use:</p>
+            <h3>7. Your Rights & Controls</h3>
+            <p>As a SupperAge user, you have the right to:</p>
             <ul>
-                <li>Encryption</li>
-                <li>Secure servers</li>
-                <li>Two-factor authentication (optional)</li>
-                <li>Fraud monitoring</li>
+                <li><strong>Access your data</strong> — Request a copy of the data we hold about you</li>
+                <li><strong>Edit your profile</strong> — Update your name, email, photo, and other details at any time</li>
+                <li><strong>Delete your content</strong> — Delete your posts, stories, and comments</li>
+                <li><strong>Delete your account</strong> — Request permanent account deletion by emailing <a href=”mailto:info@supperage.com”>info@supperage.com</a>. We will process your request within 30 days.</li>
+                <li><strong>Control notifications</strong> — Turn off push notifications in your device settings or app settings</li>
+                <li><strong>Revoke app permissions</strong> — Revoke camera, microphone, or storage access at any time in your device settings</li>
+                <li><strong>Object to processing</strong> — Contact us to object to how we process your data</li>
             </ul>
-            <p>However, no system is 100% secure.</p>
 
-            <h3>8. Children's Privacy</h3>
-            <p>“SupperAge is not intended for children under 13 years old, and we actively remove underage accounts when identified.”.</p>
+            <h3>8. Data Security</h3>
+            <p>We protect your data with:</p>
+            <ul>
+                <li>HTTPS encryption on all data transfers</li>
+                <li>Encrypted secure storage for login tokens on the mobile app</li>
+                <li>Secure servers with access controls</li>
+                <li>Fraud monitoring and anomaly detection on wallet transactions</li>
+                <li>Password hashing (bcrypt) — we never store passwords in plain text</li>
+            </ul>
+            <p>However, no system is completely secure. If you suspect unauthorized access to your account, contact us immediately at <a href=”mailto:info@supperage.com”>info@supperage.com</a>.</p>
 
-            <h3>9. Changes to This Policy</h3>
-            <p>We may update this policy at any time. We will notify you of major changes.</p>
+            <h3>9. Children's Privacy</h3>
+            <p>SupperAge is not intended for children under 13 years old. Wallet features, marketplace, and live streaming are restricted to users aged 18 and above. We do not knowingly collect data from users under 13. If we discover an underage account, we will immediately suspend and delete it. Parents or guardians who believe their child has created an account should contact us at <a href=”mailto:info@supperage.com”>info@supperage.com</a>.</p>
 
-            <h3>10. Contact Us</h3>
-            <p>For questions or requests:</p>
+            <h3>10. Third-Party Links</h3>
+            <p>SupperAge may contain links to third-party websites or services. We are not responsible for the privacy practices of those external sites. Please read their privacy policies separately.</p>
+
+            <h3>11. Changes to This Policy</h3>
+            <p>We may update this Privacy Policy at any time. When we make significant changes, we will notify you via the app, email, or a notice on the website. Your continued use of SupperAge after changes are posted means you accept the updated policy.</p>
+
+            <h3>12. Contact Us</h3>
+            <p>For any privacy questions, data requests, or account deletion requests:</p>
             <p><strong>SupperAge Support Team</strong><br>
-            Email: <a href="mailto:info@supperage.com">info@supperage.com</a></p>
+            Email: <a href=”mailto:info@supperage.com”>info@supperage.com</a><br>
+            Website: <a href=”https://www.supperage.com” target=”_blank”>www.supperage.com</a></p>
         </div>
 
         <!-- Terms & Conditions -->
